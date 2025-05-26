@@ -11,15 +11,13 @@ import {
   Typography,
   TextField,
   InputAdornment,
-  IconButton,
-  InputBase,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import axios from "@/lib/axios";
 import FeedbackSnackbar from "@/components/Utils/FeedbackSnackbar";
 import PaginationBar from "@/components/Utils/PaginationBar";
+import SortToggle from "@/components/Utils/SortToggle";
 import statusChipConfig from "@/data/invitationStatusChipConfig";
-import clsx from "clsx";
 
 const InvitationsPageContainer = ({ data }) => {
   /*-- STATES --*/
@@ -41,6 +39,9 @@ const InvitationsPageContainer = ({ data }) => {
 
   // States for search functionality
   const [searchQuery, setSearchQuery] = useState("");
+
+  // States for sort functionality
+  const [sortOrder, setSortOrder] = useState("desc"); // default to descending
 
   /*-- FUNCTIONS --*/
 
@@ -79,7 +80,7 @@ const InvitationsPageContainer = ({ data }) => {
   };
 
   // Handler for fetching data with page and limit args setting the state to a new fresh one
-  const fetchData = async (page, limit, query = "") => {
+  const fetchData = async (page, limit, query = "", sortOrder = "desc") => {
     setLoading(true);
     try {
       const response = await axios.get(`/company/invites`, {
@@ -87,6 +88,7 @@ const InvitationsPageContainer = ({ data }) => {
           page,
           limit,
           search: query,
+          sortOrder,
         },
       });
       setCompanyInvitationsData(response.data);
@@ -102,13 +104,18 @@ const InvitationsPageContainer = ({ data }) => {
 
   // Handler for only page change
   const handlePageChange = async (event, newPage) => {
-    await fetchData(newPage, companyInvitationsData.limit, searchQuery);
+    await fetchData(
+      newPage,
+      companyInvitationsData.limit,
+      searchQuery,
+      sortOrder
+    );
   };
 
   // Handler for only limit change and revert back to page 1
   const handleLimitChange = async (event) => {
     const newLimit = parseInt(event.target.value, 10);
-    await fetchData(1, newLimit, searchQuery); // Go back to first page when limit changes
+    await fetchData(1, newLimit, searchQuery, sortOrder); // Go back to first page when limit changes
   };
 
   // Handler for search state change
@@ -120,140 +127,158 @@ const InvitationsPageContainer = ({ data }) => {
   // UseEffect for search debounce
   useEffect(() => {
     const timeout = setTimeout(() => {
-      fetchData(1, companyInvitationsData.limit, searchQuery);
-    }, 1000); // wait 1000ms after typing
+      fetchData(1, companyInvitationsData.limit, searchQuery, sortOrder);
+    }, 500); // wait 500ms after typing
 
     return () => clearTimeout(timeout);
   }, [searchQuery]);
+
+  // UseEffect for sorting
+  useEffect(() => {
+    fetchData(1, companyInvitationsData.limit, searchQuery, sortOrder);
+  }, [sortOrder]);
 
   return (
     <div className="pb-24">
       <div className="container m-auto">
         <h2 className="text-2xl font-semibold mb-4">Company Invitations</h2>
         {/* Search bar */}
-        <div className="flex items-center gap-2 w-full max-w-md mb-4">
-          <TextField
-            size="small"
-            fullWidth
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center gap-2 md:w-full max-w-md">
+            <TextField
+              size="small"
+              fullWidth
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+          </div>
+          <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
         </div>
         {companyInvitationsData.error ? (
-          <p>{companyInvitationsData.message}</p>
+          <p className="m-auto w-fit font-semibold text-2xl">
+            {companyInvitationsData.message}
+          </p>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-            {companyInvitationsData.data.map((invitation, index) => {
-              const date = new Date(invitation.createdAt);
-              const formattedWithTime = new Intl.DateTimeFormat("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-                hour: "numeric",
-                minute: "2-digit",
-                hour12: true,
-                timeZone: "Asia/Manila", // Optional: adjust as needed
-              }).format(date);
+            {companyInvitationsData.data.length < 1 ? (
+              <p className="m-auto w-fit font-semibold text-2xl">
+                No records found
+              </p>
+            ) : (
+              companyInvitationsData.data.map((invitation, index) => {
+                const date = new Date(invitation.createdAt);
+                const formattedWithTime = new Intl.DateTimeFormat("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  hour: "numeric",
+                  minute: "2-digit",
+                  hour12: true,
+                  timeZone: "Asia/Manila", // Optional: adjust as needed
+                }).format(date);
 
-              const config = statusChipConfig[invitation.status] || {};
+                const config = statusChipConfig[invitation.status] || {};
 
-              return (
-                <React.Fragment key={index}>
-                  {loading ? (
-                    <div className="p-4 bg-white rounded shadow">
-                      <div className="h-32 bg-gray-200 animate-pulse rounded mb-4" />
-                      <div className="h-4 bg-gray-200 animate-pulse rounded w-3/4 mb-2" />
-                      <div className="h-4 bg-gray-200 animate-pulse rounded w-1/2" />
-                    </div>
-                  ) : (
-                    <Card sx={{ minWidth: 275 }}>
-                      <CardContent className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
-                          <Avatar
-                            sx={{ bgcolor: "#ccc", width: 48, height: 48 }}
+                return (
+                  <React.Fragment key={index}>
+                    {loading ? (
+                      <div className="p-4 bg-white rounded shadow">
+                        <div className="h-32 bg-gray-200 animate-pulse rounded mb-4" />
+                        <div className="h-4 bg-gray-200 animate-pulse rounded w-3/4 mb-2" />
+                        <div className="h-4 bg-gray-200 animate-pulse rounded w-1/2" />
+                      </div>
+                    ) : (
+                      <Card sx={{ minWidth: 275 }}>
+                        <CardContent className="flex flex-col gap-2">
+                          <div className="flex items-center gap-2">
+                            <Avatar
+                              sx={{ bgcolor: "#ccc", width: 48, height: 48 }}
+                            >
+                              {invitation.email.charAt(0).toUpperCase()}
+                            </Avatar>
+                            <Typography variant="h5" component="div">
+                              {invitation.email}
+                            </Typography>
+                          </div>
+                          <div className="flex gap-2 items-center">
+                            <Chip
+                              label={invitation.status}
+                              sx={config.style}
+                              size="small"
+                              icon={config.icon}
+                            />
+                            <Chip
+                              label={invitation.role.toUpperCase()}
+                              sx={
+                                invitation.role === "admin"
+                                  ? {
+                                      backgroundColor:
+                                        "rgba(33, 150, 243, 0.1)",
+                                      color: "#2196f3",
+                                      borderColor: "#1976d2",
+                                      fontWeight: 600,
+                                    }
+                                  : {
+                                      backgroundColor:
+                                        "rgba(156, 39, 176, 0.1)",
+                                      color: "#9c27b0",
+                                      borderColor: "#9c27b0",
+                                      fontWeight: 600,
+                                    }
+                              }
+                              variant="outlined"
+                              size="small"
+                            />
+                          </div>
+                          <Typography
+                            sx={{ color: "text.secondary", fontSize: 14 }}
                           >
-                            {invitation.email.charAt(0).toUpperCase()}
-                          </Avatar>
-                          <Typography variant="h5" component="div">
-                            {invitation.email}
+                            Invited by {invitation.createdBy.name} <br />{" "}
+                            {formattedWithTime}
                           </Typography>
-                        </div>
-                        <div className="flex gap-2 items-center">
-                          <Chip
-                            label={invitation.status}
-                            sx={config.style}
+                        </CardContent>
+                        <CardActions sx={{ px: "1rem", pb: "1rem", pt: "0" }}>
+                          <Button
                             size="small"
-                            icon={config.icon}
-                          />
-                          <Chip
-                            label={invitation.role.toUpperCase()}
-                            sx={
-                              invitation.role === "admin"
-                                ? {
-                                    backgroundColor: "rgba(33, 150, 243, 0.1)",
-                                    color: "#2196f3",
-                                    borderColor: "#1976d2",
-                                    fontWeight: 600,
-                                  }
-                                : {
-                                    backgroundColor: "rgba(156, 39, 176, 0.1)",
-                                    color: "#9c27b0",
-                                    borderColor: "#9c27b0",
-                                    fontWeight: 600,
-                                  }
-                            }
                             variant="outlined"
-                            size="small"
-                          />
-                        </div>
-                        <Typography
-                          sx={{ color: "text.secondary", fontSize: 14 }}
-                        >
-                          Invited by {invitation.createdBy.name} <br />{" "}
-                          {formattedWithTime}
-                        </Typography>
-                      </CardContent>
-                      <CardActions sx={{ px: "1rem", pb: "1rem", pt: "0" }}>
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          sx={{
-                            borderColor: "red",
-                            color: "red",
-                            "&:hover": {
-                              backgroundColor: "rgba(255, 0, 0, 0.05)", // light red hover
-                            },
-                          }}
-                          onClick={() =>
-                            handleCancelInvitation(invitation.companyInviteId)
-                          }
-                          loading={
-                            loadingInviteId === invitation.companyInviteId
-                          }
-                          disabled={[
-                            "Cancelled",
-                            "Expired",
-                            "Accepted",
-                          ].includes(invitation.status)}
-                        >
-                          Cancel
-                        </Button>
-                      </CardActions>
-                    </Card>
-                  )}
-                </React.Fragment>
-              );
-            })}
+                            sx={{
+                              borderColor: "red",
+                              color: "red",
+                              "&:hover": {
+                                backgroundColor: "rgba(255, 0, 0, 0.05)", // light red hover
+                              },
+                            }}
+                            onClick={() =>
+                              handleCancelInvitation(invitation.companyInviteId)
+                            }
+                            loading={
+                              loadingInviteId === invitation.companyInviteId
+                            }
+                            disabled={[
+                              "Cancelled",
+                              "Expired",
+                              "Accepted",
+                            ].includes(invitation.status)}
+                          >
+                            Cancel
+                          </Button>
+                        </CardActions>
+                      </Card>
+                    )}
+                  </React.Fragment>
+                );
+              })
+            )}
           </div>
         )}
       </div>

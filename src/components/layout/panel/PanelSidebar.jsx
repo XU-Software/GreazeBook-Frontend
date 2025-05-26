@@ -55,13 +55,11 @@ export default function Sidebar() {
                           ? "text-blue-900"
                           : "text-gray-900",
                         isSidebarCollapsed
-                          ? "text-xs mt-1 opacity-100"
-                          : "opacity-100 text-lg"
+                          ? "text-xs truncate max-w-20 mt-1"
+                          : "text-lg"
                       )}
                     >
-                      {isSidebarCollapsed && item.title.includes(" ")
-                        ? item.title.split(" ")[0] + "..."
-                        : item.title}
+                      {item.title}
                     </span>
                   </Link>
                   {navigationPageList[index + 1]?.kind === "header" &&
