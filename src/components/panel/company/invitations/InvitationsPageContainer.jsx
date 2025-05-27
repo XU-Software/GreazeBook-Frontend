@@ -50,7 +50,7 @@ const InvitationsPageContainer = ({ data }) => {
     setLoadingInviteId(inviteId);
     try {
       const response = await axios.patch(
-        `/company/${inviteId}/cancel-invitation`
+        `/company/invitations/${inviteId}/cancel`
       );
 
       const data = response.data;

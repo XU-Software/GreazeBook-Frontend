@@ -11,6 +11,7 @@ import {
   Chip,
   CardActions,
   Button,
+  Tooltip,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import axios from "@/lib/axios";
@@ -18,7 +19,11 @@ import FeedbackSnackbar from "@/components/Utils/FeedbackSnackbar";
 import PaginationBar from "@/components/Utils/PaginationBar";
 import SortToggle from "@/components/Utils/SortToggle";
 
+import { useAppSelector } from "@/app/redux";
+
 const PeoplePageContainer = ({ data }) => {
+  const userData = useAppSelector((state) => state.global.userData);
+
   /*-- STATES --*/
 
   // Initial data fetched from the server
@@ -42,14 +47,90 @@ const PeoplePageContainer = ({ data }) => {
   // States for sort functionality
   const [sortOrder, setSortOrder] = useState("desc"); // default to descending
 
-  const handleLimitChange = () => {};
-  const handlePageChange = () => {};
+  const handleRemoveAccess = async (userId) => {
+    setLoadingUserId(userId);
+    try {
+      const response = await axios.patch(`/company/users/${userId}/delete`);
+
+      const data = response.data;
+
+      if (data.success) {
+        setCompanyUsersData((prev) => ({
+          ...prev,
+          data: prev.data.map((user) =>
+            user.userId === data.data.userId ? data.data : user
+          ),
+        }));
+        setSnackbarInfo({
+          show: true,
+          success: data.success,
+          message: data.message,
+        });
+      }
+    } catch (error) {
+      setSnackbarInfo({
+        show: true,
+        success: false,
+        message: error.message,
+      });
+    } finally {
+      setLoadingUserId(null);
+    }
+  };
+
+  // Handler for fetching data with page and limit args setting the state to a new fresh one
+  const fetchData = async (page, limit, query = "", sortOrder = "desc") => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`/company/users`, {
+        params: {
+          page,
+          limit,
+          search: query,
+          sortOrder,
+        },
+      });
+      setCompanyUsersData(response.data);
+    } catch (error) {
+      setCompanyUsersData({
+        error: true,
+        message: error.message || "Failed to fetch invitations",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handler for only page change
+  const handlePageChange = async (event, newPage) => {
+    await fetchData(newPage, companyUsersData.limit, searchQuery, sortOrder);
+  };
+
+  // Handler for only limit change and revert back to page 1
+  const handleLimitChange = async (event) => {
+    const newLimit = parseInt(event.target.value, 10);
+    await fetchData(1, newLimit, searchQuery, sortOrder); // Go back to first page when limit changes
+  };
 
   // Handler for search state change
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchQuery(value);
   };
+
+  // UseEffect for search debounce
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      fetchData(1, companyUsersData.limit, searchQuery, sortOrder);
+    }, 500); // wait 500ms after typing
+
+    return () => clearTimeout(timeout);
+  }, [searchQuery]);
+
+  // UseEffect for sorting
+  useEffect(() => {
+    fetchData(1, companyUsersData.limit, searchQuery, sortOrder);
+  }, [sortOrder]);
 
   return (
     <div className="pb-24">
@@ -109,22 +190,25 @@ const PeoplePageContainer = ({ data }) => {
                         <div className="h-4 bg-gray-200 animate-pulse rounded w-1/2" />
                       </div>
                     ) : (
-                      <Card sx={{ minWidth: 275 }}>
-                        <CardContent className="flex flex-col gap-2">
-                          <div className="flex gap-2">
+                      <Card
+                        sx={{
+                          minWidth: 275,
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <CardContent className="flex flex-col gap-2 h-full">
+                          <div className="relative flex items-center gap-4 h-full">
                             <Avatar
-                              sx={{ bgcolor: "#ccc", width: 100, height: 100 }}
+                              sx={{ bgcolor: "#ccc", width: 110, height: 110 }}
                               src={user.profilePicture}
                               alt={user.name}
                             >
                               {user.email.charAt(0).toUpperCase()}
                             </Avatar>
-                            <div className="flex flex-col gap-2">
-                              <Typography
-                                variant="h5"
-                                component="div"
-                                className="break-all"
-                              >
+                            <div className="flex flex-col gap-2 break-all border-l border-gray-200 px-4">
+                              <Typography variant="h5" component="div">
                                 {user.name}
                               </Typography>
                               <Typography component="div" className="text-sm">
@@ -159,6 +243,17 @@ const PeoplePageContainer = ({ data }) => {
                                 Joined {formattedWithTime}
                               </Typography>
                             </div>
+                            <Tooltip
+                              title={
+                                user.isDeleted ? "Access Removed" : "Has Access"
+                              }
+                            >
+                              <span
+                                className={`h-3 w-3 rounded-full absolute top-0 right-0 ${
+                                  user.isDeleted ? "bg-red-500" : "bg-green-500"
+                                }`}
+                              />
+                            </Tooltip>
                           </div>
                         </CardContent>
                         <CardActions sx={{ px: "1rem", pb: "1rem", pt: "0" }}>
@@ -172,17 +267,12 @@ const PeoplePageContainer = ({ data }) => {
                                 backgroundColor: "rgba(255, 0, 0, 0.05)", // light red hover
                               },
                             }}
-                            // onClick={() =>
-                            //   handleCancelInvitation(invitation.companyInviteId)
-                            // }
-                            // loading={
-                            //   loadingInviteId === invitation.companyInviteId
-                            // }
-                            // disabled={[
-                            //   "Cancelled",
-                            //   "Expired",
-                            //   "Accepted",
-                            // ].includes(invitation.status)}
+                            onClick={() => handleRemoveAccess(user.userId)}
+                            loading={loadingUserId === user.userId}
+                            disabled={
+                              user.isDeleted ||
+                              userData.data.email === user.email
+                            }
                           >
                             Remove Access
                           </Button>

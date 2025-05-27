@@ -1,15 +1,18 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const api = createApi({
-  baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1`,
+    credentials: "include",
+  }),
   reducerPath: "api",
-  tagTypes: ["DasboardMetrics"],
+  tagTypes: ["User", "CompanyInvitations", "CompanyUsers"],
   endpoints: (build) => ({
-    getDashboardMetrics: build.query({
-      query: () => "/dashboard",
-      providesTags: ["DasboardMetrics"],
+    getUser: build.query({
+      query: () => "/company/user-data",
+      providesTags: ["User"],
     }),
   }),
 });
 
-export const { useGetDashboardMetricsQuery } = api;
+export const { useGetUserQuery } = api;
