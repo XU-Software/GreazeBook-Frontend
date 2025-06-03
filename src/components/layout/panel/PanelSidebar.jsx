@@ -22,14 +22,16 @@ export default function Sidebar() {
       )}
     >
       {/* Navigation */}
-      <nav className="flex-1 px-2 py-4 overflow-auto">
+      <nav className="flex-1 px-2 py-4 overflow-auto overflow-x-hidden">
         {navigationPageList.map((item, index) => {
           const Icon = item.icon;
           return (
             <React.Fragment key={index}>
               {item.kind === "header" ? (
                 !isSidebarCollapsed && (
-                  <h2 className="py-2 font-semibold">{item.title}</h2>
+                  <h2 className="py-2 font-semibold whitespace-nowrap">
+                    {item.title}
+                  </h2>
                 )
               ) : (
                 <>
@@ -51,6 +53,7 @@ export default function Sidebar() {
                     />
                     <span
                       className={clsx(
+                        "whitespace-nowrap",
                         pathname === item.href
                           ? "text-blue-900"
                           : "text-gray-900",

@@ -1,12 +1,7 @@
 import React from "react";
-import PaginationBar from "@/components/Utils/PaginationBar";
 
 const DashboardPage = () => {
-  return (
-    <div className="">
-      <PaginationBar />
-    </div>
-  );
+  return <div className="">DashboardPage</div>;
 };
 
 export default DashboardPage;
