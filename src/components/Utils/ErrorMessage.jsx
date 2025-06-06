@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import FeedbackSnackbar from "./FeedbackSnackbar";
 import { Button, CircularProgress } from "@mui/material";

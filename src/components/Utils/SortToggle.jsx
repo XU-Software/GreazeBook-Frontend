@@ -1,7 +1,12 @@
+"use client";
+
 import { IconButton, Tooltip, Box } from "@mui/material";
 import { Sort, ArrowUpward, ArrowDownward } from "@mui/icons-material";
 
-export default function SortToggle({ sortOrder, setSortOrder }) {
+export default function SortToggle({
+  sortOrder = "desc",
+  setSortOrder = () => {},
+}) {
   const toggleSort = () => {
     setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
   };

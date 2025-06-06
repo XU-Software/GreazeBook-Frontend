@@ -25,7 +25,7 @@ const PageWrapper = ({ children }) => {
         isSidebarCollapsed ? "md:pl-24" : "md:pl-76"
       )}
     >
-      <div className="h-full w-full p-4">{children}</div>
+      {children}
     </div>
   );
 };

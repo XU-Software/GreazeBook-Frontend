@@ -2,8 +2,6 @@
 
 import React, { useState, useMemo } from "react";
 import {
-  TextField,
-  InputAdornment,
   Card,
   CardContent,
   Avatar,
@@ -13,13 +11,12 @@ import {
   Button,
   Tooltip,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
 import PaginationBar from "@/components/Utils/PaginationBar";
 import SortToggle from "@/components/Utils/SortToggle";
+import SearchBar from "@/components/Utils/SearchBar";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";
 import InviteModal from "./InviteModal";
-import { useDebounce } from "@/hooks/useDebounce";
 import { useAppSelector, useAppDispatch } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
 import {
@@ -39,16 +36,14 @@ const PeoplePageContainer = () => {
   const [sortOrder, setSortOrder] = useState("desc");
   const [search, setSearch] = useState("");
 
-  const debouncedSearch = useDebounce(search, 500);
-
   const queryArgs = useMemo(
     () => ({
       page,
       limit,
       sortOrder,
-      search: debouncedSearch,
+      search,
     }),
-    [page, limit, sortOrder, debouncedSearch]
+    [page, limit, sortOrder, search]
   );
 
   const {
@@ -105,12 +100,6 @@ const PeoplePageContainer = () => {
     setLimit(newLimit);
   };
 
-  // Handler for search state change
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
-    setSearch(value);
-  };
-
   if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center">
@@ -129,7 +118,7 @@ const PeoplePageContainer = () => {
   }
 
   return (
-    <div className="pb-24">
+    <div className="pb-24 pt-4 px-4">
       <div className="container m-auto">
         <div className="flex flex-row justify-between items-center w-full mb-4">
           <h2 className="text-2xl font-semibold">People</h2>
@@ -137,24 +126,7 @@ const PeoplePageContainer = () => {
         </div>
         {/* Search bar */}
         <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center gap-2 md:w-full max-w-md">
-            <TextField
-              size="small"
-              fullWidth
-              placeholder="Search..."
-              value={search}
-              onChange={handleSearchChange}
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                },
-              }}
-            />
-          </div>
+          <SearchBar search={search} setSearch={setSearch} />
           <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
         </div>
         {companyUsersData?.data.length < 1 ? (

@@ -13,9 +13,10 @@
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^7.1.0",
     "@mui/material": "^7.1.0",
-    "@mui/x-data-grid": "^8.5.0",
+    "@mui/x-date-pickers": "^8.5.1",
     "@reduxjs/toolkit": "^2.6.1",
     "axios": "^1.8.4",
+    "dayjs": "^1.11.13",
     "dotenv": "^16.4.7",
     "jose": "^6.0.11",
     "next": "15.2.3",
@@ -25,7 +26,8 @@
     "react-redux": "^9.2.0",
     "recharts": "^2.15.1",
     "redux-persist": "^6.0.0",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

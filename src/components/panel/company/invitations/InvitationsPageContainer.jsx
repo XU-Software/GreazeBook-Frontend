@@ -9,18 +9,15 @@ import {
   CardContent,
   Button,
   Typography,
-  TextField,
-  InputAdornment,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
 import PaginationBar from "@/components/Utils/PaginationBar";
 import SortToggle from "@/components/Utils/SortToggle";
+import SearchBar from "@/components/Utils/SearchBar";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";
 import statusChipConfig from "@/data/invitationStatusChipConfig";
 import { useAppDispatch } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
-import { useDebounce } from "@/hooks/useDebounce";
 import {
   useGetCompanyInvitesQuery,
   useCancelCompanyInviteMutation,
@@ -35,16 +32,14 @@ const InvitationsPageContainer = () => {
   const [sortOrder, setSortOrder] = useState("desc");
   const [search, setSearch] = useState("");
 
-  const debouncedSearch = useDebounce(search, 500);
-
   const queryArgs = useMemo(
     () => ({
       page,
       limit,
       sortOrder,
-      search: debouncedSearch,
+      search,
     }),
-    [page, limit, sortOrder, debouncedSearch]
+    [page, limit, sortOrder, search]
   );
 
   const {
@@ -100,12 +95,6 @@ const InvitationsPageContainer = () => {
     setLimit(newLimit);
   };
 
-  // Handler for search state change
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
-    setSearch(value);
-  };
-
   if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center">
@@ -124,29 +113,12 @@ const InvitationsPageContainer = () => {
   }
 
   return (
-    <div className="pb-24">
+    <div className="pb-24 pt-4 px-4">
       <div className="container m-auto">
         <h2 className="text-2xl font-semibold mb-4">Company Invitations</h2>
         {/* Search bar */}
         <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center gap-2 md:w-full max-w-md">
-            <TextField
-              size="small"
-              fullWidth
-              placeholder="Search..."
-              value={search}
-              onChange={handleSearchChange}
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                },
-              }}
-            />
-          </div>
+          <SearchBar search={search} setSearch={setSearch} />
           <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
         </div>
         {companyInvitesData?.data.length < 1 ? (

@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {
   FormControl,
@@ -10,11 +12,11 @@ import { useAppSelector } from "@/app/redux";
 import clsx from "clsx";
 
 const PaginationBar = ({
-  limit,
-  handleLimitChange,
-  totalPages,
-  page,
-  handlePageChange,
+  limit = 10,
+  handleLimitChange = () => {},
+  totalPages = 1,
+  page = 1,
+  handlePageChange = () => {},
 }) => {
   const isSidebarCollapsed = useAppSelector(
     (state) => state.global.isSidebarCollapsed
