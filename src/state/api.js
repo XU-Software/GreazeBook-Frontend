@@ -73,6 +73,30 @@ export const api = createApi({
       }),
       providesTags: ["Accounts"],
     }),
+    deleteAccounts: build.mutation({
+      query: (accounts) => ({
+        url: `/account/delete-accounts`,
+        method: "POST",
+        body: { accounts },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: ["Accounts"],
+    }),
+    importAccountsExcel: build.mutation({
+      query: (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        return {
+          url: `/account/import-data`,
+          method: "POST",
+          body: formData,
+        };
+      },
+      invalidatesTags: ["Accounts"],
+    }),
   }),
 });
 
@@ -84,4 +108,6 @@ export const {
   useCancelUserAccessMutation,
   useInviteCompanyUserMutation,
   useGetAccountsQuery,
+  useDeleteAccountsMutation,
+  useImportAccountsExcelMutation,
 } = api;

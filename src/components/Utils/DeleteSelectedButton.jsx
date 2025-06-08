@@ -10,11 +10,18 @@ import {
   Typography,
 } from "@mui/material";
 
-const DeleteSelectedButton = ({ selected = [], onDelete = () => {} }) => {
+const DeleteSelectedButton = ({
+  selected = new Set(),
+  setSelected = () => {},
+  handleDeleteSelected = () => {},
+  isDeleting = false,
+}) => {
   const [open, setOpen] = useState(false);
 
   const handleConfirmDelete = () => {
-    onDelete(selected);
+    const selectedArray = Array.from(selected);
+    handleDeleteSelected(selectedArray);
+    setSelected(new Set());
     setOpen(false);
   };
 
@@ -24,17 +31,18 @@ const DeleteSelectedButton = ({ selected = [], onDelete = () => {} }) => {
         variant="outlined"
         color="error"
         onClick={() => setOpen(true)}
-        disabled={selected.length === 0}
+        disabled={selected.size === 0}
+        loading={isDeleting}
       >
-        Delete Selected ({selected.length})
+        Delete Selected ({selected.size})
       </Button>
 
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete <strong>{selected.length}</strong>{" "}
-            {selected.length === 1 ? "item" : "items"}? This action cannot be
+            Are you sure you want to delete <strong>{selected.size}</strong>{" "}
+            {selected.size === 1 ? "item" : "items"}? This action cannot be
             undone.
           </Typography>
         </DialogContent>
@@ -46,6 +54,7 @@ const DeleteSelectedButton = ({ selected = [], onDelete = () => {} }) => {
             onClick={handleConfirmDelete}
             color="error"
             variant="contained"
+            loading={isDeleting}
           >
             Confirm Delete
           </Button>

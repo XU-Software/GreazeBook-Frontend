@@ -111,7 +111,7 @@ const PeoplePageContainer = () => {
   if (isError) {
     return (
       <ErrorMessage
-        message={error?.error || "Failed to load users"}
+        message={error?.data?.message || error?.error || "Failed to load users"}
         onRetry={refetch}
       />
     );

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { TextField, InputAdornment, IconButton } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
-const SearchBar = ({ setSearch = () => {} }) => {
+const SearchBar = ({ setSearch = () => {}, setPage = () => {} }) => {
   const [keyword, setKeyword] = useState("");
 
   const handleKeywordChange = (e) => {
@@ -20,6 +20,7 @@ const SearchBar = ({ setSearch = () => {} }) => {
   const handleSubmit = (e) => {
     e.preventDefault(); // prevent page reload
     setSearch(keyword.trim());
+    setPage(1);
   };
 
   return (

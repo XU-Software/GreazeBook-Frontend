@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -10,9 +10,37 @@ import {
   TableRow,
   Paper,
   Checkbox,
-  Button,
   Box,
 } from "@mui/material";
+
+const MemoizedTableRow = React.memo(
+  ({ row, id, columns, isSelected, onRowClick, onSelect, enableSelection }) => {
+    return (
+      <TableRow
+        key={id}
+        hover
+        onClick={() => onRowClick(row)}
+        sx={{ cursor: "pointer" }}
+      >
+        {enableSelection && (
+          <TableCell padding="checkbox" onClick={(e) => e.stopPropagation()}>
+            <Checkbox checked={isSelected} onChange={(e) => onSelect(e, id)} />
+          </TableCell>
+        )}
+        {columns.map((col) => (
+          <TableCell key={col.field}>
+            {typeof col.render === "function"
+              ? col.render(row[col.field], row)
+              : row[col.field]}
+          </TableCell>
+        ))}
+      </TableRow>
+    );
+  },
+  (prevProps, nextProps) => {
+    return prevProps.isSelected === nextProps.isSelected;
+  }
+);
 
 export default function DataTable({
   rows = [],
@@ -21,35 +49,23 @@ export default function DataTable({
   getRowId = (row) => row.id,
   enableSelection = true,
   selected = [],
-  onSelectChange = () => {},
+  setSelected = () => {},
 }) {
-  const isSelected = (id) => selected.includes(id);
-
   const handleSelectAll = (event) => {
     if (event.target.checked) {
-      const allIds = rows.map(getRowId);
-      onSelectChange(allIds);
+      setSelected(new Set(rows.map(getRowId)));
     } else {
-      onSelectChange([]);
+      setSelected(new Set());
     }
   };
 
-  const handleSelect = (event, id) => {
-    event.stopPropagation();
-    const selectedIndex = selected.indexOf(id);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = [...selected, id];
-    } else {
-      newSelected = selected.filter((item) => item !== id);
-    }
-
-    onSelectChange(newSelected);
-  };
-
-  const handleRowClick = (row) => {
-    onRowClick(getRowId(row), row);
+  const handleSelect = (e, id) => {
+    setSelected((prev) => {
+      const newSet = new Set(prev);
+      if (e.target.checked) newSet.add(id);
+      else newSet.delete(id);
+      return newSet;
+    });
   };
 
   return (
@@ -66,9 +82,9 @@ export default function DataTable({
                 {enableSelection && (
                   <TableCell padding="checkbox">
                     <Checkbox
-                      checked={selected.length === rows.length}
+                      checked={selected.size === rows.length}
                       indeterminate={
-                        selected.length > 0 && selected.length < rows.length
+                        selected.size > 0 && selected.size < rows.length
                       }
                       onChange={handleSelectAll}
                     />
@@ -89,34 +105,20 @@ export default function DataTable({
             </TableHead>
 
             <TableBody>
-              {rows.map((row) => {
+              {rows.map((row, index) => {
                 const id = getRowId(row);
+
                 return (
-                  <TableRow
+                  <MemoizedTableRow
                     key={id}
-                    hover
-                    onClick={() => handleRowClick(row)}
-                    sx={{ cursor: "pointer" }}
-                  >
-                    {enableSelection && (
-                      <TableCell
-                        padding="checkbox"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Checkbox
-                          checked={isSelected(id)}
-                          onChange={(e) => handleSelect(e, id)}
-                        />
-                      </TableCell>
-                    )}
-                    {columns.map((col) => (
-                      <TableCell key={col.field}>
-                        {typeof col.render === "function"
-                          ? col.render(row[col.field], row)
-                          : row[col.field]}
-                      </TableCell>
-                    ))}
-                  </TableRow>
+                    id={id}
+                    row={row}
+                    columns={columns}
+                    isSelected={selected.has(id)}
+                    onRowClick={onRowClick}
+                    onSelect={handleSelect}
+                    enableSelection={enableSelection}
+                  />
                 );
               })}
             </TableBody>

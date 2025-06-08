@@ -67,7 +67,11 @@ const PanelBootstrap = ({ children }) => {
   if (isError) {
     return (
       <div className="w-full h-screen flex items-center justify-center text-red-500 text-center">
-        <ErrorMessage message={error?.error || "Failed to load user data"} />
+        <ErrorMessage
+          message={
+            error?.data?.message || error?.error || "Failed to load user data"
+          }
+        />
       </div>
     );
   }
