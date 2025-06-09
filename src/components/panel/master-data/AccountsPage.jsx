@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   useGetAccountsQuery,
   useDeleteAccountsMutation,
+  useAddSingleAccountMutation,
   useImportAccountsExcelMutation,
 } from "@/state/api";
 import { useAppDispatch } from "@/app/redux";
@@ -15,10 +16,12 @@ import DynamicBreadcrumbs from "@/components/Utils/DynamicBreadcrumbs";
 import Table from "@/components/Utils/DataTable";
 import SearchBar from "@/components/Utils/SearchBar";
 import SortToggle from "@/components/Utils/SortToggle";
+import AddRowButton from "@/components/Utils/AddRowButton";
 import ImportExcel from "@/components/Utils/ImportExcel";
 import ExportExcel from "@/components/Utils/ExportExcel";
 import DeleteSelectedButton from "@/components/Utils/DeleteSelectedButton";
 import PaginationControls from "@/components/Utils/TablePagination";
+import numeral from "numeral";
 
 const columns = [
   {
@@ -60,7 +63,7 @@ const columns = [
 ];
 
 // Example data for preview of importing excel file inputs guide
-const exampleRow = {
+const rowGuide = {
   customerNumber: "CN-12345",
   accountName: "John Doe",
   tradeType: "Trade type",
@@ -70,37 +73,37 @@ const exampleRow = {
   contactInformation: "Email or Phone number",
 };
 
-const exampleColumns = [
+const columnsGuide = [
   {
     field: "customerNumber",
     headerName: "Customer Number",
-    type: "Text or Number",
+    type: "text",
   },
-  { field: "accountName", headerName: "Account Name", type: "Text" },
+  { field: "accountName", headerName: "Account Name", type: "text" },
   {
     field: "tradeType",
     headerName: "Trade Type",
-    type: "Text",
+    type: "text",
   },
   {
     field: "location",
     headerName: "Location",
-    type: "Text",
+    type: "text",
   },
   {
     field: "dsp",
     headerName: "DSP",
-    type: "Text",
+    type: "text",
   },
   {
     field: "balance",
     headerName: "Balance",
-    type: "Number only",
+    type: "number",
   },
   {
     field: "contactInformation",
     headerName: "Contact Information",
-    type: "Text or Number",
+    type: "text",
   },
 ];
 
@@ -170,6 +173,29 @@ const AccountsPageContainer = () => {
     }
   };
 
+  const [addSingleAccount, { isLoading: isAdding }] =
+    useAddSingleAccountMutation();
+
+  const handleAddSingleAccount = async (account) => {
+    try {
+      const res = await addSingleAccount(account).unwrap();
+      dispatch(
+        setShowSnackbar({
+          severity: "success",
+          message: res.message || "Account added",
+        })
+      );
+    } catch (error) {
+      dispatch(
+        setShowSnackbar({
+          severity: "error",
+          message:
+            error.data?.message || error.message || "Failed to add account",
+        })
+      );
+    }
+  };
+
   const [importAccountsExcel, { isLoading: isImporting }] =
     useImportAccountsExcelMutation();
 
@@ -213,7 +239,7 @@ const AccountsPageContainer = () => {
         tradeType: acc.tradeType,
         location: acc.location,
         dsp: acc.dsp,
-        balance: `₱${Number(acc.balance).toFixed(2)}`,
+        balance: `₱${numeral(acc.balance).format("0,0.00")}`,
         contactInformation: acc.contactInformation,
         createdAt: formattedDate,
       });
@@ -224,7 +250,7 @@ const AccountsPageContainer = () => {
         "Trade Type": acc.tradeType,
         Location: acc.location,
         DSP: acc.dsp,
-        "Balance (₱)": `₱${Number(acc.balance).toFixed(2)}`,
+        "Balance (₱)": `₱${numeral(acc.balance).format("0,0.00")}`,
         "Contact Info": acc.contactInformation,
         "Created At": formattedDate,
       });
@@ -254,19 +280,34 @@ const AccountsPageContainer = () => {
 
   return (
     <div className="min-h-full">
+      <DynamicBreadcrumbs />
       <div className="sticky top-18 z-10 bg-white py-2 px-4 shadow-sm">
-        <DynamicBreadcrumbs />
         <div className="flex flex-col lg:flex-row items-center justify-between gap-2 ">
           <div className="w-full lg:w-auto flex justify-between items-center gap-4">
             <SearchBar setSearch={setSearch} setPage={setPage} />
             <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
           </div>
-          <div className="flex items-center gap-2 md:gap-4">
+          <div className="flex flex-wrap items-center gap-2 md:gap-4">
+            <AddRowButton
+              columns={columnsGuide}
+              initialValues={{
+                customerNumber: "",
+                accountName: "",
+                tradeType: "",
+                location: "",
+                dsp: "",
+                balance: 0,
+                contactInformation: "",
+              }}
+              onSubmit={handleAddSingleAccount}
+              title="Add New Account"
+              buttonLabel="Account"
+            />
             <ImportExcel
               handleImportExcel={handleImportAccountsExcel}
               isImporting={isImporting}
-              exampleRow={exampleRow}
-              exampleColumns={exampleColumns}
+              rowGuide={rowGuide}
+              columnsGuide={columnsGuide}
             />
             <ExportExcel
               exportData={exportData}
@@ -285,7 +326,9 @@ const AccountsPageContainer = () => {
       <Table
         rows={rows}
         columns={columns}
-        onRowClick={() => router.push("/company/people")}
+        onRowClick={(accountId) =>
+          router.push(`/master-data/accounts/${accountId}`)
+        }
         enableSelection={true}
         selected={selected}
         setSelected={setSelected}

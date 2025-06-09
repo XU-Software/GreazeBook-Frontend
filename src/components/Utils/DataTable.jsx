@@ -19,7 +19,7 @@ const MemoizedTableRow = React.memo(
       <TableRow
         key={id}
         hover
-        onClick={() => onRowClick(row)}
+        onClick={() => onRowClick(id)}
         sx={{ cursor: "pointer" }}
       >
         {enableSelection && (

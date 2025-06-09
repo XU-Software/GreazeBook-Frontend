@@ -11,7 +11,7 @@ export default function DynamicBreadcrumbs() {
   const pathnames = pathname.split("/").filter(Boolean);
 
   return (
-    <Breadcrumbs aria-label="breadcrumb">
+    <Breadcrumbs aria-label="breadcrumb" sx={{ padding: 1 }}>
       {pathnames.map((segment, index) => {
         const fullPath = "/" + pathnames.slice(0, index + 1).join("/");
 

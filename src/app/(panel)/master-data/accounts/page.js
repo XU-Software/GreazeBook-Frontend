@@ -1,8 +1,8 @@
 import React from "react";
-import AccountsPageContainer from "@/components/panel/master-data/AccountsPageContainer";
+import AccountsPage from "@/components/panel/master-data/AccountsPage";
 
-const AccountsPage = () => {
-  return <AccountsPageContainer />;
+const Page = () => {
+  return <AccountsPage />;
 };
 
-export default AccountsPage;
+export default Page;

@@ -10,6 +10,12 @@ import React from "react";
 export default function Sidebar() {
   const pathname = usePathname();
 
+  // Get only the first two non-empty segments
+  const baseSegments = pathname.split("/").filter(Boolean).slice(0, 2);
+
+  // Join them back into a path
+  const basePath = "/" + baseSegments.join("/");
+
   const isSidebarCollapsed = useAppSelector(
     (state) => state.global.isSidebarCollapsed
   );
@@ -42,7 +48,7 @@ export default function Sidebar() {
                       isSidebarCollapsed
                         ? "flex-col justify-center gap-0"
                         : "flex-row transition-all duration-300 ease-in-out gap-5",
-                      pathname === item.href
+                      basePath === item.href
                         ? "bg-blue-100 text-blue-500 font-medium hover:bg-blue-200"
                         : "hover:bg-gray-100"
                     )}
@@ -54,7 +60,7 @@ export default function Sidebar() {
                     <span
                       className={clsx(
                         "whitespace-nowrap",
-                        pathname === item.href
+                        basePath === item.href
                           ? "text-blue-900"
                           : "text-gray-900",
                         isSidebarCollapsed

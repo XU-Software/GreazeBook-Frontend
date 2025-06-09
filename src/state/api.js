@@ -6,7 +6,7 @@ export const api = createApi({
     credentials: "include",
   }),
   reducerPath: "api",
-  tagTypes: ["User", "CompanyInvites", "CompanyUsers", "Accounts"],
+  tagTypes: ["User", "CompanyInvites", "CompanyUsers", "Accounts", "Account"],
   endpoints: (build) => ({
     getUser: build.query({
       query: () => "/company/user-data",
@@ -84,6 +84,17 @@ export const api = createApi({
       }),
       invalidatesTags: ["Accounts"],
     }),
+    addSingleAccount: build.mutation({
+      query: (account) => ({
+        url: `/account/add/single-account`,
+        method: "POST",
+        body: { account },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: ["Accounts"],
+    }),
     importAccountsExcel: build.mutation({
       query: (file) => {
         const formData = new FormData();
@@ -97,6 +108,12 @@ export const api = createApi({
       },
       invalidatesTags: ["Accounts"],
     }),
+    getSingleAccount: build.query({
+      query: (accountId) => ({
+        url: `/account/${accountId}`,
+      }),
+      providesTags: ["Account"],
+    }),
   }),
 });
 
@@ -109,5 +126,7 @@ export const {
   useInviteCompanyUserMutation,
   useGetAccountsQuery,
   useDeleteAccountsMutation,
+  useAddSingleAccountMutation,
   useImportAccountsExcelMutation,
+  useGetSingleAccountQuery,
 } = api;

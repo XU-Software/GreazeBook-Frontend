@@ -33,8 +33,8 @@ const modalStyle = {
 const ImportExcel = ({
   handleImportExcel = () => {},
   isImporting = false,
-  exampleRow = {},
-  exampleColumns = [],
+  rowGuide = {},
+  columnsGuide = [],
 }) => {
   const inputRef = useRef();
 
@@ -84,7 +84,7 @@ const ImportExcel = ({
           </Typography>
 
           <ul>
-            {exampleColumns.map((header) => (
+            {columnsGuide.map((header) => (
               <li key={header.field}>
                 {header.headerName} : {header.type}
               </li>
@@ -99,7 +99,7 @@ const ImportExcel = ({
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  {exampleColumns.map((header) => (
+                  {columnsGuide.map((header) => (
                     <TableCell key={header.field}>
                       {header.headerName}
                     </TableCell>
@@ -108,10 +108,8 @@ const ImportExcel = ({
               </TableHead>
               <TableBody>
                 <TableRow>
-                  {exampleColumns.map((key) => (
-                    <TableCell key={key.field}>
-                      {exampleRow[key.field]}
-                    </TableCell>
+                  {columnsGuide.map((key) => (
+                    <TableCell key={key.field}>{rowGuide[key.field]}</TableCell>
                   ))}
                 </TableRow>
               </TableBody>
