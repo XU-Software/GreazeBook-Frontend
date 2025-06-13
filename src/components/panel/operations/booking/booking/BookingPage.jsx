@@ -2,26 +2,30 @@
 
 import React from "react";
 import { useParams, usePathname } from "next/navigation";
-import { useGetSingleAccountQuery } from "@/state/api";
+import { useGetSingleBookingQuery } from "@/state/api";
 import NextLink from "next/link";
 import DynamicBreadcrumbs from "@/components/Utils/DynamicBreadcrumbs";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";
-import { Card, Grid, Typography, Tabs, Tab, Box, Button } from "@mui/material";
-import numeral from "numeral";
+import { Card, Button } from "@mui/material";
+import { formatDateWithTime } from "@/utils/dateFormatter";
+import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 
-const AccountPage = () => {
+const BookingPage = () => {
   const params = useParams();
   const pathName = usePathname();
-  const { accountId } = params;
+  const { bookingId } = params;
 
   const {
-    data: accountData,
+    data: bookingData,
     isLoading,
     isError,
     error,
     refetch,
-  } = useGetSingleAccountQuery(accountId, { refetchOnMountOrArgChange: true });
+  } = useGetSingleBookingQuery(bookingId, {
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+  });
 
   if (isLoading) {
     return (
@@ -43,43 +47,22 @@ const AccountPage = () => {
   }
 
   const {
-    account: {
-      customerNumber,
-      accountName,
-      tradeType,
-      location,
-      dsp,
-      balance,
-      contactInformation,
+    booking: {
+      orderDate,
+      deliveryDate,
+      customerName,
+      totalAmount,
+      term,
+      freebiesRemarksConcern,
+      status,
       createdAt,
       updatedAt,
+      account,
+      orders,
+      createdBy,
+      approvedBy,
     },
-    bookingGroupedByStatus,
-    bookingSummary,
-    invoiceSummary,
-    accountsReceivableGroupedByStatus,
-    accountsReceivableSummary,
-    paymentSummary,
-    pendingExcessGroupedByStatus,
-    pendingExcessSummary,
-    refundGroupedByStatus,
-    refundSummary,
-    creditMemoSummary,
-  } = accountData?.data;
-
-  const formatDateWithTime = (date) =>
-    new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-      timeZone: "Asia/Manila", // Optional: adjust as needed
-    }).format(date);
-
-  const formatToPesoCurrency = (amount) =>
-    `₱${numeral(amount).format("0,0.00")}`;
+  } = bookingData?.data;
 
   return (
     <div>
@@ -95,8 +78,7 @@ const AccountPage = () => {
             <p>Customer Number: {customerNumber}</p>
           </div>
           <div className="flex flex-col">
-            <p>Created: {formatDateWithTime(new Date(createdAt))}</p>
-            {/* <p>Updated: {formatDateWithTime(new Date(updatedAt))}</p> */}
+            <p>Created: {formatDateWithTime(createdAt)}</p>
           </div>
         </div>
         <div className="flex flex-col gap-2">
@@ -112,26 +94,26 @@ const AccountPage = () => {
           <p className="font-bold text-md border border-gray-300 p-2 bg-blue-100">
             STATEMENT OF ACCOUNT SUMMARY
           </p>
-          <p>Outstanding Balance: {formatToPesoCurrency(balance)}</p>
+          <p>Outstanding Balance: {formatToLocalCurrency(balance)}</p>
           <p>
             Total Sales Amount:{" "}
-            {formatToPesoCurrency(accountsReceivableSummary.totalSales || 0)}
+            {formatToLocalCurrency(accountsReceivableSummary.totalSales || 0)}
           </p>
           <p>
             Total Payments Amount:{" "}
-            {formatToPesoCurrency(paymentSummary._sum.amount || 0)}
+            {formatToLocalCurrency(paymentSummary._sum.amount || 0)}
           </p>
           <p>
             Over Payments Amount:{" "}
-            {formatToPesoCurrency(pendingExcessSummary.totalAmount || 0)}
+            {formatToLocalCurrency(pendingExcessSummary.totalAmount || 0)}
           </p>
           <p>
             Refunds Amount:{" "}
-            {formatToPesoCurrency(refundSummary.totalAmount || 0)}
+            {formatToLocalCurrency(refundSummary.totalAmount || 0)}
           </p>
           <p>
             Credit Memos Amount:{" "}
-            {formatToPesoCurrency(creditMemoSummary._sum.amount || 0)}
+            {formatToLocalCurrency(creditMemoSummary._sum.amount || 0)}
           </p>
         </div>
         <div className="flex flex-col gap-4">
@@ -285,14 +267,10 @@ const AccountPage = () => {
               {creditMemoSummary._count || 0}
             </p>
           </div>
-          {/* <p>Total Payments: {paymentSummary._sum.amount || 0}</p>
-          <p>Pending Excess: {pendingExcessSummary._sum.amount || 0}</p>
-          <p>Refunds: {refundSummary._sum.amount || 0}</p>
-          <p>Credit Memos: {creditMemoSummary._sum.amount || 0}</p> */}
         </div>
       </Card>
     </div>
   );
 };
 
-export default AccountPage;
+export default BookingPage;

@@ -1,5 +1,5 @@
 import React from "react";
-import AccountsPage from "@/components/panel/master-data/AccountsPage";
+import AccountsPage from "@/components/panel/master-data/accounts/AccountsPage";
 
 const Page = () => {
   return <AccountsPage />;

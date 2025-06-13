@@ -8,10 +8,14 @@ function FeedbackSnackbar({
   message = "",
   severity = "success",
 }) {
+  const lines = message.split("\n");
+
   return (
     <Snackbar open={open} autoHideDuration={4000} onClose={onClose}>
       <Alert onClose={onClose} severity={severity} sx={{ width: "100%" }}>
-        {message}
+        {lines.map((line, index) => (
+          <div key={index}>{line}</div>
+        ))}
       </Alert>
     </Snackbar>
   );

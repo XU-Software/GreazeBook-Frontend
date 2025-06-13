@@ -6,7 +6,16 @@ export const api = createApi({
     credentials: "include",
   }),
   reducerPath: "api",
-  tagTypes: ["User", "CompanyInvites", "CompanyUsers", "Accounts", "Account"],
+  tagTypes: [
+    "User",
+    "CompanyInvites",
+    "CompanyUsers",
+    "Accounts",
+    "Account",
+    "Products",
+    "Bookings",
+    "Booking",
+  ],
   endpoints: (build) => ({
     getUser: build.query({
       query: () => "/company/user-data",
@@ -114,6 +123,93 @@ export const api = createApi({
       }),
       providesTags: ["Account"],
     }),
+    getProducts: build.query({
+      query: ({ page = 1, limit = 10, search = "", sortOrder = "desc" }) => ({
+        url: `/product/all`,
+        params: {
+          page,
+          limit,
+          search,
+          sortOrder,
+        },
+      }),
+      providesTags: ["Products"],
+    }),
+    deleteProducts: build.mutation({
+      query: (products) => ({
+        url: `/product/delete-products`,
+        method: "POST",
+        body: { products },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: ["Products"],
+    }),
+    addSingleProduct: build.mutation({
+      query: (product) => ({
+        url: `/product/add/single-product`,
+        method: "POST",
+        body: { product },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: ["Products"],
+    }),
+    importProductsExcel: build.mutation({
+      query: (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        return {
+          url: `/product/import-data`,
+          method: "POST",
+          body: formData,
+        };
+      },
+      invalidatesTags: ["Products"],
+    }),
+    submitBooking: build.mutation({
+      query: ({ bookingInformation, account, orders }) => ({
+        url: `/booking/new`,
+        method: "POST",
+        body: { bookingInformation, account, orders },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: ["Bookings", "Products"],
+    }),
+    getBookings: build.query({
+      query: ({ page = 1, limit = 10, search = "", sortOrder = "desc" }) => ({
+        url: `/booking/all`,
+        params: {
+          page,
+          limit,
+          search,
+          sortOrder,
+        },
+      }),
+      providesTags: ["Bookings"],
+    }),
+    deleteBookings: build.mutation({
+      query: (bookings) => ({
+        url: `/booking/delete-bookings`,
+        method: "POST",
+        body: { bookings },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: ["Bookings"],
+    }),
+    getSingleBooking: build.query({
+      query: (bookingId) => ({
+        url: `/booking/${bookingId}`,
+      }),
+      providesTags: ["Booking"],
+    }),
   }),
 });
 
@@ -129,4 +225,12 @@ export const {
   useAddSingleAccountMutation,
   useImportAccountsExcelMutation,
   useGetSingleAccountQuery,
+  useGetProductsQuery,
+  useDeleteProductsMutation,
+  useAddSingleProductMutation,
+  useImportProductsExcelMutation,
+  useSubmitBookingMutation,
+  useGetBookingsQuery,
+  useDeleteBookingsMutation,
+  useGetSingleBookingQuery,
 } = api;

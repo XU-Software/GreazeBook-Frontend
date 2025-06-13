@@ -22,6 +22,7 @@ import {
   useGetCompanyInvitesQuery,
   useCancelCompanyInviteMutation,
 } from "@/state/api";
+import { formatDateWithTime } from "@/utils/dateFormatter";
 
 const InvitationsPageContainer = () => {
   const dispatch = useAppDispatch();
@@ -50,6 +51,7 @@ const InvitationsPageContainer = () => {
     refetch,
   } = useGetCompanyInvitesQuery(queryArgs, {
     refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
   });
 
   const [loadingInviteId, setLoadingInviteId] = useState(null);
@@ -130,16 +132,9 @@ const InvitationsPageContainer = () => {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
             {companyInvitesData?.data.map((invitation, index) => {
-              const date = new Date(invitation.createdAt);
-              const formattedWithTime = new Intl.DateTimeFormat("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-                hour: "numeric",
-                minute: "2-digit",
-                hour12: true,
-                timeZone: "Asia/Manila", // Optional: adjust as needed
-              }).format(date);
+              const formattedWithTime = formatDateWithTime(
+                invitation.createdAt
+              );
 
               const config = statusChipConfig[invitation.status] || {};
 

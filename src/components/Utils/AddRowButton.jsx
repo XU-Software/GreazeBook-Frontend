@@ -17,6 +17,7 @@ export default function AddRowButton({
   columns = [],
   initialValues = {},
   onSubmit,
+  isLoading = false,
 }) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(initialValues || {});
@@ -45,6 +46,7 @@ export default function AddRowButton({
         color="primary"
         onClick={handleOpen}
         startIcon={<Add />}
+        loading={isLoading}
       >
         {buttonLabel}
       </Button>
@@ -68,10 +70,15 @@ export default function AddRowButton({
             ))}
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose} color="inherit">
+            <Button onClick={handleClose} color="inherit" loading={isLoading}>
               Cancel
             </Button>
-            <Button type="submit" variant="contained" color="primary">
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              loading={isLoading}
+            >
               Submit
             </Button>
           </DialogActions>

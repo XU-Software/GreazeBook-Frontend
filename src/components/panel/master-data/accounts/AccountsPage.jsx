@@ -22,6 +22,7 @@ import ExportExcel from "@/components/Utils/ExportExcel";
 import DeleteSelectedButton from "@/components/Utils/DeleteSelectedButton";
 import PaginationControls from "@/components/Utils/TablePagination";
 import numeral from "numeral";
+import { formatDate } from "@/utils/dateFormatter";
 
 const columns = [
   {
@@ -107,7 +108,7 @@ const columnsGuide = [
   },
 ];
 
-const AccountsPageContainer = () => {
+const AccountsPage = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -136,6 +137,7 @@ const AccountsPageContainer = () => {
     refetch,
   } = useGetAccountsQuery(queryArgs, {
     refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
   });
 
   // Handler for only page change
@@ -159,7 +161,13 @@ const AccountsPageContainer = () => {
       dispatch(
         setShowSnackbar({
           severity: "success",
-          message: res.message || "Accounts deleted",
+          message:
+            "Batch deletion complete\n" +
+              res.failed
+                .map((acc) => `${acc.accountName} - ${acc.message}`)
+                .join("\n") ||
+            res.message ||
+            "Accounts deleted",
         })
       );
     } catch (error) {
@@ -226,11 +234,7 @@ const AccountsPageContainer = () => {
     if (!accountsData) return { rows, exportData };
 
     accountsData?.data.forEach((acc) => {
-      const formattedDate = new Intl.DateTimeFormat("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      }).format(new Date(acc.createdAt));
+      const formattedDate = formatDate(acc.createdAt);
 
       rows.push({
         id: acc.accountId,
@@ -299,6 +303,7 @@ const AccountsPageContainer = () => {
                 balance: 0,
                 contactInformation: "",
               }}
+              isLoading={isAdding}
               onSubmit={handleAddSingleAccount}
               title="Add New Account"
               buttonLabel="Account"
@@ -344,4 +349,4 @@ const AccountsPageContainer = () => {
   );
 };
 
-export default AccountsPageContainer;
+export default AccountsPage;

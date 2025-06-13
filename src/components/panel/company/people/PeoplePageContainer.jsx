@@ -23,6 +23,7 @@ import {
   useGetCompanyUsersQuery,
   useCancelUserAccessMutation,
 } from "@/state/api";
+import { formatDateWithTime } from "@/utils/dateFormatter";
 
 const PeoplePageContainer = () => {
   const dispatch = useAppDispatch();
@@ -54,6 +55,7 @@ const PeoplePageContainer = () => {
     refetch,
   } = useGetCompanyUsersQuery(queryArgs, {
     refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
   });
 
   // Loading state for specific user while cancelling
@@ -136,16 +138,7 @@ const PeoplePageContainer = () => {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
             {companyUsersData?.data.map((user, index) => {
-              const date = new Date(user.createdAt);
-              const formattedWithTime = new Intl.DateTimeFormat("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-                hour: "numeric",
-                minute: "2-digit",
-                hour12: true,
-                timeZone: "Asia/Manila", // Optional: adjust as needed
-              }).format(date);
+              const formattedWithTime = formatDateWithTime(user.createdAt);
 
               return (
                 <Card
