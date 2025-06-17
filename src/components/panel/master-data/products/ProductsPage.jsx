@@ -23,9 +23,8 @@ import DeleteSelectedButton from "@/components/Utils/DeleteSelectedButton";
 import PaginationControls from "@/components/Utils/TablePagination";
 import { formatDate } from "@/utils/dateFormatter";
 import { Chip, Tooltip } from "@mui/material";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import ErrorIcon from "@mui/icons-material/Error";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { WarningAmber, Error, CheckCircle } from "@mui/icons-material";
+import { usePathname } from "next/navigation";
 
 const columns = [
   {
@@ -48,12 +47,12 @@ const columns = [
     field: "totalStocks",
     headerName: "Total Stocks",
     render: (value) => {
-      if (value === 0) {
+      if (value < 0) {
         return (
-          <Tooltip title="Product is out of stock">
+          <Tooltip title="Backorder — stock needs replenishment">
             <Chip
-              icon={<ErrorIcon sx={{ fontSize: 18 }} />}
-              label="Out of Stock"
+              icon={<Error sx={{ fontSize: 18 }} />}
+              label={`Backorder (${Math.abs(value)})`}
               color="error"
               size="small"
             />
@@ -63,9 +62,9 @@ const columns = [
 
       if (value < 20) {
         return (
-          <Tooltip title="Running low on inventory">
+          <Tooltip title="Low physical stock">
             <Chip
-              icon={<WarningAmberIcon sx={{ fontSize: 18 }} />}
+              icon={<WarningAmber sx={{ fontSize: 18 }} />}
               label={`Low Stock (${value})`}
               color="warning"
               size="small"
@@ -77,50 +76,7 @@ const columns = [
       return (
         <Tooltip title="Sufficient stock available">
           <Chip
-            icon={<CheckCircleIcon sx={{ fontSize: 18 }} />}
-            label={`In Stock (${value})`}
-            color="success"
-            size="small"
-          />
-        </Tooltip>
-      );
-    },
-    minWidth: 150,
-  },
-  {
-    field: "availableStocks",
-    headerName: "Available Stocks",
-    render: (value) => {
-      if (value === 0) {
-        return (
-          <Tooltip title="Product is out of stock">
-            <Chip
-              icon={<ErrorIcon sx={{ fontSize: 18 }} />}
-              label="Out of Stock"
-              color="error"
-              size="small"
-            />
-          </Tooltip>
-        );
-      }
-
-      if (value < 20) {
-        return (
-          <Tooltip title="Running low on inventory">
-            <Chip
-              icon={<WarningAmberIcon sx={{ fontSize: 18 }} />}
-              label={`Low Stock (${value})`}
-              color="warning"
-              size="small"
-            />
-          </Tooltip>
-        );
-      }
-
-      return (
-        <Tooltip title="Sufficient stock available">
-          <Chip
-            icon={<CheckCircleIcon sx={{ fontSize: 18 }} />}
+            icon={<CheckCircle sx={{ fontSize: 18 }} />}
             label={`In Stock (${value})`}
             color="success"
             size="small"
@@ -143,8 +99,7 @@ const rowGuide = {
   productName: "Product1",
   productFamily: "Product Family1",
   uom: "123",
-  totalStocks: "123 (Must be greater than or equal to available stocks)",
-  availableStocks: "123",
+  totalStocks: "123 or 0",
 };
 
 const columnsGuide = [
@@ -169,14 +124,10 @@ const columnsGuide = [
     headerName: "Total Stocks",
     type: "number",
   },
-  {
-    field: "availableStocks",
-    headerName: "Available Stocks",
-    type: "number",
-  },
 ];
 
 const ProductsPage = () => {
+  const pathName = usePathname();
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -311,7 +262,6 @@ const ProductsPage = () => {
         productFamily: prod.productFamily,
         uom: prod.uom,
         totalStocks: prod.totalStocks,
-        availableStocks: prod.availableStocks,
         createdAt: formattedDate,
       });
 
@@ -321,7 +271,6 @@ const ProductsPage = () => {
         "Product Family": prod.productFamily,
         UOM: prod.uom,
         "Total Stocks": prod.totalStocks,
-        "Available Stocks": prod.availableStocks,
         "Created At": formattedDate,
       });
     });
@@ -366,7 +315,6 @@ const ProductsPage = () => {
                 productFamily: "",
                 uom: 0,
                 totalStocks: 0,
-                availableStocks: 0,
               }}
               isLoading={isAdding}
               onSubmit={handleAddSingleProduct}
@@ -396,9 +344,7 @@ const ProductsPage = () => {
       <Table
         rows={rows}
         columns={columns}
-        onRowClick={(productId) =>
-          router.push(`/master-data/products/${productId}`)
-        }
+        onRowClick={(productId) => router.push(`${pathName}/${productId}`)}
         enableSelection={true}
         selected={selected}
         setSelected={setSelected}

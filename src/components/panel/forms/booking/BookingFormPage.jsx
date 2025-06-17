@@ -96,19 +96,6 @@ export default function BookingFormPage() {
         })
       );
     } catch (error) {
-      // special error response from backend if available stocks is less than quantity, this updates local state
-      if (error?.status === 400 && error?.data?.product) {
-        const updatedProduct = error.data.product;
-
-        // Update local product inside ordersData
-        setOrdersData((prev) =>
-          prev.map((order) =>
-            order.product.productId === updatedProduct.productId
-              ? { ...order, product: updatedProduct }
-              : order
-          )
-        );
-      }
       dispatch(
         setShowSnackbar({
           severity: "error",
@@ -129,9 +116,6 @@ export default function BookingFormPage() {
       }}
       className="container m-auto"
     >
-      {/* <Typography variant="h4" mb={3} fontWeight={600} textAlign="center">
-        Create Booking
-      </Typography> */}
       <h2 className="text-2xl font-semibold my-4">Create Booking</h2>
       <form onSubmit={handleSubmit}>
         <Paper elevation={3} sx={{ p: 3, mb: 4 }}>

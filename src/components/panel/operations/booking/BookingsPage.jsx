@@ -17,6 +17,7 @@ import PaginationControls from "@/components/Utils/TablePagination";
 import { formatDate } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 import { Chip } from "@mui/material";
+import { usePathname } from "next/navigation";
 
 const statusColorMap = {
   Pending: "warning",
@@ -85,6 +86,7 @@ const columns = [
 ];
 
 const BookingsPage = () => {
+  const pathName = usePathname();
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -209,7 +211,7 @@ const BookingsPage = () => {
     return (
       <ErrorMessage
         message={
-          error?.data?.message || error?.error || "Failed to load accounts"
+          error?.data?.message || error?.error || "Failed to load bookings"
         }
         onRetry={refetch}
       />
@@ -243,9 +245,7 @@ const BookingsPage = () => {
       <Table
         rows={rows}
         columns={columns}
-        onRowClick={(bookingId) =>
-          router.push(`/operations/booking/${bookingId}`)
-        }
+        onRowClick={(bookingId) => router.push(`${pathName}/${bookingId}`)}
         enableSelection={true}
         selected={selected}
         setSelected={setSelected}

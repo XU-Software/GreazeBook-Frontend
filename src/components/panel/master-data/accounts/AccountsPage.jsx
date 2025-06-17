@@ -23,6 +23,7 @@ import DeleteSelectedButton from "@/components/Utils/DeleteSelectedButton";
 import PaginationControls from "@/components/Utils/TablePagination";
 import numeral from "numeral";
 import { formatDate } from "@/utils/dateFormatter";
+import { usePathname } from "next/navigation";
 
 const columns = [
   {
@@ -109,6 +110,7 @@ const columnsGuide = [
 ];
 
 const AccountsPage = () => {
+  const pathName = usePathname();
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -331,9 +333,7 @@ const AccountsPage = () => {
       <Table
         rows={rows}
         columns={columns}
-        onRowClick={(accountId) =>
-          router.push(`/master-data/accounts/${accountId}`)
-        }
+        onRowClick={(accountId) => router.push(`${pathName}/${accountId}`)}
         enableSelection={true}
         selected={selected}
         setSelected={setSelected}

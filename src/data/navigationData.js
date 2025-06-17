@@ -50,28 +50,28 @@ export const navigationPageList = [
     title: "Operations",
   },
   {
-    title: "Accounts Receivable",
-    href: "/operations/accounts-receivable",
+    title: "Accounts Receivables",
+    href: "/operations/accounts-receivables",
     icon: AccountBalanceWalletIcon,
   },
   {
-    title: "Booking",
-    href: "/operations/booking",
+    title: "Bookings",
+    href: "/operations/bookings",
     icon: EventNoteIcon,
   },
   {
-    title: "Invoice",
-    href: "/operations/invoice",
+    title: "Invoices",
+    href: "/operations/invoices",
     icon: ReceiptLongIcon,
   },
   {
-    title: "Order",
-    href: "/operations/order",
+    title: "Orders",
+    href: "/operations/orders",
     icon: LocalShippingIcon,
   },
   {
     title: "Sales",
-    href: "/operations/sale",
+    href: "/operations/sales",
     icon: BarChartIcon,
   },
   {

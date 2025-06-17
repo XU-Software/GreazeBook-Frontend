@@ -210,6 +210,17 @@ export const api = createApi({
       }),
       providesTags: ["Booking"],
     }),
+    updatePendingBooking: build.mutation({
+      query: ({ bookingId, booking }) => ({
+        url: `/booking/${bookingId}/update`,
+        method: "POST",
+        body: { booking },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: ["Booking"],
+    }),
   }),
 });
 
@@ -233,4 +244,5 @@ export const {
   useGetBookingsQuery,
   useDeleteBookingsMutation,
   useGetSingleBookingQuery,
+  useUpdatePendingBookingMutation,
 } = api;

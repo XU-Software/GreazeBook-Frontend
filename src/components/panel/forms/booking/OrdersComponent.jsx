@@ -81,9 +81,6 @@ const OrdersComponent = ({ ordersData = [], setOrdersData = () => {} }) => {
               <TableCell align="right">
                 <strong>Subtotal</strong>
               </TableCell>
-              <TableCell align="center">
-                <strong>Available Stocks</strong>
-              </TableCell>
               <TableCell>
                 <strong>Actions</strong>
               </TableCell>
@@ -92,7 +89,7 @@ const OrdersComponent = ({ ordersData = [], setOrdersData = () => {} }) => {
           <TableBody>
             {ordersData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} align="center">
+                <TableCell colSpan={5} align="center">
                   <Typography variant="body2" color="textSecondary">
                     No orders added yet. Use the form below to add your first
                     order.
@@ -101,18 +98,6 @@ const OrdersComponent = ({ ordersData = [], setOrdersData = () => {} }) => {
               </TableRow>
             ) : (
               ordersData.map((order, index) => {
-                const available = order.product.availableStocks || 0;
-
-                const totalOrderedQty = ordersData
-                  .filter(
-                    (o, i) =>
-                      o.product.productId === order.product.productId &&
-                      i <= index
-                  )
-                  .reduce((sum, o) => sum + Number(o.quantity || 0), 0);
-
-                const isLowStock = totalOrderedQty > available;
-
                 return (
                   <TableRow key={index}>
                     <TableCell>{order.product.productName}</TableCell>
@@ -123,38 +108,6 @@ const OrdersComponent = ({ ordersData = [], setOrdersData = () => {} }) => {
                         ? formatToLocalCurrency(order.quantity * order.price)
                         : "-"}
                     </TableCell>
-
-                    <TableCell align="center" sx={{ width: 200 }}>
-                      {available === 0 ? (
-                        <Tooltip title="Product is out of stock">
-                          <Chip
-                            icon={<ErrorIcon sx={{ fontSize: 18 }} />}
-                            label="Out of Stock"
-                            color="error"
-                            size="small"
-                          />
-                        </Tooltip>
-                      ) : isLowStock ? (
-                        <Tooltip title="Running low on inventory">
-                          <Chip
-                            icon={<WarningAmberIcon sx={{ fontSize: 18 }} />}
-                            label={`Only ${available} left`}
-                            color="warning"
-                            size="small"
-                          />
-                        </Tooltip>
-                      ) : (
-                        <Tooltip title="Sufficient stock available">
-                          <Chip
-                            icon={<CheckCircleIcon sx={{ fontSize: 18 }} />}
-                            label={`In Stock (${available})`}
-                            color="success"
-                            size="small"
-                          />
-                        </Tooltip>
-                      )}
-                    </TableCell>
-
                     <TableCell align="center" sx={{ width: 60 }}>
                       <IconButton
                         color="error"
