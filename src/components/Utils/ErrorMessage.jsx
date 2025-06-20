@@ -19,7 +19,7 @@ const ErrorMessage = ({ message = "Something went wrong", onRetry }) => {
 
     try {
       setIsRetrying(true);
-      await onRetry();
+      await onRetry().unwrap();
       setSnackbarInfo({
         show: true,
         success: true,
@@ -30,9 +30,9 @@ const ErrorMessage = ({ message = "Something went wrong", onRetry }) => {
         show: true,
         success: false,
         message:
-          err?.data?.message ||
-          err?.error ||
-          err?.message ||
+          error?.data?.message ||
+          error?.error ||
+          error?.message ||
           "Retry failed. Please try again later.",
       });
     } finally {

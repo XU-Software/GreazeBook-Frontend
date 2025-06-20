@@ -207,7 +207,7 @@ const BookingsPage = () => {
     );
   }
 
-  if (isError) {
+  if (isError || !bookingsData) {
     return (
       <ErrorMessage
         message={

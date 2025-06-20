@@ -110,7 +110,7 @@ const PeoplePageContainer = () => {
     );
   }
 
-  if (isError) {
+  if (isError || !companyUsersData) {
     return (
       <ErrorMessage
         message={error?.data?.message || error?.error || "Failed to load users"}

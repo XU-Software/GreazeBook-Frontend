@@ -35,7 +35,7 @@ const AccountPage = () => {
     );
   }
 
-  if (isError) {
+  if (isError || !accountData) {
     return (
       <ErrorMessage
         message={

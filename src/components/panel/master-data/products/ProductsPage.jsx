@@ -286,7 +286,7 @@ const ProductsPage = () => {
     );
   }
 
-  if (isError) {
+  if (isError || !productsData) {
     return (
       <ErrorMessage
         message={

@@ -84,7 +84,7 @@ export default function SearchableSelect({
     );
   }
 
-  if (isError) {
+  if (isError || !response) {
     return (
       <ErrorMessage
         message={error?.data?.message || error?.error || "Failed to load data"}

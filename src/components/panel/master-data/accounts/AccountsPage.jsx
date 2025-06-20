@@ -273,7 +273,7 @@ const AccountsPage = () => {
     );
   }
 
-  if (isError) {
+  if (isError || !accountsData) {
     return (
       <ErrorMessage
         message={

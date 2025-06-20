@@ -105,7 +105,7 @@ const InvitationsPageContainer = () => {
     );
   }
 
-  if (isError) {
+  if (isError || !companyInvitesData) {
     return (
       <ErrorMessage
         message={
