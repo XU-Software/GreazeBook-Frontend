@@ -221,6 +221,17 @@ export const api = createApi({
       }),
       invalidatesTags: ["Booking"],
     }),
+    updatePendingOrders: build.mutation({
+      query: ({ bookingId, ordersToUpdate, orderIdsToDelete }) => ({
+        url: `/booking/${bookingId}/orders`,
+        method: "PATCH",
+        body: { ordersToUpdate, orderIdsToDelete },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: ["Booking"],
+    }),
   }),
 });
 
@@ -245,4 +256,5 @@ export const {
   useDeleteBookingsMutation,
   useGetSingleBookingQuery,
   useUpdatePendingBookingMutation,
+  useUpdatePendingOrdersMutation,
 } = api;

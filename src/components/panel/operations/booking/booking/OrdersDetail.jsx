@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Card,
   CardContent,
@@ -20,6 +20,8 @@ import {
 import { Edit, Check, Close, Delete } from "@mui/icons-material";
 import EditableCell from "@/components/Utils/EditableCell";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
+import AddRowButton from "@/components/Utils/AddRowButton";
+import AddOrderModal from "./AddOrderModal";
 
 const OrdersDetail = ({
   bookingData = {},
@@ -31,7 +33,10 @@ const OrdersDetail = ({
   setEditOrders = () => {},
   handleUpdateOrders = () => {},
   isUpdating = false,
+  bookingId = "",
 }) => {
+  const [toggleModal, setToggelModal] = useState(false);
+
   const liveTotalAmount = useMemo(() => {
     if (!editOrders) return null;
 
@@ -70,10 +75,12 @@ const OrdersDetail = ({
                 {/* Needed to wrap disabled button to ensure Tooltip works */}
                 <Button
                   variant="outlined"
-                  disabled={bookingData.status === "Approved"}
+                  disabled={bookingData.status === "Approved" || editOrders}
+                  onClick={() => setToggelModal(true)}
                 >
                   + Add Order
                 </Button>
+                {/* <AddRowButton  /> */}
               </span>
             </Tooltip>
             {bookingData.status === "Pending" && editOrders ? (
@@ -82,7 +89,13 @@ const OrdersDetail = ({
                   <IconButton
                     variant="contained"
                     color="primary"
-                    onClick={() => handleUpdateOrders()}
+                    onClick={() =>
+                      handleUpdateOrders(
+                        bookingId,
+                        ordersFormData,
+                        ordersToDelete
+                      )
+                    }
                     loading={isUpdating}
                     size="medium"
                   >
@@ -99,6 +112,7 @@ const OrdersDetail = ({
                       setOrdersToDelete(new Set());
                       setEditOrders(false);
                     }}
+                    loading={isUpdating}
                   >
                     <Close fontSize="medium" />
                   </IconButton>
@@ -224,6 +238,7 @@ const OrdersDetail = ({
           </Table>
         </TableContainer>
       </CardContent>
+      <AddOrderModal open={toggleModal} onClose={() => setToggelModal(false)} />
     </Card>
   );
 };

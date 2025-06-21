@@ -5,6 +5,7 @@ import { useParams, usePathname } from "next/navigation";
 import {
   useGetSingleBookingQuery,
   useUpdatePendingBookingMutation,
+  useUpdatePendingOrdersMutation,
 } from "@/state/api";
 import NextLink from "next/link";
 import DynamicBreadcrumbs from "@/components/Utils/DynamicBreadcrumbs";
@@ -98,6 +99,52 @@ const BookingPage = () => {
     }
   };
 
+  const [updatePendingOrders, { isLoading: isUpdatingOrders }] =
+    useUpdatePendingOrdersMutation();
+
+  const handleUpdateOrders = async (
+    bookingId,
+    ordersToUpdateMap,
+    orderIdsToDeleteSet
+  ) => {
+    try {
+      if (ordersToUpdateMap.size === 0 && orderIdsToDeleteSet.size === 0) {
+        throw new Error("No changes made", 400);
+      }
+      const ordersToUpdate = Array.from(ordersToUpdateMap.entries()).map(
+        ([orderId, data]) => ({
+          orderId,
+          ...data,
+        })
+      );
+
+      const orderIdsToDelete = Array.from(orderIdsToDeleteSet);
+
+      const res = await updatePendingOrders({
+        bookingId,
+        ordersToUpdate,
+        orderIdsToDelete,
+      }).unwrap();
+      dispatch(
+        setShowSnackbar({
+          severity: "success",
+          message: res.message || "Orders updated",
+        })
+      );
+      setOrdersFormData(new Map());
+      setOrdersToDelete(new Set());
+      setEditOrders(false);
+    } catch (error) {
+      dispatch(
+        setShowSnackbar({
+          severity: "error",
+          message:
+            error.data?.message || error.message || "Failed to update orders",
+        })
+      );
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center">
@@ -150,15 +197,16 @@ const BookingPage = () => {
         />
         {/* Orders Details */}
         <OrdersDetail
-          bookingData={bookingData.data}
-          ordersFormData={ordersFormData}
-          setOrdersFormData={setOrdersFormData}
-          ordersToDelete={ordersToDelete}
-          setOrdersToDelete={setOrdersToDelete}
           editOrders={editOrders}
           setEditOrders={setEditOrders}
-          handleUpdateOrders={() => {}}
-          isUpdating={false}
+          ordersFormData={ordersFormData}
+          setOrdersFormData={setOrdersFormData}
+          handleUpdateOrders={handleUpdateOrders}
+          bookingId={bookingId}
+          isUpdating={isUpdatingOrders}
+          bookingData={bookingData.data}
+          ordersToDelete={ordersToDelete}
+          setOrdersToDelete={setOrdersToDelete}
         />
         {/* Notes Section */}
         <Card sx={{ mb: 4 }}>

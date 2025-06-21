@@ -19,7 +19,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { useGetProductsQuery } from "@/state/api";
-import SearchableSelect from "./SearchableSelect";
+import SearchableSelect from "../../../Utils/SearchableSelect";
 import { Add, Delete } from "@mui/icons-material";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";

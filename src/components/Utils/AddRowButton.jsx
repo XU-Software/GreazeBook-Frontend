@@ -18,6 +18,7 @@ export default function AddRowButton({
   initialValues = {},
   onSubmit,
   isLoading = false,
+  isDisabled = false,
 }) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(initialValues || {});
@@ -47,6 +48,7 @@ export default function AddRowButton({
         onClick={handleOpen}
         startIcon={<Add />}
         loading={isLoading}
+        disabled={isDisabled}
       >
         {buttonLabel}
       </Button>
