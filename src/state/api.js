@@ -15,6 +15,7 @@ export const api = createApi({
     "Products",
     "Bookings",
     "Booking",
+    "Invoices",
   ],
   endpoints: (build) => ({
     getUser: build.query({
@@ -232,6 +233,57 @@ export const api = createApi({
       }),
       invalidatesTags: ["Booking"],
     }),
+    addPendingOrders: build.mutation({
+      query: ({ bookingId, order }) => ({
+        url: `/booking/${bookingId}/orders`,
+        method: "POST",
+        body: { order },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: ["Booking"],
+    }),
+    addBookingNote: build.mutation({
+      query: ({ bookingId, note }) => ({
+        url: `/booking/${bookingId}/notes`,
+        method: "POST",
+        body: { note },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: ["Booking"],
+    }),
+    approveBooking: build.mutation({
+      query: ({ bookingId, salesInvoiceNumber }) => ({
+        url: `/invoice/${bookingId}/approve`,
+        method: "POST",
+        body: { salesInvoiceNumber },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: ["Booking"],
+    }),
+    deletePendingBooking: build.mutation({
+      query: ({ bookingId }) => ({
+        url: `/booking/${bookingId}/delete`,
+        method: "DELETE",
+      }),
+    }),
+    getInvoices: build.query({
+      query: ({ page = 1, limit = 10, search = "", sortOrder = "desc" }) => ({
+        url: `/invoice/all`,
+        params: {
+          page,
+          limit,
+          search,
+          sortOrder,
+        },
+      }),
+      providesTags: ["Invoices"],
+    }),
   }),
 });
 
@@ -257,4 +309,9 @@ export const {
   useGetSingleBookingQuery,
   useUpdatePendingBookingMutation,
   useUpdatePendingOrdersMutation,
+  useAddPendingOrdersMutation,
+  useAddBookingNoteMutation,
+  useApproveBookingMutation,
+  useDeletePendingBookingMutation,
+  useGetInvoicesQuery,
 } = api;

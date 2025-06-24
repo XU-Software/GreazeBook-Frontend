@@ -1,50 +1,39 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
-import { useParams, usePathname } from "next/navigation";
+import React, { useState } from "react";
+import { useParams, usePathname, useRouter } from "next/navigation";
+
 import {
+  useDeletePendingBookingMutation,
   useGetSingleBookingQuery,
   useUpdatePendingBookingMutation,
   useUpdatePendingOrdersMutation,
 } from "@/state/api";
-import NextLink from "next/link";
 import DynamicBreadcrumbs from "@/components/Utils/DynamicBreadcrumbs";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";
-import EditableField from "@/components/Utils/EditableField";
-import EditableCell from "@/components/Utils/EditableCell";
 import { useAppDispatch } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Chip,
-  Stack,
-  Divider,
-  TextField,
-  IconButton,
-  Tooltip,
-} from "@mui/material";
-import { Edit, Check, Close, Delete } from "@mui/icons-material";
-import { formatDateWithTime, formatDateForInput } from "@/utils/dateFormatter";
-import { formatToLocalCurrency } from "@/utils/currencyFormatter";
+import { Box, Button, Stack } from "@mui/material";
+
 import BookingDetails from "./BookingDetails";
 import OrdersDetail from "./OrdersDetail";
+import NoteDetails from "./NoteDetails";
+import InvoiceNumberModal from "./InvoiceNumberModal";
+import ConfirmationModal from "@/components/Utils/ConfirmationModal";
 
 const BookingPage = () => {
   const params = useParams();
-  const pathName = usePathname();
+  const pathname = usePathname();
+  const router = useRouter();
   const { bookingId } = params;
   const dispatch = useAppDispatch();
+
+  // Get only the first two non-empty segments
+  const baseSegments = pathname.split("/").filter(Boolean).slice(0, 2);
+
+  // Join them back into a path
+  const basePath = "/" + baseSegments.join("/");
 
   const {
     data: bookingData,
@@ -66,6 +55,9 @@ const BookingPage = () => {
 
   // Stores IDs of deleted orders
   const [ordersToDelete, setOrdersToDelete] = useState(new Set());
+
+  // Toggle state for delete confirmation modal
+  const [toggleDeleteModal, setToggleDeleteModal] = useState(false);
 
   const [updatePendingBooking, { isLoading: isUpdatingBooking }] =
     useUpdatePendingBookingMutation();
@@ -145,6 +137,31 @@ const BookingPage = () => {
     }
   };
 
+  const [deletePendingBooking, { isLoading: isDeletingBooking }] =
+    useDeletePendingBookingMutation();
+
+  // HANDLE FOR DELETING PENDING BOOKING
+  const handleDeleteBooking = async (bookingId) => {
+    try {
+      const res = await deletePendingBooking({ bookingId }).unwrap();
+      dispatch(
+        setShowSnackbar({
+          severity: "success",
+          message: res.message || "Booking deleted",
+        })
+      );
+      router.replace(basePath);
+    } catch (error) {
+      dispatch(
+        setShowSnackbar({
+          severity: "error",
+          message:
+            error.data?.message || error.message || "Failed to delete booking",
+        })
+      );
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center">
@@ -163,22 +180,6 @@ const BookingPage = () => {
       />
     );
   }
-
-  const {
-    orderDate,
-    deliveryDate,
-    customerName,
-    totalAmount,
-    term,
-    freebiesRemarksConcern,
-    status,
-    createdAt,
-    updatedAt,
-    account,
-    orders,
-    createdBy,
-    approvedBy,
-  } = bookingData?.data;
 
   return (
     <div>
@@ -209,30 +210,35 @@ const BookingPage = () => {
           setOrdersToDelete={setOrdersToDelete}
         />
         {/* Notes Section */}
-        <Card sx={{ mb: 4 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              📝 Notes / Internal Comments
-            </Typography>
-            <TextField
-              fullWidth
-              multiline
-              rows={4}
-              placeholder="Optional notes or internal comments for this booking..."
-            />
-          </CardContent>
-        </Card>
+        <NoteDetails bookingData={bookingData} bookingId={bookingId} />
 
         {/* Bottom Action Buttons */}
         <Stack direction="row" spacing={2}>
-          <Button variant="outlined" color="secondary">
-            Generate Invoice
-          </Button>
-          <Button variant="outlined" color="error">
-            Delete
-          </Button>
+          <InvoiceNumberModal bookingData={bookingData} bookingId={bookingId} />
+          {bookingData.data.status === "Pending" && (
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => setToggleDeleteModal(true)}
+            >
+              Delete
+            </Button>
+          )}
         </Stack>
       </Box>
+      <ConfirmationModal
+        open={toggleDeleteModal}
+        onClose={() => setToggleDeleteModal(false)}
+        onConfirm={() => handleDeleteBooking(bookingId)}
+        title={"Delete Booking"}
+        message={
+          "Are you sure you want to delete this booking and together with its associated orders?"
+        }
+        confirmText="Delete"
+        confirmButtonColor="error"
+        cancelText="Cancel"
+        cancelButtonColor="primary"
+      />
     </div>
   );
 };

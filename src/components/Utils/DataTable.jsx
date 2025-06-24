@@ -48,7 +48,7 @@ export default function DataTable({
   onRowClick = () => {},
   getRowId = (row) => row.id,
   enableSelection = true,
-  selected = [],
+  selected = new Set(),
   setSelected = () => {},
 }) {
   const handleSelectAll = (event) => {

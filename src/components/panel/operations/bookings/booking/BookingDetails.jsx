@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import EditableField from "@/components/Utils/EditableField";
 import { Edit, Check, Close, Delete } from "@mui/icons-material";
 import { formatDateWithTime, formatDateForInput } from "@/utils/dateFormatter";
@@ -24,6 +25,7 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
+import ColoredLink from "@/components/Utils/ColoredLink";
 
 const BookingDetails = ({
   editBooking = false,
@@ -75,13 +77,15 @@ const BookingDetails = ({
               </Tooltip>
             </Stack>
           ) : (
-            <IconButton
-              size="medium"
-              color="primary"
-              onClick={() => setEditBooking(true)}
-            >
-              <Edit fontSize="medium" />
-            </IconButton>
+            bookingData.status === "Pending" && (
+              <IconButton
+                size="medium"
+                color="primary"
+                onClick={() => setEditBooking(true)}
+              >
+                <Edit fontSize="medium" />
+              </IconButton>
+            )
           )}
         </Typography>
         <Divider sx={{ mb: 2 }} />
@@ -125,7 +129,11 @@ const BookingDetails = ({
             }
           />
           <Typography>
-            <strong>Account Name:</strong> {bookingData.account.accountName}
+            <strong>Account Name:</strong>{" "}
+            <ColoredLink
+              href={`/master-data/accounts/${bookingData.accountId}`}
+              linkText={bookingData.account.accountName}
+            />
           </Typography>
           <EditableField
             label="Customer Name"
@@ -210,4 +218,4 @@ const BookingDetails = ({
   );
 };
 
-export default BookingDetails;
+export default React.memo(BookingDetails);

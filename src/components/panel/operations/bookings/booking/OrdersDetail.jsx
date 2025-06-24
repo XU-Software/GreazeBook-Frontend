@@ -62,72 +62,75 @@ const OrdersDetail = ({
           <Typography variant="h6">
             🛒 Orders ({bookingData.orders.length})
           </Typography>
-          <div className="flex items-center gap-4">
-            <Tooltip
-              title={
-                bookingData.status === "Approved"
-                  ? "Cannot add new orders to an approved booking"
-                  : "Add a new order to this booking"
-              }
-              arrow
-            >
-              <span>
-                {/* Needed to wrap disabled button to ensure Tooltip works */}
-                <Button
-                  variant="outlined"
-                  disabled={bookingData.status === "Approved" || editOrders}
-                  onClick={() => setToggelModal(true)}
-                >
-                  + Add Order
-                </Button>
-                {/* <AddRowButton  /> */}
-              </span>
-            </Tooltip>
-            {bookingData.status === "Pending" && editOrders ? (
-              <Stack direction="row" spacing={2}>
-                <Tooltip title="Save Changes">
-                  <IconButton
-                    variant="contained"
-                    color="primary"
-                    onClick={() =>
-                      handleUpdateOrders(
-                        bookingId,
-                        ordersFormData,
-                        ordersToDelete
-                      )
-                    }
-                    loading={isUpdating}
-                    size="medium"
-                  >
-                    <Check fontSize="medium" />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Cancel Editing">
-                  <IconButton
-                    variant="outlined"
-                    size="medium"
-                    color="secondary"
-                    onClick={() => {
-                      setOrdersFormData(new Map());
-                      setOrdersToDelete(new Set());
-                      setEditOrders(false);
-                    }}
-                    loading={isUpdating}
-                  >
-                    <Close fontSize="medium" />
-                  </IconButton>
-                </Tooltip>
-              </Stack>
-            ) : (
-              <IconButton
-                size="medium"
-                color="primary"
-                onClick={() => setEditOrders(true)}
+          {bookingData.status === "Pending" && (
+            <div className="flex items-center gap-4">
+              <Tooltip
+                title={
+                  bookingData.status === "Approved"
+                    ? "Cannot add new orders to an approved booking"
+                    : "Add a new order to this booking"
+                }
+                arrow
               >
-                <Edit fontSize="medium" />
-              </IconButton>
-            )}
-          </div>
+                <span>
+                  {/* Needed to wrap disabled button to ensure Tooltip works */}
+                  <Button
+                    variant="outlined"
+                    disabled={bookingData.status === "Approved" || editOrders}
+                    onClick={() => setToggelModal(true)}
+                  >
+                    + Add Order
+                  </Button>
+                  {/* <AddRowButton  /> */}
+                </span>
+              </Tooltip>
+
+              {editOrders ? (
+                <Stack direction="row" spacing={2}>
+                  <Tooltip title="Save Changes">
+                    <IconButton
+                      variant="contained"
+                      color="primary"
+                      onClick={() =>
+                        handleUpdateOrders(
+                          bookingId,
+                          ordersFormData,
+                          ordersToDelete
+                        )
+                      }
+                      loading={isUpdating}
+                      size="medium"
+                    >
+                      <Check fontSize="medium" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Cancel Editing">
+                    <IconButton
+                      variant="outlined"
+                      size="medium"
+                      color="secondary"
+                      onClick={() => {
+                        setOrdersFormData(new Map());
+                        setOrdersToDelete(new Set());
+                        setEditOrders(false);
+                      }}
+                      loading={isUpdating}
+                    >
+                      <Close fontSize="medium" />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
+              ) : (
+                <IconButton
+                  size="medium"
+                  color="primary"
+                  onClick={() => setEditOrders(true)}
+                >
+                  <Edit fontSize="medium" />
+                </IconButton>
+              )}
+            </div>
+          )}
         </Stack>
         <TableContainer>
           <Table size="small">
@@ -138,10 +141,11 @@ const OrdersDetail = ({
                 <TableCell>Quantity</TableCell>
                 <TableCell>Unit Price</TableCell>
                 <TableCell>Subtotal</TableCell>
-
-                <TableCell align="center" sx={{ width: 120 }}>
-                  Actions
-                </TableCell>
+                {bookingData.status === "Pending" && (
+                  <TableCell align="center" sx={{ width: 120 }}>
+                    Actions
+                  </TableCell>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -191,32 +195,34 @@ const OrdersDetail = ({
                           (orderEdit?.price ?? order.price)
                       )}
                     </TableCell>
-                    <TableCell align="center" sx={{ width: 120 }}>
-                      <Box
-                        display="flex"
-                        justifyContent="center"
-                        alignItems="center"
-                        gap={2}
-                        height="100%"
-                      >
-                        <Tooltip title="Delete" arrow>
-                          <IconButton
-                            onClick={() => {
-                              setOrdersToDelete((prev) => {
-                                const updated = new Set(prev);
-                                updated.add(order.orderId);
-                                return updated;
-                              });
-                            }}
-                            color="error"
-                            size="medium"
-                            disabled={!editOrders}
-                          >
-                            <Delete fontSize="medium" />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    </TableCell>
+                    {bookingData.status === "Pending" && (
+                      <TableCell align="center" sx={{ width: 120 }}>
+                        <Box
+                          display="flex"
+                          justifyContent="center"
+                          alignItems="center"
+                          gap={2}
+                          height="100%"
+                        >
+                          <Tooltip title="Delete" arrow>
+                            <IconButton
+                              onClick={() => {
+                                setOrdersToDelete((prev) => {
+                                  const updated = new Set(prev);
+                                  updated.add(order.orderId);
+                                  return updated;
+                                });
+                              }}
+                              color="error"
+                              size="medium"
+                              disabled={!editOrders}
+                            >
+                              <Delete fontSize="medium" />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      </TableCell>
+                    )}
                   </TableRow>
                 );
               })}
@@ -238,9 +244,13 @@ const OrdersDetail = ({
           </Table>
         </TableContainer>
       </CardContent>
-      <AddOrderModal open={toggleModal} onClose={() => setToggelModal(false)} />
+      <AddOrderModal
+        open={toggleModal}
+        onClose={() => setToggelModal(false)}
+        bookingId={bookingId}
+      />
     </Card>
   );
 };
 
-export default OrdersDetail;
+export default React.memo(OrdersDetail);
