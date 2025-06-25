@@ -1,9 +1,8 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import EditableField from "@/components/Utils/EditableField";
-import { Edit, Check, Close, Delete } from "@mui/icons-material";
+import { Edit, Check, Close } from "@mui/icons-material";
 import { formatDateWithTime, formatDateForInput } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 import {
@@ -11,17 +10,9 @@ import {
   Card,
   CardContent,
   Typography,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Chip,
   Stack,
   Divider,
-  TextField,
   IconButton,
   Tooltip,
 } from "@mui/material";
@@ -212,6 +203,15 @@ const BookingDetails = ({
               size="small"
             />
           </Stack>
+          {bookingData.status !== "Pending" && bookingData.invoice && (
+            <Typography>
+              <strong>Generated Invoice:</strong>{" "}
+              <ColoredLink
+                href={`/operations/invoices/${bookingData.invoice?.invoiceId}`}
+                linkText={bookingData.invoice?.salesInvoiceNumber}
+              />
+            </Typography>
+          )}
         </Box>
       </CardContent>
     </Card>

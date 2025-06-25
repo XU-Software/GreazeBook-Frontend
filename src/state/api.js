@@ -16,6 +16,8 @@ export const api = createApi({
     "Bookings",
     "Booking",
     "Invoices",
+    "Invoice",
+    "AccountsReceivables",
   ],
   endpoints: (build) => ({
     getUser: build.query({
@@ -284,6 +286,24 @@ export const api = createApi({
       }),
       providesTags: ["Invoices"],
     }),
+    getSingleInvoice: build.query({
+      query: (invoiceId) => ({
+        url: `/invoice/${invoiceId}`,
+      }),
+      providesTags: ["Invoice"],
+    }),
+    getAccountsReceivables: build.query({
+      query: ({ page = 1, limit = 10, search = "", sortOrder = "desc" }) => ({
+        url: `/accounts-receivable/all`,
+        params: {
+          page,
+          limit,
+          search,
+          sortOrder,
+        },
+      }),
+      providesTags: ["AccountsReceivables"],
+    }),
   }),
 });
 
@@ -314,4 +334,6 @@ export const {
   useApproveBookingMutation,
   useDeletePendingBookingMutation,
   useGetInvoicesQuery,
+  useGetSingleInvoiceQuery,
+  useGetAccountsReceivablesQuery,
 } = api;
