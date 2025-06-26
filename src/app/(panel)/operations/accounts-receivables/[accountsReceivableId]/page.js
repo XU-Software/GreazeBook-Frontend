@@ -1,7 +1,8 @@
 import React from "react";
+import AccountsReceivablePage from "@/components/panel/operations/accounts-receivables/accounts-receivable/AccountsReceivablePage";
 
 const page = () => {
-  return <div>AR details</div>;
+  return <AccountsReceivablePage />;
 };
 
 export default page;

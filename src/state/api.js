@@ -18,6 +18,7 @@ export const api = createApi({
     "Invoices",
     "Invoice",
     "AccountsReceivables",
+    "AccountsReceivable",
   ],
   endpoints: (build) => ({
     getUser: build.query({
@@ -304,6 +305,23 @@ export const api = createApi({
       }),
       providesTags: ["AccountsReceivables"],
     }),
+    getSingleAccountsReceivable: build.query({
+      query: (accountsReceivableId) => ({
+        url: `/accounts-receivable/${accountsReceivableId}`,
+      }),
+      providesTags: ["AccountsReceivable"],
+    }),
+    accountsReceivablePayment: build.mutation({
+      query: ({ accountsReceivableId, paymentInfo }) => ({
+        url: `/accounts-receivable/${accountsReceivableId}/payment`,
+        method: "POST",
+        body: { paymentInfo },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: ["AccountsReceivable"],
+    }),
   }),
 });
 
@@ -336,4 +354,6 @@ export const {
   useGetInvoicesQuery,
   useGetSingleInvoiceQuery,
   useGetAccountsReceivablesQuery,
+  useGetSingleAccountsReceivableQuery,
+  useAccountsReceivablePaymentMutation,
 } = api;

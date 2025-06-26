@@ -15,6 +15,12 @@ import PaginationControls from "@/components/Utils/TablePagination";
 import { formatDate } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 import { usePathname } from "next/navigation";
+import { Chip, Tooltip } from "@mui/material";
+import {
+  HourglassEmpty,
+  HourglassBottom,
+  CheckCircle,
+} from "@mui/icons-material";
 
 const columns = [
   {
@@ -51,6 +57,44 @@ const columns = [
   {
     field: "status",
     headerName: "Status",
+    render: (value) => {
+      if (value === "Paid") {
+        return (
+          <Tooltip title="Fully paid">
+            <Chip
+              icon={<CheckCircle sx={{ fontSize: 18 }} />}
+              label={value}
+              color="success"
+              size="small"
+            />
+          </Tooltip>
+        );
+      }
+
+      if (value === "Partial") {
+        return (
+          <Tooltip title="Partial payment received">
+            <Chip
+              icon={<HourglassBottom sx={{ fontSize: 18 }} />}
+              label={value}
+              color="warning"
+              size="small"
+            />
+          </Tooltip>
+        );
+      }
+
+      return (
+        <Tooltip title="No payment received">
+          <Chip
+            icon={<HourglassEmpty sx={{ fontSize: 18 }} />}
+            label={value}
+            color="default" // Grey, less aggressive
+            size="small"
+          />
+        </Tooltip>
+      );
+    },
     minWidth: 150,
   },
   {
