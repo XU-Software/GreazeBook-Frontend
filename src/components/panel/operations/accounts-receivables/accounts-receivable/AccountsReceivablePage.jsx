@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { useGetSingleAccountsReceivableQuery } from "@/state/api";
+import {
+  useGetSingleAccountsReceivableQuery,
+  useAccountsReceivableVoidPaymentMutation,
+  useAccountsReceivableCancelSaleMutation,
+} from "@/state/api";
+import { useAppDispatch } from "@/app/redux";
+import { setShowSnackbar } from "@/state/snackbarSlice";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import {
   Box,
@@ -17,9 +23,12 @@ import {
   TableBody,
   Button,
   Stack,
+  Tooltip,
+  IconButton,
 } from "@mui/material";
 import {
   CheckCircle,
+  CheckCircleOutline,
   HourglassEmpty,
   WarningAmber,
   Cancel,
@@ -33,6 +42,7 @@ import ColoredLink from "@/components/Utils/ColoredLink";
 import PaymentModal from "./PaymentModal";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 import { formatDate, formatDateWithTime } from "@/utils/dateFormatter";
+import ConfirmationModal from "@/components/Utils/ConfirmationModal";
 
 // Helper chips
 const getStatusChip = (status) => {
@@ -77,31 +87,6 @@ const getFulfillmentChip = (actionType) => {
   }
 };
 
-const getDeliveryStatusChip = (status) => {
-  switch (status) {
-    case "Delivered":
-      return (
-        <Chip
-          icon={<CheckCircle sx={{ fontSize: 18 }} />}
-          label="Delivered"
-          color="success"
-          size="small"
-        />
-      );
-    case "Undelivered":
-      return (
-        <Chip
-          icon={<LocalShippingOutlined sx={{ fontSize: 18 }} />}
-          label="Undelivered"
-          color="default"
-          size="small"
-        />
-      );
-    default:
-      return <Chip label={status} size="small" />;
-  }
-};
-
 const getAgingChip = (dueDate) => {
   const today = new Date();
   const diffMs = today.getTime() - new Date(dueDate).getTime();
@@ -128,13 +113,24 @@ const AccountsReceivablePage = () => {
   const router = useRouter();
   const { accountsReceivableId } = params;
 
+  const dispatch = useAppDispatch();
+
   // Get only the first two non-empty segments
   const baseSegments = pathname.split("/").filter(Boolean).slice(0, 2);
 
   // Join them back into a path
   const basePath = "/" + baseSegments.join("/");
 
+  // Toggling payment functionality modal
   const [togglePaymentModal, setTogglePaymentModal] = useState(false);
+
+  // Toggling and data of voiding payment modal
+  const [toggleVoidPaymentModal, setToggleVoidPaymentModal] = useState(false);
+  const [paymentId, setPaymentId] = useState("");
+
+  // Toggling and data of cancelling sale modal
+  const [toggleCancelSaleModal, setToggleCancelSaleModal] = useState(false);
+  const [saleId, setSaleId] = useState("");
 
   const {
     data: arData,
@@ -146,6 +142,72 @@ const AccountsReceivablePage = () => {
     refetchOnMountOrArgChange: true,
     refetchOnFocus: true,
   });
+
+  const handleCloseVoidModal = () => {
+    setPaymentId("");
+    setToggleVoidPaymentModal(false);
+  };
+
+  const [accountsReceivableVoidPayment, { isLoading: isVoidingPayment }] =
+    useAccountsReceivableVoidPaymentMutation();
+
+  const handleVoidPayment = async (accountsReceivableId, paymentId) => {
+    try {
+      const res = await accountsReceivableVoidPayment({
+        accountsReceivableId,
+        paymentId,
+      }).unwrap();
+      dispatch(
+        setShowSnackbar({
+          severity: "success",
+          message: res.message || "Void payment successful",
+        })
+      );
+      handleCloseVoidModal();
+    } catch (error) {
+      dispatch(
+        setShowSnackbar({
+          severity: "error",
+          message:
+            error.data?.message || error.message || "Failed to void payment",
+        })
+      );
+    }
+  };
+
+  const handleCloseCancelSaleModal = () => {
+    setSaleId("");
+    setToggleCancelSaleModal(false);
+  };
+
+  const [accountsReceivableCancelSale, { isLoading: isCancellingSale }] =
+    useAccountsReceivableCancelSaleMutation();
+
+  const handleCancelSale = async (accountsReceivableId, saleId) => {
+    try {
+      const res = await accountsReceivableCancelSale({
+        accountsReceivableId,
+        saleId,
+      }).unwrap();
+      dispatch(
+        setShowSnackbar({
+          severity: "success",
+          message: res.message || "Sale record cancellation successful",
+        })
+      );
+      handleCloseCancelSaleModal();
+    } catch (error) {
+      dispatch(
+        setShowSnackbar({
+          severity: "error",
+          message:
+            error.data?.message ||
+            error.message ||
+            "Failed to cancel sale record",
+        })
+      );
+    }
+  };
 
   if (isLoading) {
     return (
@@ -179,9 +241,10 @@ const AccountsReceivablePage = () => {
     invoice,
     sales,
     payments,
-    pendingExcess,
     totalSalesAmount,
     totalPayments,
+    activePendingExcess,
+    // totalPendingExcessAmount,
     balance,
     status,
   } = arData.data;
@@ -199,19 +262,38 @@ const AccountsReceivablePage = () => {
 
       {/* Actions */}
       <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mb={3}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setTogglePaymentModal(true)}
-        >
-          Record Payment
-        </Button>
-        {/* <Button variant="outlined" color="warning">
-          Adjust Sale
-        </Button>
-        <Button variant="outlined" color="success">
-          Issue Refund
-        </Button> */}
+        {status === "Paid" ? (
+          <Tooltip title="AR is already paid">
+            <span>
+              <Button variant="contained" color="primary" disabled>
+                Record Payment
+              </Button>
+            </span>
+          </Tooltip>
+        ) : (
+          <Tooltip title="Make a payment">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => setTogglePaymentModal(true)}
+            >
+              Record Payment
+            </Button>
+          </Tooltip>
+        )}
+        {activePendingExcess && (
+          <Button
+            variant="outlined"
+            color="warning"
+            onClick={() =>
+              router.push(
+                `/master-data/accounts/${account.accountId}/pending-excess?arId=${accountsReceivableId}`
+              )
+            }
+          >
+            Manage Overpayment
+          </Button>
+        )}
       </Stack>
 
       {/* Summary */}
@@ -228,20 +310,35 @@ const AccountsReceivablePage = () => {
           </Grid>
           <Grid item xs={6} sm={2.4}>
             <Typography variant="body2" color="text.secondary">
-              Total Payments
-            </Typography>
-            <Typography variant="h6">
-              {formatToLocalCurrency(totalPayments)}
-            </Typography>
-          </Grid>
-          <Grid item xs={6} sm={2.4}>
-            <Typography variant="body2" color="text.secondary">
               Balance
             </Typography>
             <Typography variant="h6">
               {formatToLocalCurrency(balance)}
             </Typography>
           </Grid>
+          <Grid item xs={6} sm={2.4}>
+            <Typography variant="body2" color="text.secondary">
+              Total Payments
+            </Typography>
+            <Typography variant="h6">
+              {formatToLocalCurrency(totalPayments)}
+            </Typography>
+          </Grid>
+          {activePendingExcess && (
+            <Tooltip title="Please process the excess by either converting it into a credit memo or issuing a refund.">
+              <Grid item xs={6} sm={2.4}>
+                <Typography variant="body2" color="text.secondary">
+                  Unprocessed Overpayment
+                </Typography>
+                <Stack direction="row" alignItems="center" spacing={0.5}>
+                  <WarningAmber fontSize="small" color="warning" />
+                  <Typography variant="h6" color="warning.main">
+                    {formatToLocalCurrency(activePendingExcess?.amount)}
+                  </Typography>
+                </Stack>
+              </Grid>
+            </Tooltip>
+          )}
           <Grid item xs={6} sm={2.4}>
             <Typography variant="body2" color="text.secondary">
               Status
@@ -340,8 +437,7 @@ const AccountsReceivablePage = () => {
                 <TableCell align="right">Quantity</TableCell>
                 <TableCell align="right">Unit Price</TableCell>
                 <TableCell align="right">Subtotal</TableCell>
-                <TableCell>Delivery Status</TableCell>
-                <TableCell>Action Type</TableCell>
+                <TableCell align="center">Action Type</TableCell>
                 <TableCell>Changed From</TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
@@ -363,8 +459,9 @@ const AccountsReceivablePage = () => {
                         sale.order.quantity * sale.order.price
                       )}
                     </TableCell>
-                    <TableCell>{getDeliveryStatusChip(sale.status)}</TableCell>
-                    <TableCell>{getFulfillmentChip(sale.actionType)}</TableCell>
+                    <TableCell align="center">
+                      {getFulfillmentChip(sale.actionType)}
+                    </TableCell>
                     <TableCell>
                       {originalSale ? (
                         <Chip
@@ -378,20 +475,14 @@ const AccountsReceivablePage = () => {
                       )}
                     </TableCell>
                     <TableCell>
-                      {sale.status === "Undelivered" ? (
-                        <Stack direction="row" spacing={1}>
-                          <Button variant="outlined" color="primary">
-                            Cancel
-                          </Button>
-                          <Button variant="outlined" color="primary">
-                            Change
-                          </Button>
-                        </Stack>
-                      ) : sale.status === "Delivered" ? (
-                        <Button size="small" color="error" variant="outlined">
-                          Return
+                      <Stack direction="row" spacing={1}>
+                        <Button variant="outlined" color="error">
+                          Cancel
                         </Button>
-                      ) : null}
+                        <Button variant="outlined" color="primary">
+                          Change
+                        </Button>
+                      </Stack>
                     </TableCell>
                   </TableRow>
                 );
@@ -412,8 +503,10 @@ const AccountsReceivablePage = () => {
                 <TableCell>Date</TableCell>
                 <TableCell>Amount</TableCell>
                 <TableCell>Method</TableCell>
+                <TableCell>Void Status</TableCell>
                 <TableCell>Reference</TableCell>
                 <TableCell>Note</TableCell>
+                <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -432,8 +525,37 @@ const AccountsReceivablePage = () => {
                     <TableCell>{formatDateWithTime(p.createdAt)}</TableCell>
                     <TableCell>{formatToLocalCurrency(p.amount)}</TableCell>
                     <TableCell>{p.method}</TableCell>
+                    <TableCell>
+                      {p.isVoid ? (
+                        <Chip
+                          icon={<Cancel />}
+                          label="Voided"
+                          color="error"
+                          size="small"
+                          variant="filled"
+                        />
+                      ) : (
+                        "-"
+                      )}
+                    </TableCell>
                     <TableCell>{p.reference}</TableCell>
                     <TableCell>{p.note}</TableCell>
+                    <TableCell>
+                      {!p.isVoid ? (
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          onClick={() => {
+                            setPaymentId(p.paymentId);
+                            setToggleVoidPaymentModal(true);
+                          }}
+                        >
+                          Void
+                        </Button>
+                      ) : (
+                        "-"
+                      )}
+                    </TableCell>
                   </TableRow>
                 ))
               )}
@@ -441,30 +563,23 @@ const AccountsReceivablePage = () => {
           </Table>
         </Box>
       </Paper>
-      {/* Pending Excess */}
-      {/* {ar.pendingExcess.amount > 0 && (
-        <Paper sx={{ p: 2 }} elevation={2}>
-          <Typography variant="h6" gutterBottom>
-            Pending Excess
-          </Typography>
-          <Typography>
-            Amount: <strong>{ar.pendingExcess.amount.toLocaleString()}</strong>
-          </Typography>
-          <Stack direction="row" spacing={2} mt={1}>
-            <Button size="small" variant="outlined" color="primary">
-              Convert to Credit Memo
-            </Button>
-            <Button size="small" variant="outlined" color="secondary">
-              Issue Refund
-            </Button>
-          </Stack>
-        </Paper>
-      )} */}
       <PaymentModal
         open={togglePaymentModal}
         onClose={() => setTogglePaymentModal(false)}
         accountsReceivableId={accountsReceivableId}
       />
+      <ConfirmationModal
+        open={toggleVoidPaymentModal}
+        onClose={handleCloseVoidModal}
+        onConfirm={() => handleVoidPayment(accountsReceivableId, paymentId)}
+        title="Void Payment"
+        message="Are you sure you want to void this payment? This action is irreversible and will permanently mark the payment as voided in the system."
+        confirmText="Void"
+        confirmButtonColor="error"
+        cancelText="Cancel"
+        cancelButtonColor="primary"
+      />
+      <ConfirmationModal open={toggleCancelSaleModal} onClose={() => {}} />
     </Box>
   );
 };

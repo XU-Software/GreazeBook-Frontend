@@ -322,6 +322,20 @@ export const api = createApi({
       }),
       invalidatesTags: ["AccountsReceivable"],
     }),
+    accountsReceivableVoidPayment: build.mutation({
+      query: ({ accountsReceivableId, paymentId }) => ({
+        url: `/accounts-receivable/${accountsReceivableId}/${paymentId}/void`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["AccountsReceivable"],
+    }),
+    accountsReceivableCancelSale: build.mutation({
+      query: ({ accountsReceivableId, saleId }) => ({
+        url: `/accounts-receivable/${accountsReceivableId}/${saleId}/cancel`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["AccountsReceivable"],
+    }),
   }),
 });
 
@@ -356,4 +370,6 @@ export const {
   useGetAccountsReceivablesQuery,
   useGetSingleAccountsReceivableQuery,
   useAccountsReceivablePaymentMutation,
+  useAccountsReceivableVoidPaymentMutation,
+  useAccountsReceivableCancelSaleMutation,
 } = api;
