@@ -2,8 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { useGetAccountsReceivablesQuery } from "@/state/api";
-import { useAppDispatch } from "@/app/redux";
+import { useGetAccountsReceivablesQuery } from "@/state/services/accountsReceivablesApi";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";
 import DynamicBreadcrumbs from "@/components/Utils/DynamicBreadcrumbs";

@@ -8,7 +8,7 @@ import {
   useGetSingleBookingQuery,
   useUpdatePendingBookingMutation,
   useUpdatePendingOrdersMutation,
-} from "@/state/api";
+} from "@/state/services/bookingsApi";
 import DynamicBreadcrumbs from "@/components/Utils/DynamicBreadcrumbs";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";

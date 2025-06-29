@@ -25,7 +25,7 @@ const ConfirmationModal = ({
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
       <DialogTitle>{title}</DialogTitle>
-      <DialogContent>
+      <DialogContent dividers>
         <Typography>{message}</Typography>
       </DialogContent>
       <DialogActions>

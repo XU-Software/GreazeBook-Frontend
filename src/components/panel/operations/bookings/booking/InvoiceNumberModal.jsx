@@ -2,7 +2,7 @@
 
 // components/InvoiceNumberModal.js
 import React, { useState } from "react";
-import { useApproveBookingMutation } from "@/state/api";
+import { useApproveBookingMutation } from "@/state/services/bookingsApi";
 import { useAppDispatch } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
 import {
@@ -74,7 +74,7 @@ const InvoiceNumberModal = ({ bookingData, bookingId = "" }) => {
         <form
           onSubmit={(e) => handleApproveBooking(e, bookingId, invoiceNumber)}
         >
-          <DialogContent>
+          <DialogContent dividers>
             <TextField
               autoFocus
               margin="dense"

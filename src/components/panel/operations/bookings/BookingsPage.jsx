@@ -2,7 +2,10 @@
 
 import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { useGetBookingsQuery, useDeleteBookingsMutation } from "@/state/api";
+import {
+  useGetBookingsQuery,
+  useDeleteBookingsMutation,
+} from "@/state/services/bookingsApi";
 import { useAppDispatch } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";

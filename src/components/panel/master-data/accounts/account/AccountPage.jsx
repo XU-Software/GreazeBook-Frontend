@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useParams, usePathname } from "next/navigation";
-import { useGetSingleAccountQuery } from "@/state/api";
+import { useGetSingleAccountQuery } from "@/state/services/accountsApi";
 import NextLink from "next/link";
 import DynamicBreadcrumbs from "@/components/Utils/DynamicBreadcrumbs";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";

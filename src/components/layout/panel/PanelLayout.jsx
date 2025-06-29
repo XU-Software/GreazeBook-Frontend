@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setUserData } from "@/state";
 import { setHideSnackbar } from "@/state/snackbarSlice";
-import { useGetUserQuery } from "@/state/api";
+import { useGetUserQuery } from "@/state/services/userApi";
 
 const PageWrapper = ({ children }) => {
   const isSidebarCollapsed = useAppSelector(

@@ -4,8 +4,7 @@ import React, { useState } from "react";
 import {
   useGetSingleAccountsReceivableQuery,
   useAccountsReceivableVoidPaymentMutation,
-  useAccountsReceivableCancelSaleMutation,
-} from "@/state/api";
+} from "@/state/services/accountsReceivablesApi";
 import { useAppDispatch } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
 import { useParams, usePathname, useRouter } from "next/navigation";
@@ -14,7 +13,6 @@ import {
   Grid,
   Typography,
   Paper,
-  Divider,
   Chip,
   Table,
   TableHead,
@@ -24,17 +22,12 @@ import {
   Button,
   Stack,
   Tooltip,
-  IconButton,
 } from "@mui/material";
 import {
   CheckCircle,
-  CheckCircleOutline,
-  HourglassEmpty,
   WarningAmber,
   Cancel,
   ChangeCircle,
-  LocalShippingOutlined,
-  AccessTime,
 } from "@mui/icons-material";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";
@@ -43,6 +36,7 @@ import PaymentModal from "./PaymentModal";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 import { formatDate, formatDateWithTime } from "@/utils/dateFormatter";
 import ConfirmationModal from "@/components/Utils/ConfirmationModal";
+import CancelSaleModal from "./CancelSaleModal";
 
 // Helper chips
 const getStatusChip = (status) => {
@@ -87,19 +81,59 @@ const getFulfillmentChip = (actionType) => {
   }
 };
 
+// const getAgingChip = (dueDate) => {
+//   const today = new Date();
+//   const diffMs = today.getTime() - new Date(dueDate).getTime();
+//   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+//   if (diffDays > 0) {
+//     return (
+//       <Chip label={`${diffDays} days overdue`} color="error" size="small" />
+//     );
+//   } else {
+//     return (
+//       <Chip
+//         label={`Due in ${Math.abs(diffDays)} days`}
+//         color="info"
+//         size="small"
+//       />
+//     );
+//   }
+// };
+
 const getAgingChip = (dueDate) => {
   const today = new Date();
-  const diffMs = today.getTime() - new Date(dueDate).getTime();
+  const todayDateOnly = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate()
+  );
+  const due = new Date(dueDate);
+  const dueDateOnly = new Date(
+    due.getFullYear(),
+    due.getMonth(),
+    due.getDate()
+  );
+
+  const diffMs = todayDateOnly.getTime() - dueDateOnly.getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
   if (diffDays > 0) {
     return (
-      <Chip label={`${diffDays} days overdue`} color="error" size="small" />
+      <Chip
+        label={`${diffDays} day${diffDays > 1 ? "s" : ""} overdue`}
+        color="error"
+        size="small"
+      />
     );
+  } else if (diffDays === 0) {
+    return <Chip label="Due today" color="warning" size="small" />;
   } else {
     return (
       <Chip
-        label={`Due in ${Math.abs(diffDays)} days`}
+        label={`Due in ${Math.abs(diffDays)} day${
+          Math.abs(diffDays) > 1 ? "s" : ""
+        }`}
         color="info"
         size="small"
       />
@@ -178,35 +212,6 @@ const AccountsReceivablePage = () => {
   const handleCloseCancelSaleModal = () => {
     setSaleId("");
     setToggleCancelSaleModal(false);
-  };
-
-  const [accountsReceivableCancelSale, { isLoading: isCancellingSale }] =
-    useAccountsReceivableCancelSaleMutation();
-
-  const handleCancelSale = async (accountsReceivableId, saleId) => {
-    try {
-      const res = await accountsReceivableCancelSale({
-        accountsReceivableId,
-        saleId,
-      }).unwrap();
-      dispatch(
-        setShowSnackbar({
-          severity: "success",
-          message: res.message || "Sale record cancellation successful",
-        })
-      );
-      handleCloseCancelSaleModal();
-    } catch (error) {
-      dispatch(
-        setShowSnackbar({
-          severity: "error",
-          message:
-            error.data?.message ||
-            error.message ||
-            "Failed to cancel sale record",
-        })
-      );
-    }
   };
 
   if (isLoading) {
@@ -476,10 +481,22 @@ const AccountsReceivablePage = () => {
                     </TableCell>
                     <TableCell>
                       <Stack direction="row" spacing={1}>
-                        <Button variant="outlined" color="error">
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          disabled={sale.actionType !== "Fulfilled"}
+                          onClick={() => {
+                            setSaleId(sale.saleId);
+                            setToggleCancelSaleModal(true);
+                          }}
+                        >
                           Cancel
                         </Button>
-                        <Button variant="outlined" color="primary">
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          disabled={sale.actionType !== "Fulfilled"}
+                        >
                           Change
                         </Button>
                       </Stack>
@@ -579,7 +596,12 @@ const AccountsReceivablePage = () => {
         cancelText="Cancel"
         cancelButtonColor="primary"
       />
-      <ConfirmationModal open={toggleCancelSaleModal} onClose={() => {}} />
+      <CancelSaleModal
+        open={toggleCancelSaleModal}
+        onClose={handleCloseCancelSaleModal}
+        accountsReceivableId={accountsReceivableId}
+        saleId={saleId}
+      />
     </Box>
   );
 };

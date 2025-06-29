@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useAccountsReceivablePaymentMutation } from "@/state/api";
+import { useAccountsReceivablePaymentMutation } from "@/state/services/accountsReceivablesApi";
 import { useAppDispatch } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
 import {

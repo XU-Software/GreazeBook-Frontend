@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useAddBookingNoteMutation } from "@/state/api";
+import { useAddBookingNoteMutation } from "@/state/services/bookingsApi";
 import {
   Card,
   CardContent,

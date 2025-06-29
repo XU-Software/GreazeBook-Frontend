@@ -22,7 +22,7 @@ import { setShowSnackbar } from "@/state/snackbarSlice";
 import {
   useGetCompanyUsersQuery,
   useCancelUserAccessMutation,
-} from "@/state/api";
+} from "@/state/services/companyUsersApi";
 import { formatDateWithTime } from "@/utils/dateFormatter";
 
 const PeoplePageContainer = () => {

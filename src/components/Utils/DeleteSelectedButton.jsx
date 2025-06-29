@@ -39,7 +39,7 @@ const DeleteSelectedButton = ({
 
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>Confirm Deletion</DialogTitle>
-        <DialogContent>
+        <DialogContent dividers>
           <Typography>
             Are you sure you want to delete <strong>{selected.size}</strong>{" "}
             {selected.size === 1 ? "item" : "items"}? This action cannot be

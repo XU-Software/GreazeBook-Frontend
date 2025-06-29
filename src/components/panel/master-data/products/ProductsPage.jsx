@@ -7,7 +7,7 @@ import {
   useDeleteProductsMutation,
   useAddSingleProductMutation,
   useImportProductsExcelMutation,
-} from "@/state/api";
+} from "@/state/services/productsApi";
 import { useAppDispatch } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";

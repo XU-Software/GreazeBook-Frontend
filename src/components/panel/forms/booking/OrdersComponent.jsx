@@ -15,16 +15,11 @@ import {
   TableHead,
   TableRow,
   TableFooter,
-  Chip,
-  Tooltip,
 } from "@mui/material";
-import { useGetProductsQuery } from "@/state/api";
+import { useGetProductsQuery } from "@/state/services/productsApi";
 import SearchableSelect from "../../../Utils/SearchableSelect";
 import { Add, Delete } from "@mui/icons-material";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import ErrorIcon from "@mui/icons-material/Error";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 const OrdersComponent = ({ ordersData = [], setOrdersData = () => {} }) => {
   const [tempOrder, setTempOrder] = useState({

@@ -5,15 +5,10 @@ import {
   Typography,
   Button,
   TextField,
-  IconButton,
-  Grid,
   MenuItem,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import AddIcon from "@mui/icons-material/Add";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { useInviteCompanyUserMutation } from "@/state/api";
-import FeedbackSnackbar from "@/components/Utils/FeedbackSnackbar";
+import { useInviteCompanyUserMutation } from "@/state/services/companyUsersApi";
 import { useAppDispatch } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
 

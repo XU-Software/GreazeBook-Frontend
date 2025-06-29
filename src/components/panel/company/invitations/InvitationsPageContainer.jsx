@@ -21,7 +21,7 @@ import { setShowSnackbar } from "@/state/snackbarSlice";
 import {
   useGetCompanyInvitesQuery,
   useCancelCompanyInviteMutation,
-} from "@/state/api";
+} from "@/state/services/companyInvitesApi";
 import { formatDateWithTime } from "@/utils/dateFormatter";
 
 const InvitationsPageContainer = () => {

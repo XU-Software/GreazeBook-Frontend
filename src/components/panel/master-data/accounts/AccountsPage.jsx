@@ -7,7 +7,7 @@ import {
   useDeleteAccountsMutation,
   useAddSingleAccountMutation,
   useImportAccountsExcelMutation,
-} from "@/state/api";
+} from "@/state/services/accountsApi";
 import { useAppDispatch } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";

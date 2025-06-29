@@ -11,7 +11,8 @@ import {
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import SearchableSelect from "@/components/Utils/SearchableSelect";
-import { useGetProductsQuery, useAddPendingOrdersMutation } from "@/state/api";
+import { useGetProductsQuery } from "@/state/services/productsApi";
+import { useAddPendingOrdersMutation } from "@/state/services/bookingsApi";
 import { useAppDispatch } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
 

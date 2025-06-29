@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { useGetSingleInvoiceQuery } from "@/state/api";
+import { useGetSingleInvoiceQuery } from "@/state/services/invoicesApi";
 import DynamicBreadcrumbs from "@/components/Utils/DynamicBreadcrumbs";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";
