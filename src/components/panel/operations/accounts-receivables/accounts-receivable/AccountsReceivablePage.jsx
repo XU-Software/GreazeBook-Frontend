@@ -37,6 +37,7 @@ import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 import { formatDate, formatDateWithTime } from "@/utils/dateFormatter";
 import ConfirmationModal from "@/components/Utils/ConfirmationModal";
 import CancelSaleModal from "./CancelSaleModal";
+import ChangeSaleModal from "./ChangeSaleModal";
 
 // Helper chips
 const getStatusChip = (status) => {
@@ -80,26 +81,6 @@ const getFulfillmentChip = (actionType) => {
       return <Chip label={actionType} size="small" />;
   }
 };
-
-// const getAgingChip = (dueDate) => {
-//   const today = new Date();
-//   const diffMs = today.getTime() - new Date(dueDate).getTime();
-//   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-//   if (diffDays > 0) {
-//     return (
-//       <Chip label={`${diffDays} days overdue`} color="error" size="small" />
-//     );
-//   } else {
-//     return (
-//       <Chip
-//         label={`Due in ${Math.abs(diffDays)} days`}
-//         color="info"
-//         size="small"
-//       />
-//     );
-//   }
-// };
 
 const getAgingChip = (dueDate) => {
   const today = new Date();
@@ -166,6 +147,10 @@ const AccountsReceivablePage = () => {
   const [toggleCancelSaleModal, setToggleCancelSaleModal] = useState(false);
   const [saleId, setSaleId] = useState("");
 
+  // Toggling change order and data of order to be changed
+  const [toggleChangeSaleModal, setToggleChangeSaleModal] = useState(false);
+  const [saleToChange, setSaleToChange] = useState("");
+
   const {
     data: arData,
     isLoading,
@@ -212,6 +197,11 @@ const AccountsReceivablePage = () => {
   const handleCloseCancelSaleModal = () => {
     setSaleId("");
     setToggleCancelSaleModal(false);
+  };
+
+  const handleCloseChangeSaleModal = () => {
+    setSaleToChange("");
+    setToggleChangeSaleModal(false);
   };
 
   if (isLoading) {
@@ -443,14 +433,14 @@ const AccountsReceivablePage = () => {
                 <TableCell align="right">Unit Price</TableCell>
                 <TableCell align="right">Subtotal</TableCell>
                 <TableCell align="center">Action Type</TableCell>
-                <TableCell>Changed From</TableCell>
+                <TableCell>Changed To</TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {sales.map((sale) => {
-                const originalSale = sales.find(
-                  (s) => s.saleId === sale.originalSaleId
+                const changedTo = sales.find(
+                  (s) => s.saleId === sale?.replacementSale?.saleId
                 );
                 return (
                   <TableRow key={sale.saleId}>
@@ -468,10 +458,10 @@ const AccountsReceivablePage = () => {
                       {getFulfillmentChip(sale.actionType)}
                     </TableCell>
                     <TableCell>
-                      {originalSale ? (
+                      {changedTo ? (
                         <Chip
                           size="small"
-                          label={originalSale.order.product.productName}
+                          label={changedTo.order.product.productName}
                           variant="outlined"
                           color="info"
                         />
@@ -496,6 +486,10 @@ const AccountsReceivablePage = () => {
                           variant="outlined"
                           color="primary"
                           disabled={sale.actionType !== "Fulfilled"}
+                          onClick={() => {
+                            setSaleToChange(sale);
+                            setToggleChangeSaleModal(true);
+                          }}
                         >
                           Change
                         </Button>
@@ -601,6 +595,12 @@ const AccountsReceivablePage = () => {
         onClose={handleCloseCancelSaleModal}
         accountsReceivableId={accountsReceivableId}
         saleId={saleId}
+      />
+      <ChangeSaleModal
+        open={toggleChangeSaleModal}
+        onClose={handleCloseChangeSaleModal}
+        accountsReceivableId={accountsReceivableId}
+        sale={saleToChange}
       />
     </Box>
   );

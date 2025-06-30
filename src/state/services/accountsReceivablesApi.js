@@ -110,6 +110,8 @@ export const accountsReceivablesApi = api.injectEndpoints({
         if (hasUpdatedItems || hasNewCreated) {
           tags.push({ type: "PendingExcesses", id: "LIST" });
         }
+
+        return tags;
       },
     }),
     accountsReceivableCancelSale: build.mutation({
@@ -162,6 +164,58 @@ export const accountsReceivablesApi = api.injectEndpoints({
         return tags;
       },
     }),
+    accountsReceivableChangeSale: build.mutation({
+      query: ({ accountsReceivableId, saleId, newSale, changeDetails }) => ({
+        url: `/accounts-receivable/${accountsReceivableId}/${saleId}/change`,
+        method: "PATCH",
+        body: { newSale, changeDetails },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: (result, error, arg) => {
+        const tags = [
+          { type: "AccountsReceivables", id: "LIST" },
+          { type: "AccountsReceivable", id: arg.accountsReceivableId },
+          { type: "Sales", id: "LIST" },
+          { type: "Sale", id: arg.saleId },
+          { type: "Orders", id: "LIST" },
+          { type: "Products", id: "LIST" },
+          { type: "Product", id: arg.newSale.productId },
+        ];
+
+        // Products (We check if affectedProductId is not null, it can be null from backend response as it's totalStocks is either replenished or not)
+        if (result?.affectedProductId) {
+          tags.push({ type: "Product", id: result.affectedProductId });
+        }
+
+        // PendingExcesses (We check if pendingExcessIds is not empty, it can be empty because we invalidate all active pendingExcess every transaction and we only create new active pendingExcess if theres overpaid calculated)
+        const hasUpdatedItems =
+          Array.isArray(result?.affectedPendingExcessIds) &&
+          result.affectedPendingExcessIds.length > 0;
+
+        const hasNewCreated = result?.newPendingExcessCreated;
+
+        // Individual updated PendingExcess items
+        if (hasUpdatedItems) {
+          tags.push(
+            ...result.affectedPendingExcessIds.map((pendingExcessId) => ({
+              type: "PendingExcess",
+              id: pendingExcessId,
+            }))
+          );
+        }
+
+        // Invalidate PendingExcess list if:
+        // - Any items updated
+        // - OR a new item was created
+        if (hasUpdatedItems || hasNewCreated) {
+          tags.push({ type: "PendingExcesses", id: "LIST" });
+        }
+
+        return tags;
+      },
+    }),
   }),
 });
 
@@ -171,4 +225,5 @@ export const {
   useAccountsReceivablePaymentMutation,
   useAccountsReceivableVoidPaymentMutation,
   useAccountsReceivableCancelSaleMutation,
+  useAccountsReceivableChangeSaleMutation,
 } = accountsReceivablesApi;

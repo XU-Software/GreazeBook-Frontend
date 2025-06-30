@@ -158,10 +158,7 @@ export const bookingsApi = api.injectEndpoints({
         url: `/booking/${bookingId}/delete`,
         method: "DELETE",
       }),
-      invalidatesTags: (result, error, arg) => [
-        { type: "Bookings", id: "LIST" },
-        { type: "Booking", id: arg.bookingId },
-      ],
+      invalidatesTags: [{ type: "Bookings", id: "LIST" }],
     }),
   }),
 });

@@ -78,7 +78,7 @@ const CancelSaleModal = ({
       dispatch(
         setShowSnackbar({
           severity: "success",
-          message: res.message || "Sale record cancellation successful",
+          message: res.message || "Sales record cancellation successful",
         })
       );
       handleClose();
