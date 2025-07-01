@@ -138,7 +138,11 @@ const CancelSaleModal = ({
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} color="inherit">
+        <Button
+          onClick={handleClose}
+          color="inherit"
+          loading={isCancellingSale}
+        >
           Cancel
         </Button>
         <Button

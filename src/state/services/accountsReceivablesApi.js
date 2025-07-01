@@ -216,6 +216,44 @@ export const accountsReceivablesApi = api.injectEndpoints({
         return tags;
       },
     }),
+    accountsReceivableProcessOverpaymentToRefund: build.mutation({
+      query: ({ accountsReceivableId, pendingExcessId, refundDetails }) => ({
+        url: `/accounts-receivable/${accountsReceivableId}/${pendingExcessId}/refund`,
+        method: "PATCH",
+        body: { refundDetails },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: (result, error, arg) => [
+        { type: "AccountsReceivables", id: "LIST" },
+        { type: "AccountsReceivable", id: arg.accountsReceivableId },
+        { type: "PendingExcesses", id: "LIST" },
+        { type: "PendingExcess", id: arg.pendingExcessId },
+        { type: "Refunds", id: "LIST" },
+      ],
+    }),
+    accountsReceivableProcessOverpaymentToCreditMemo: build.mutation({
+      query: ({
+        accountsReceivableId,
+        pendingExcessId,
+        creditMemoDetails,
+      }) => ({
+        url: `/accounts-receivable/${accountsReceivableId}/${pendingExcessId}/credit-memo`,
+        method: "PATCH",
+        body: { creditMemoDetails },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: (result, error, arg) => [
+        { type: "AccountsReceivables", id: "LIST" },
+        { type: "AccountsReceivable", id: arg.accountsReceivableId },
+        { type: "PendingExcesses", id: "LIST" },
+        { type: "PendingExcess", id: arg.pendingExcessId },
+        { type: "CreditMemos", id: "LIST" },
+      ],
+    }),
   }),
 });
 
@@ -226,4 +264,6 @@ export const {
   useAccountsReceivableVoidPaymentMutation,
   useAccountsReceivableCancelSaleMutation,
   useAccountsReceivableChangeSaleMutation,
+  useAccountsReceivableProcessOverpaymentToRefundMutation,
+  useAccountsReceivableProcessOverpaymentToCreditMemoMutation,
 } = accountsReceivablesApi;

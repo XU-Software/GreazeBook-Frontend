@@ -28,6 +28,7 @@ import {
   WarningAmber,
   Cancel,
   ChangeCircle,
+  Check,
 } from "@mui/icons-material";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";
@@ -38,6 +39,7 @@ import { formatDate, formatDateWithTime } from "@/utils/dateFormatter";
 import ConfirmationModal from "@/components/Utils/ConfirmationModal";
 import CancelSaleModal from "./CancelSaleModal";
 import ChangeSaleModal from "./ChangeSaleModal";
+import ProcessOverpaymentModal from "./ProcessPendingExcessModal";
 
 // Helper chips
 const getStatusChip = (status) => {
@@ -151,6 +153,11 @@ const AccountsReceivablePage = () => {
   const [toggleChangeSaleModal, setToggleChangeSaleModal] = useState(false);
   const [saleToChange, setSaleToChange] = useState("");
 
+  // Toggling process overpayment modal
+  const [toggleProcessOverpaymentModal, setToggleProcessOverpaymentModal] =
+    useState(false);
+  const [pendingExcessId, setPendingExcessId] = useState("");
+
   const {
     data: arData,
     isLoading,
@@ -204,6 +211,11 @@ const AccountsReceivablePage = () => {
     setToggleChangeSaleModal(false);
   };
 
+  const handleCloseProcessOverpaymentModal = () => {
+    setPendingExcessId("");
+    setToggleProcessOverpaymentModal(false);
+  };
+
   if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center">
@@ -238,8 +250,9 @@ const AccountsReceivablePage = () => {
     payments,
     totalSalesAmount,
     totalPayments,
-    activePendingExcess,
-    // totalPendingExcessAmount,
+    activePendingExcess, //can be null
+    refund, //can be null
+    creditMemo, //can be null
     balance,
     status,
   } = arData.data;
@@ -280,11 +293,10 @@ const AccountsReceivablePage = () => {
           <Button
             variant="outlined"
             color="warning"
-            onClick={() =>
-              router.push(
-                `/master-data/accounts/${account.accountId}/pending-excess?arId=${accountsReceivableId}`
-              )
-            }
+            onClick={() => {
+              setPendingExcessId(activePendingExcess?.pendingExcessId);
+              setToggleProcessOverpaymentModal(true);
+            }}
           >
             Manage Overpayment
           </Button>
@@ -329,6 +341,36 @@ const AccountsReceivablePage = () => {
                   <WarningAmber fontSize="small" color="warning" />
                   <Typography variant="h6" color="warning.main">
                     {formatToLocalCurrency(activePendingExcess?.amount)}
+                  </Typography>
+                </Stack>
+              </Grid>
+            </Tooltip>
+          )}
+          {refund && (
+            <Tooltip title="This amount has been processed to refund">
+              <Grid item xs={6} sm={2.4}>
+                <Typography variant="body2" color="text.secondary">
+                  Amount Refunded
+                </Typography>
+                <Stack direction="row" alignItems="center" spacing={0.5}>
+                  <Check fontSize="small" color="success" />
+                  <Typography variant="h6" color="success.main">
+                    {formatToLocalCurrency(refund?.amount)}
+                  </Typography>
+                </Stack>
+              </Grid>
+            </Tooltip>
+          )}
+          {creditMemo && (
+            <Tooltip title="This amount has been processed to refund">
+              <Grid item xs={6} sm={2.4}>
+                <Typography variant="body2" color="text.secondary">
+                  Amount Transferred To Credit Memo
+                </Typography>
+                <Stack direction="row" alignItems="center" spacing={0.5}>
+                  <Check fontSize="small" color="success" />
+                  <Typography variant="h6" color="success.main">
+                    {formatToLocalCurrency(creditMemo?.amount)}
                   </Typography>
                 </Stack>
               </Grid>
@@ -434,6 +476,7 @@ const AccountsReceivablePage = () => {
                 <TableCell align="right">Subtotal</TableCell>
                 <TableCell align="center">Action Type</TableCell>
                 <TableCell>Changed To</TableCell>
+                <TableCell>Reason</TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -468,6 +511,13 @@ const AccountsReceivablePage = () => {
                       ) : (
                         "-"
                       )}
+                    </TableCell>
+                    <TableCell>
+                      {sale.cancellationReason
+                        ? sale.cancellationReason
+                        : sale.changeReason
+                        ? sale.changeReason
+                        : "-"}
                     </TableCell>
                     <TableCell>
                       <Stack direction="row" spacing={1}>
@@ -601,6 +651,13 @@ const AccountsReceivablePage = () => {
         onClose={handleCloseChangeSaleModal}
         accountsReceivableId={accountsReceivableId}
         sale={saleToChange}
+      />
+      <ProcessOverpaymentModal
+        open={toggleProcessOverpaymentModal}
+        onClose={handleCloseProcessOverpaymentModal}
+        accountsReceivableId={accountsReceivableId}
+        pendingExcessId={pendingExcessId}
+        accountName={account.accountName}
       />
     </Box>
   );

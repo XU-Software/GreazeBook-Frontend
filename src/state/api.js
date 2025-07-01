@@ -30,6 +30,10 @@ export const api = createApi({
     "Payment",
     "PendingExcesses",
     "PendingExcess",
+    "Refunds",
+    "Refund",
+    "CreditMemos",
+    "CreditMemo",
   ],
   endpoints: () => ({}),
 });
