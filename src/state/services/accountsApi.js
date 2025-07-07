@@ -61,11 +61,23 @@ export const accountsApi = api.injectEndpoints({
       },
       invalidatesTags: [{ type: "Accounts", id: "LIST" }],
     }),
-    getSingleAccount: build.query({
+    getAccountInformation: build.query({
       query: (accountId) => ({
         url: `/account/${accountId}`,
       }),
       providesTags: (result, error, arg) => [{ type: "Account", id: arg }],
+    }),
+    getAccountMetrics: build.query({
+      query: ({ accountId, startDate, endDate }) => ({
+        url: `/account/${accountId}/metrics`,
+        params: {
+          startDate,
+          endDate,
+        },
+      }),
+      providesTags: (result, error, arg) => [
+        { type: "AccountMetrics", id: arg.accountId },
+      ],
     }),
   }),
 });
@@ -75,5 +87,6 @@ export const {
   useDeleteAccountsMutation,
   useAddSingleAccountMutation,
   useImportAccountsExcelMutation,
-  useGetSingleAccountQuery,
+  useGetAccountInformationQuery,
+  useGetAccountMetricsQuery,
 } = accountsApi;

@@ -32,10 +32,11 @@ import {
 } from "@mui/icons-material";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";
+import DynamicBreadcrumbs from "@/components/Utils/DynamicBreadcrumbs";
 import ColoredLink from "@/components/Utils/ColoredLink";
-import PaymentModal from "./PaymentModal";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 import { formatDate, formatDateWithTime } from "@/utils/dateFormatter";
+import PaymentModal from "./PaymentModal";
 import ConfirmationModal from "@/components/Utils/ConfirmationModal";
 import CancelSaleModal from "./CancelSaleModal";
 import ChangeSaleModal from "./ChangeSaleModal";
@@ -258,408 +259,411 @@ const AccountsReceivablePage = () => {
   } = arData.data;
 
   return (
-    <Box sx={{ p: 2, mx: "auto" }}>
-      {/* Header */}
-      <Typography variant="h4" gutterBottom>
-        Accounts Receivable:{" "}
-        <ColoredLink
-          href={`/operations/invoices/${invoice.invoiceId}`}
-          linkText={`#${invoice.salesInvoiceNumber}`}
-        />
-      </Typography>
+    <>
+      <DynamicBreadcrumbs />
+      <Box sx={{ p: 2, mx: "auto" }}>
+        {/* Header */}
+        <Typography variant="h4" gutterBottom>
+          Accounts Receivable:{" "}
+          <ColoredLink
+            href={`/operations/invoices/${invoice.invoiceId}`}
+            linkText={`#${invoice.salesInvoiceNumber}`}
+          />
+        </Typography>
 
-      {/* Actions */}
-      <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mb={3}>
-        {status === "Paid" ? (
-          <Tooltip title="AR is already paid">
-            <span>
-              <Button variant="contained" color="primary" disabled>
+        {/* Actions */}
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mb={3}>
+          {status === "Paid" ? (
+            <Tooltip title="AR is already paid">
+              <span>
+                <Button variant="contained" color="primary" disabled>
+                  Record Payment
+                </Button>
+              </span>
+            </Tooltip>
+          ) : (
+            <Tooltip title="Make a payment">
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => setTogglePaymentModal(true)}
+              >
                 Record Payment
               </Button>
-            </span>
-          </Tooltip>
-        ) : (
-          <Tooltip title="Make a payment">
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => setTogglePaymentModal(true)}
-            >
-              Record Payment
-            </Button>
-          </Tooltip>
-        )}
-        {activePendingExcess && (
-          <Button
-            variant="outlined"
-            color="warning"
-            onClick={() => {
-              setPendingExcessId(activePendingExcess?.pendingExcessId);
-              setToggleProcessOverpaymentModal(true);
-            }}
-          >
-            Manage Overpayment
-          </Button>
-        )}
-      </Stack>
-
-      {/* Summary */}
-      <Paper sx={{ p: 2, mb: 3 }} elevation={2}>
-        <Typography variant="h6">Summary</Typography>
-        <Grid container columnSpacing={4} rowSpacing={1} mt={1}>
-          <Grid item xs={6} sm={2.4}>
-            <Typography variant="body2" color="text.secondary">
-              Total Sales
-            </Typography>
-            <Typography variant="h6">
-              {formatToLocalCurrency(totalSalesAmount)}
-            </Typography>
-          </Grid>
-          <Grid item xs={6} sm={2.4}>
-            <Typography variant="body2" color="text.secondary">
-              Balance
-            </Typography>
-            <Typography variant="h6">
-              {formatToLocalCurrency(balance)}
-            </Typography>
-          </Grid>
-          <Grid item xs={6} sm={2.4}>
-            <Typography variant="body2" color="text.secondary">
-              Total Payments
-            </Typography>
-            <Typography variant="h6">
-              {formatToLocalCurrency(totalPayments)}
-            </Typography>
-          </Grid>
+            </Tooltip>
+          )}
           {activePendingExcess && (
-            <Tooltip title="Please process the excess by either converting it into a credit memo or issuing a refund.">
-              <Grid item xs={6} sm={2.4}>
-                <Typography variant="body2" color="text.secondary">
-                  Unprocessed Overpayment
-                </Typography>
-                <Stack direction="row" alignItems="center" spacing={0.5}>
-                  <WarningAmber fontSize="small" color="warning" />
-                  <Typography variant="h6" color="warning.main">
-                    {formatToLocalCurrency(activePendingExcess?.amount)}
-                  </Typography>
-                </Stack>
-              </Grid>
-            </Tooltip>
+            <Button
+              variant="outlined"
+              color="warning"
+              onClick={() => {
+                setPendingExcessId(activePendingExcess?.pendingExcessId);
+                setToggleProcessOverpaymentModal(true);
+              }}
+            >
+              Manage Overpayment
+            </Button>
           )}
-          {refund && (
-            <Tooltip title="This amount has been processed to refund">
-              <Grid item xs={6} sm={2.4}>
-                <Typography variant="body2" color="text.secondary">
-                  Amount Refunded
-                </Typography>
-                <Stack direction="row" alignItems="center" spacing={0.5}>
-                  <Check fontSize="small" color="success" />
-                  <Typography variant="h6" color="success.main">
-                    {formatToLocalCurrency(refund?.amount)}
-                  </Typography>
-                </Stack>
-              </Grid>
-            </Tooltip>
-          )}
-          {creditMemo && (
-            <Tooltip title="This amount has been processed to refund">
-              <Grid item xs={6} sm={2.4}>
-                <Typography variant="body2" color="text.secondary">
-                  Amount Transferred To Credit Memo
-                </Typography>
-                <Stack direction="row" alignItems="center" spacing={0.5}>
-                  <Check fontSize="small" color="success" />
-                  <Typography variant="h6" color="success.main">
-                    {formatToLocalCurrency(creditMemo?.amount)}
-                  </Typography>
-                </Stack>
-              </Grid>
-            </Tooltip>
-          )}
-          <Grid item xs={6} sm={2.4}>
-            <Typography variant="body2" color="text.secondary">
-              Status
-            </Typography>
-            {getStatusChip(status)}
-          </Grid>
-          <Grid
-            item
-            xs={6}
-            sm={2.4}
-            sx={{ display: "flex", flexDirection: "column", gap: 0.7 }}
-          >
-            <Typography variant="body2" color="text.secondary">
-              Invoice Date
-            </Typography>
-            {formatDate(invoice.createdAt)}
-          </Grid>
-          <Grid
-            item
-            xs={6}
-            sm={2.4}
-            sx={{ display: "flex", flexDirection: "column", gap: 0.7 }}
-          >
-            <Typography variant="body2" color="text.secondary">
-              Due Date
-            </Typography>
-            <span>{formatDate(dueDate)}</span>
-          </Grid>
-          <Grid item xs={6} sm={2.4}>
-            <Typography variant="body2" color="text.secondary">
-              Aging
-            </Typography>
-            {status !== "Paid" ? getAgingChip(dueDate) : "-"}
-          </Grid>
-        </Grid>
-      </Paper>
-      {/* Customer Details */}
-      <Paper sx={{ p: 2, mb: 3 }} elevation={2}>
-        <Typography variant="h6">Customer Details</Typography>
-        <Grid container columnSpacing={4} rowSpacing={1} mt={1}>
-          <Grid item xs={12} sm={6} md={4}>
-            <Typography variant="body2" color="text.secondary">
-              Customer Number
-            </Typography>
-            <Typography>{account.customerNumber}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Typography variant="body2" color="text.secondary">
-              Account Name
-            </Typography>
-            <Typography>
-              <ColoredLink
-                href={`/master-data/accounts/${account.accountId}`}
-                linkText={account.accountName}
-              />
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Typography variant="body2" color="text.secondary">
-              Customer Name
-            </Typography>
-            <Typography>{invoice.booking.customerName}</Typography>
-          </Grid>
+        </Stack>
 
-          <Grid item xs={12} sm={6} md={4}>
-            <Typography variant="body2" color="text.secondary">
-              Trade Type
-            </Typography>
-            <Typography>{account.tradeType}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Typography variant="body2" color="text.secondary">
-              Location
-            </Typography>
-            <Typography>{account.location}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Typography variant="body2" color="text.secondary">
-              DSP
-            </Typography>
-            <Typography>{account.dsp}</Typography>
-          </Grid>
-        </Grid>
-      </Paper>
-
-      {/* Sales */}
-      <Paper sx={{ p: 2, mb: 3 }} elevation={2}>
-        <Typography variant="h6" gutterBottom>
-          Sales
-        </Typography>
-        <Box sx={{ overflowX: "auto" }}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>Product</TableCell>
-                <TableCell align="right">Quantity</TableCell>
-                <TableCell align="right">Unit Price</TableCell>
-                <TableCell align="right">Subtotal</TableCell>
-                <TableCell align="center">Action Type</TableCell>
-                <TableCell>Changed To</TableCell>
-                <TableCell>Reason</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {sales.map((sale) => {
-                const changedTo = sales.find(
-                  (s) => s.saleId === sale?.replacementSale?.saleId
-                );
-                return (
-                  <TableRow key={sale.saleId}>
-                    <TableCell>{sale.order.product.productName}</TableCell>
-                    <TableCell align="right">{sale.order.quantity}</TableCell>
-                    <TableCell align="right">
-                      {formatToLocalCurrency(sale.order.price)}
-                    </TableCell>
-                    <TableCell align="right">
-                      {formatToLocalCurrency(
-                        sale.order.quantity * sale.order.price
-                      )}
-                    </TableCell>
-                    <TableCell align="center">
-                      {getFulfillmentChip(sale.actionType)}
-                    </TableCell>
-                    <TableCell>
-                      {changedTo ? (
-                        <Chip
-                          size="small"
-                          label={changedTo.order.product.productName}
-                          variant="outlined"
-                          color="info"
-                        />
-                      ) : (
-                        "-"
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {sale.cancellationReason
-                        ? sale.cancellationReason
-                        : sale.changeReason
-                        ? sale.changeReason
-                        : "-"}
-                    </TableCell>
-                    <TableCell>
-                      <Stack direction="row" spacing={1}>
-                        <Button
-                          variant="outlined"
-                          color="error"
-                          disabled={sale.actionType !== "Fulfilled"}
-                          onClick={() => {
-                            setSaleId(sale.saleId);
-                            setToggleCancelSaleModal(true);
-                          }}
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          color="primary"
-                          disabled={sale.actionType !== "Fulfilled"}
-                          onClick={() => {
-                            setSaleToChange(sale);
-                            setToggleChangeSaleModal(true);
-                          }}
-                        >
-                          Change
-                        </Button>
-                      </Stack>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </Box>
-      </Paper>
-      {/* Payments */}
-      <Paper sx={{ p: 2, mb: 3 }} elevation={2}>
-        <Typography variant="h6" gutterBottom>
-          Payments
-        </Typography>
-        <Box sx={{ overflowX: "auto" }}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>Date</TableCell>
-                <TableCell>Amount</TableCell>
-                <TableCell>Method</TableCell>
-                <TableCell>Void Status</TableCell>
-                <TableCell>Reference</TableCell>
-                <TableCell>Note</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {payments.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} align="center">
-                    <Typography variant="body2" color="textSecondary">
-                      No payments made yet. Click on the Record Payment button
-                      to proceed payment.
+        {/* Summary */}
+        <Paper sx={{ p: 2, mb: 3 }} elevation={2}>
+          <Typography variant="h6">Summary</Typography>
+          <Grid container columnSpacing={4} rowSpacing={1} mt={1}>
+            <Grid item xs={6} sm={2.4}>
+              <Typography variant="body2" color="text.secondary">
+                Total Sales
+              </Typography>
+              <Typography variant="h6">
+                {formatToLocalCurrency(totalSalesAmount)}
+              </Typography>
+            </Grid>
+            <Grid item xs={6} sm={2.4}>
+              <Typography variant="body2" color="text.secondary">
+                Balance
+              </Typography>
+              <Typography variant="h6">
+                {formatToLocalCurrency(balance)}
+              </Typography>
+            </Grid>
+            <Grid item xs={6} sm={2.4}>
+              <Typography variant="body2" color="text.secondary">
+                Total Payments
+              </Typography>
+              <Typography variant="h6">
+                {formatToLocalCurrency(totalPayments)}
+              </Typography>
+            </Grid>
+            {activePendingExcess && (
+              <Tooltip title="Please process the excess by either converting it into a credit memo or issuing a refund.">
+                <Grid item xs={6} sm={2.4}>
+                  <Typography variant="body2" color="text.secondary">
+                    Unprocessed Overpayment
+                  </Typography>
+                  <Stack direction="row" alignItems="center" spacing={0.5}>
+                    <WarningAmber fontSize="small" color="warning" />
+                    <Typography variant="h6" color="warning.main">
+                      {formatToLocalCurrency(activePendingExcess?.amount)}
                     </Typography>
-                  </TableCell>
+                  </Stack>
+                </Grid>
+              </Tooltip>
+            )}
+            {refund && (
+              <Tooltip title="This amount has been processed to refund">
+                <Grid item xs={6} sm={2.4}>
+                  <Typography variant="body2" color="text.secondary">
+                    Amount Refunded
+                  </Typography>
+                  <Stack direction="row" alignItems="center" spacing={0.5}>
+                    <Check fontSize="small" color="success" />
+                    <Typography variant="h6" color="success.main">
+                      {formatToLocalCurrency(refund?.amount)}
+                    </Typography>
+                  </Stack>
+                </Grid>
+              </Tooltip>
+            )}
+            {creditMemo && (
+              <Tooltip title="This amount has been processed to refund">
+                <Grid item xs={6} sm={2.4}>
+                  <Typography variant="body2" color="text.secondary">
+                    Amount Transferred To Credit Memo
+                  </Typography>
+                  <Stack direction="row" alignItems="center" spacing={0.5}>
+                    <Check fontSize="small" color="success" />
+                    <Typography variant="h6" color="success.main">
+                      {formatToLocalCurrency(creditMemo?.amount)}
+                    </Typography>
+                  </Stack>
+                </Grid>
+              </Tooltip>
+            )}
+            <Grid item xs={6} sm={2.4}>
+              <Typography variant="body2" color="text.secondary">
+                Status
+              </Typography>
+              {getStatusChip(status)}
+            </Grid>
+            <Grid
+              item
+              xs={6}
+              sm={2.4}
+              sx={{ display: "flex", flexDirection: "column", gap: 0.7 }}
+            >
+              <Typography variant="body2" color="text.secondary">
+                Invoice Date
+              </Typography>
+              {formatDate(invoice.createdAt)}
+            </Grid>
+            <Grid
+              item
+              xs={6}
+              sm={2.4}
+              sx={{ display: "flex", flexDirection: "column", gap: 0.7 }}
+            >
+              <Typography variant="body2" color="text.secondary">
+                Due Date
+              </Typography>
+              <span>{formatDate(dueDate)}</span>
+            </Grid>
+            <Grid item xs={6} sm={2.4}>
+              <Typography variant="body2" color="text.secondary">
+                Aging
+              </Typography>
+              {status !== "Paid" ? getAgingChip(dueDate) : "-"}
+            </Grid>
+          </Grid>
+        </Paper>
+        {/* Customer Details */}
+        <Paper sx={{ p: 2, mb: 3 }} elevation={2}>
+          <Typography variant="h6">Customer Details</Typography>
+          <Grid container columnSpacing={4} rowSpacing={1} mt={1}>
+            <Grid item xs={12} sm={6} md={4}>
+              <Typography variant="body2" color="text.secondary">
+                Customer Number
+              </Typography>
+              <Typography>{account.customerNumber}</Typography>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <Typography variant="body2" color="text.secondary">
+                Account Name
+              </Typography>
+              <Typography>
+                <ColoredLink
+                  href={`/master-data/accounts/${account.accountId}`}
+                  linkText={account.accountName}
+                />
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <Typography variant="body2" color="text.secondary">
+                Customer Name
+              </Typography>
+              <Typography>{invoice.booking.customerName}</Typography>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4}>
+              <Typography variant="body2" color="text.secondary">
+                Trade Type
+              </Typography>
+              <Typography>{account.tradeType}</Typography>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <Typography variant="body2" color="text.secondary">
+                Location
+              </Typography>
+              <Typography>{account.location}</Typography>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <Typography variant="body2" color="text.secondary">
+                DSP
+              </Typography>
+              <Typography>{account.dsp}</Typography>
+            </Grid>
+          </Grid>
+        </Paper>
+
+        {/* Sales */}
+        <Paper sx={{ p: 2, mb: 3 }} elevation={2}>
+          <Typography variant="h6" gutterBottom>
+            Sales
+          </Typography>
+          <Box sx={{ overflowX: "auto" }}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Product</TableCell>
+                  <TableCell align="right">Quantity</TableCell>
+                  <TableCell align="right">Unit Price</TableCell>
+                  <TableCell align="right">Subtotal</TableCell>
+                  <TableCell align="center">Action Type</TableCell>
+                  <TableCell>Changed To</TableCell>
+                  <TableCell>Reason</TableCell>
+                  <TableCell>Actions</TableCell>
                 </TableRow>
-              ) : (
-                payments.map((p) => (
-                  <TableRow key={p.paymentId}>
-                    <TableCell>{formatDateWithTime(p.createdAt)}</TableCell>
-                    <TableCell>{formatToLocalCurrency(p.amount)}</TableCell>
-                    <TableCell>{p.method}</TableCell>
-                    <TableCell>
-                      {p.isVoid ? (
-                        <Chip
-                          icon={<Cancel />}
-                          label="Voided"
-                          color="error"
-                          size="small"
-                          variant="filled"
-                        />
-                      ) : (
-                        "-"
-                      )}
-                    </TableCell>
-                    <TableCell>{p.reference}</TableCell>
-                    <TableCell>{p.note}</TableCell>
-                    <TableCell>
-                      {!p.isVoid ? (
-                        <Button
-                          variant="outlined"
-                          color="error"
-                          onClick={() => {
-                            setPaymentId(p.paymentId);
-                            setToggleVoidPaymentModal(true);
-                          }}
-                        >
-                          Void
-                        </Button>
-                      ) : (
-                        "-"
-                      )}
+              </TableHead>
+              <TableBody>
+                {sales.map((sale) => {
+                  const changedTo = sales.find(
+                    (s) => s.saleId === sale?.replacementSale?.saleId
+                  );
+                  return (
+                    <TableRow key={sale.saleId}>
+                      <TableCell>{sale.order.product.productName}</TableCell>
+                      <TableCell align="right">{sale.order.quantity}</TableCell>
+                      <TableCell align="right">
+                        {formatToLocalCurrency(sale.order.price)}
+                      </TableCell>
+                      <TableCell align="right">
+                        {formatToLocalCurrency(
+                          sale.order.quantity * sale.order.price
+                        )}
+                      </TableCell>
+                      <TableCell align="center">
+                        {getFulfillmentChip(sale.actionType)}
+                      </TableCell>
+                      <TableCell>
+                        {changedTo ? (
+                          <Chip
+                            size="small"
+                            label={changedTo.order.product.productName}
+                            variant="outlined"
+                            color="info"
+                          />
+                        ) : (
+                          "-"
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {sale.cancellationReason
+                          ? sale.cancellationReason
+                          : sale.changeReason
+                          ? sale.changeReason
+                          : "-"}
+                      </TableCell>
+                      <TableCell>
+                        <Stack direction="row" spacing={1}>
+                          <Button
+                            variant="outlined"
+                            color="error"
+                            disabled={sale.actionType !== "Fulfilled"}
+                            onClick={() => {
+                              setSaleId(sale.saleId);
+                              setToggleCancelSaleModal(true);
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            color="primary"
+                            disabled={sale.actionType !== "Fulfilled"}
+                            onClick={() => {
+                              setSaleToChange(sale);
+                              setToggleChangeSaleModal(true);
+                            }}
+                          >
+                            Change
+                          </Button>
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </Box>
+        </Paper>
+        {/* Payments */}
+        <Paper sx={{ p: 2, mb: 3 }} elevation={2}>
+          <Typography variant="h6" gutterBottom>
+            Payments
+          </Typography>
+          <Box sx={{ overflowX: "auto" }}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Amount</TableCell>
+                  <TableCell>Method</TableCell>
+                  <TableCell>Void Status</TableCell>
+                  <TableCell>Reference</TableCell>
+                  <TableCell>Note</TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {payments.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center">
+                      <Typography variant="body2" color="textSecondary">
+                        No payments made yet. Click on the Record Payment button
+                        to proceed payment.
+                      </Typography>
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </Box>
-      </Paper>
-      <PaymentModal
-        open={togglePaymentModal}
-        onClose={() => setTogglePaymentModal(false)}
-        accountsReceivableId={accountsReceivableId}
-      />
-      <ConfirmationModal
-        open={toggleVoidPaymentModal}
-        onClose={handleCloseVoidModal}
-        onConfirm={() => handleVoidPayment(accountsReceivableId, paymentId)}
-        title="Void Payment"
-        message="Are you sure you want to void this payment? This action is irreversible and will permanently mark the payment as voided in the system."
-        confirmText="Void"
-        confirmButtonColor="error"
-        cancelText="Cancel"
-        cancelButtonColor="primary"
-      />
-      <CancelSaleModal
-        open={toggleCancelSaleModal}
-        onClose={handleCloseCancelSaleModal}
-        accountsReceivableId={accountsReceivableId}
-        saleId={saleId}
-      />
-      <ChangeSaleModal
-        open={toggleChangeSaleModal}
-        onClose={handleCloseChangeSaleModal}
-        accountsReceivableId={accountsReceivableId}
-        sale={saleToChange}
-      />
-      <ProcessOverpaymentModal
-        open={toggleProcessOverpaymentModal}
-        onClose={handleCloseProcessOverpaymentModal}
-        accountsReceivableId={accountsReceivableId}
-        pendingExcessId={pendingExcessId}
-        accountName={account.accountName}
-      />
-    </Box>
+                ) : (
+                  payments.map((p) => (
+                    <TableRow key={p.paymentId}>
+                      <TableCell>{formatDateWithTime(p.createdAt)}</TableCell>
+                      <TableCell>{formatToLocalCurrency(p.amount)}</TableCell>
+                      <TableCell>{p.method}</TableCell>
+                      <TableCell>
+                        {p.isVoid ? (
+                          <Chip
+                            icon={<Cancel />}
+                            label="Voided"
+                            color="error"
+                            size="small"
+                            variant="filled"
+                          />
+                        ) : (
+                          "-"
+                        )}
+                      </TableCell>
+                      <TableCell>{p.reference}</TableCell>
+                      <TableCell>{p.note}</TableCell>
+                      <TableCell>
+                        {!p.isVoid ? (
+                          <Button
+                            variant="outlined"
+                            color="error"
+                            onClick={() => {
+                              setPaymentId(p.paymentId);
+                              setToggleVoidPaymentModal(true);
+                            }}
+                          >
+                            Void
+                          </Button>
+                        ) : (
+                          "-"
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </Box>
+        </Paper>
+        <PaymentModal
+          open={togglePaymentModal}
+          onClose={() => setTogglePaymentModal(false)}
+          accountsReceivableId={accountsReceivableId}
+        />
+        <ConfirmationModal
+          open={toggleVoidPaymentModal}
+          onClose={handleCloseVoidModal}
+          onConfirm={() => handleVoidPayment(accountsReceivableId, paymentId)}
+          title="Void Payment"
+          message="Are you sure you want to void this payment? This action is irreversible and will permanently mark the payment as voided in the system."
+          confirmText="Void"
+          confirmButtonColor="error"
+          cancelText="Cancel"
+          cancelButtonColor="primary"
+        />
+        <CancelSaleModal
+          open={toggleCancelSaleModal}
+          onClose={handleCloseCancelSaleModal}
+          accountsReceivableId={accountsReceivableId}
+          saleId={saleId}
+        />
+        <ChangeSaleModal
+          open={toggleChangeSaleModal}
+          onClose={handleCloseChangeSaleModal}
+          accountsReceivableId={accountsReceivableId}
+          sale={saleToChange}
+        />
+        <ProcessOverpaymentModal
+          open={toggleProcessOverpaymentModal}
+          onClose={handleCloseProcessOverpaymentModal}
+          accountsReceivableId={accountsReceivableId}
+          pendingExcessId={pendingExcessId}
+          accountName={account.accountName}
+        />
+      </Box>
+    </>
   );
 };
 
