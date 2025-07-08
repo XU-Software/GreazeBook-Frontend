@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { Box, Button } from "@mui/material";
+import dayjs from "dayjs";
 
 export default function DateRangePicker({
   onFilter = () => {},
@@ -13,7 +14,10 @@ export default function DateRangePicker({
 
   const handleSubmit = () => {
     if (!startDate || !endDate) return;
-    onFilter(startDate.toString(), endDate.toString());
+    onFilter(
+      dayjs(startDate).format("YYYY-MM-DD"),
+      dayjs(endDate).format("YYYY-MM-DD")
+    );
   };
 
   const handleClear = () => {
@@ -41,6 +45,7 @@ export default function DateRangePicker({
       <DatePicker
         label="End Date"
         value={endDate}
+        minDate={startDate}
         onChange={(newValue) => setEndDate(newValue)}
         slotProps={{ textField: { size: "small" } }}
         sx={{ maxWidth: "10rem" }}
