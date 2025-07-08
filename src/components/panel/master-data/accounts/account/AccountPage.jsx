@@ -49,12 +49,27 @@ const AccountPage = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
+  const handleFilterDateRange = (startDate, endDate) => {
+    if (!startDate || !endDate) return;
+    setStartDate(startDate);
+    setEndDate(endDate);
+  };
+
+  const handleClearInput = () => {
+    setStartDate("");
+    setEndDate("");
+  };
+
   return (
     <>
       <DynamicBreadcrumbs />
       <Box sx={{ p: 2, mx: "auto" }}>
         {/* Account information*/}
-        <AccountInformation accountId={accountId} />
+        <AccountInformation
+          accountId={accountId}
+          onFilter={handleFilterDateRange}
+          onClear={handleClearInput}
+        />
 
         {/* Account metrics*/}
         <Typography variant="h6" gutterBottom>
