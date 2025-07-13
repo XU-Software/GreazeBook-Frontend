@@ -15,8 +15,9 @@ export default function DateRangePicker({
   const handleSubmit = () => {
     if (!startDate || !endDate) return;
     onFilter(
-      dayjs(startDate).format("YYYY-MM-DD"),
-      dayjs(endDate).format("YYYY-MM-DD")
+      //Format the date to start of the day to match the format when filtering against prisma date format
+      dayjs(startDate).startOf("day").toISOString(),
+      dayjs(endDate).endOf("day").toISOString()
     );
   };
 
