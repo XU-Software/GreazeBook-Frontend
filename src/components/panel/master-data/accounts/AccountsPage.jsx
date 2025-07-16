@@ -48,11 +48,6 @@ const columns = [
     minWidth: 150,
   },
   {
-    field: "balance",
-    headerName: "Balance",
-    minWidth: 150,
-  },
-  {
     field: "contactInformation",
     headerName: "Contact Information",
     minWidth: 150,
@@ -71,7 +66,6 @@ const rowGuide = {
   tradeType: "Trade type",
   location: "Philippines",
   dsp: "DSP 1",
-  balance: "10.00 or 10",
   contactInformation: "Email or Phone number",
 };
 
@@ -96,11 +90,6 @@ const columnsGuide = [
     field: "dsp",
     headerName: "DSP",
     type: "text",
-  },
-  {
-    field: "balance",
-    headerName: "Balance",
-    type: "number",
   },
   {
     field: "contactInformation",
@@ -245,7 +234,6 @@ const AccountsPage = () => {
         tradeType: acc.tradeType,
         location: acc.location,
         dsp: acc.dsp,
-        balance: `₱${numeral(acc.balance).format("0,0.00")}`,
         contactInformation: acc.contactInformation,
         createdAt: formattedDate,
       });
@@ -256,7 +244,6 @@ const AccountsPage = () => {
         "Trade Type": acc.tradeType,
         Location: acc.location,
         DSP: acc.dsp,
-        "Balance (₱)": `₱${numeral(acc.balance).format("0,0.00")}`,
         "Contact Info": acc.contactInformation,
         "Created At": formattedDate,
       });
@@ -302,7 +289,6 @@ const AccountsPage = () => {
                 tradeType: "",
                 location: "",
                 dsp: "",
-                balance: 0,
                 contactInformation: "",
               }}
               isLoading={isAdding}

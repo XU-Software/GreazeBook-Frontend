@@ -1,54 +1,13 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
-import { useGetAccountMetricsQuery } from "@/state/services/accountsApi";
-import LoadingSpinner from "@/components/Utils/LoadingSpinner";
-import ErrorMessage from "@/components/Utils/ErrorMessage";
+import React from "react";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
-import { Grid, Paper, Typography } from "@mui/material";
+import { Grid, Paper, Typography, Box } from "@mui/material";
+import ReactECharts from "echarts-for-react";
 
-const AccountMetrics = ({ accountId = "", startDate = "", endDate = "" }) => {
-  const queryArgs = useMemo(
-    () => ({
-      accountId,
-      startDate,
-      endDate,
-    }),
-    [accountId, startDate, endDate]
-  );
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
-  const {
-    data: accountMetricsData,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useGetAccountMetricsQuery(queryArgs, {
-    refetchOnMountOrArgChange: true,
-    refetchOnFocus: true,
-  });
-
-  if (isLoading) {
-    return (
-      <div className="h-full flex items-center justify-center">
-        <LoadingSpinner />
-      </div>
-    );
-  }
-
-  if (isError || !accountMetricsData) {
-    return (
-      <ErrorMessage
-        message={
-          error?.data?.message ||
-          error?.error ||
-          "Failed to load account metrics"
-        }
-        onRetry={refetch}
-      />
-    );
-  }
-
+const AccountMetrics = ({ accountMetricsData }) => {
   const {
     outstandingBalance,
     totalSales,
@@ -61,8 +20,52 @@ const AccountMetrics = ({ accountId = "", startDate = "", endDate = "" }) => {
     refundedAmount,
     creditMemoAmount,
   } = accountMetricsData.data;
+
+  const pieOptions = {
+    tooltip: {
+      trigger: "item",
+      formatter: ({ name, data, percent }) =>
+        `${name}<br/>Count: ${data.count}<br/>Amount: ${formatToLocalCurrency(
+          data.amount
+        )}<br/>${percent}%`,
+    },
+    legend: {
+      bottom: 0,
+    },
+    series: [
+      {
+        name: "Aging Buckets",
+        type: "pie",
+        radius: ["50%", "70%"], // Donut style
+        avoidLabelOverlap: false,
+        label: {
+          show: false,
+          position: "center",
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: 16,
+            fontWeight: "bold",
+          },
+        },
+        labelLine: {
+          show: false,
+        },
+        data: agingBuckets.map((item, index) => ({
+          value: item.count,
+          name: item.label,
+          count: item.count,
+          amount: item.amount,
+          itemStyle: { color: COLORS[index % COLORS.length] },
+        })),
+      },
+    ],
+  };
+
   return (
     <Grid container spacing={2} mb={4}>
+      {/*Metrics summary*/}
       <Grid container spacing={2} size={{ xs: 12 }}>
         {[
           { label: "Outstanding Balance", value: outstandingBalance },
@@ -84,41 +87,20 @@ const AccountMetrics = ({ accountId = "", startDate = "", endDate = "" }) => {
           </Grid>
         ))}
       </Grid>
-      {/* <Grid item size={{ xs: 12, md: 6, lg: 6 }}>
-            <Paper elevation={2} className="p-4 bg-gray-50 rounded-xl w-full">
-              <Typography variant="subtitle2" gutterBottom>
-                Aging
-              </Typography>
-              <Box sx={{ width: "100%", height: 250 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={agingData}
-                      dataKey="value"
-                      nameKey="label"
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={80}
-                      paddingAngle={2}
-                      label={({ value }) => formatToLocalCurrency(value)}
-                    >
-                      {agingData.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={COLORS[index % COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend verticalAlign="bottom" height={36} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </Box>
-            </Paper>
-          </Grid>
 
-          <Grid item size={{ xs: 12, md: 6, lg: 6 }}>
+      {/* Pie graph for aging buckets*/}
+      <Grid item size={{ xs: 12, md: 6, lg: 6 }}>
+        <Paper elevation={2} className="p-4 bg-gray-50 rounded-xl w-full">
+          <Typography variant="subtitle2" gutterBottom>
+            Aging Buckets
+          </Typography>
+          <Box sx={{ width: "100%", height: 250 }}>
+            <ReactECharts option={pieOptions} style={{ height: "100%" }} />
+          </Box>
+        </Paper>
+      </Grid>
+
+      {/* <Grid item size={{ xs: 12, md: 6, lg: 6 }}>
             <Paper elevation={2} className="p-4 bg-gray-50 rounded-xl w-full">
               <Typography variant="subtitle2" gutterBottom>
                 Sales and Payments

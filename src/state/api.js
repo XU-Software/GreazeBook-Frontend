@@ -15,6 +15,7 @@ export const api = createApi({
     "Accounts",
     "Account",
     "AccountMetrics",
+    "AccountDetails",
     "Products",
     "Product",
     "Bookings",

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import clsx from "clsx";
 import StoreProvider from "@/app/redux";
 import Navbar from "./PanelNavbar";
@@ -10,7 +10,6 @@ import ErrorMessage from "@/components/Utils/ErrorMessage";
 import FeedbackSnackbar from "@/components/Utils/FeedbackSnackbar";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
-import { setUserData } from "@/state";
 import { setHideSnackbar } from "@/state/snackbarSlice";
 import { useGetUserQuery } from "@/state/services/userApi";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -48,18 +47,6 @@ const PanelBootstrap = ({ children }) => {
     error,
   } = useGetUserQuery();
 
-  useEffect(() => {
-    if (isSuccess && userDataResponse) {
-      dispatch(setUserData(userDataResponse));
-    }
-  }, [isSuccess, userDataResponse, dispatch]);
-
-  useEffect(() => {
-    if (isError && error?.status === 401) {
-      router.push("/login");
-    }
-  }, [isError, error, router]);
-
   if (isLoading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
@@ -68,7 +55,7 @@ const PanelBootstrap = ({ children }) => {
     );
   }
 
-  if (isError) {
+  if (isError || !userDataResponse) {
     return (
       <div className="w-full h-screen flex items-center justify-center text-red-500 text-center">
         <ErrorMessage

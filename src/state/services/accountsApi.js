@@ -79,6 +79,15 @@ export const accountsApi = api.injectEndpoints({
         { type: "AccountMetrics", id: arg.accountId },
       ],
     }),
+    getAccountBreakdownLists: build.query({
+      query: ({ accountId, startDate, endDate, page, pageSize, search }) => ({
+        url: `/account/${accountId}/details`,
+        params: { startDate, endDate, page, pageSize, search },
+      }),
+      providesTags: (result, error, arg) => [
+        { type: "AccountDetails", id: arg.accountId },
+      ],
+    }),
   }),
 });
 
@@ -89,4 +98,5 @@ export const {
   useImportAccountsExcelMutation,
   useGetAccountInformationQuery,
   useGetAccountMetricsQuery,
+  useGetAccountBreakdownListsQuery,
 } = accountsApi;

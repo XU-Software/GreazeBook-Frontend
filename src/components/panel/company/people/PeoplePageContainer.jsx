@@ -205,7 +205,7 @@ const PeoplePageContainer = () => {
                     </div>
                   </CardContent>
                   <CardActions sx={{ px: "1rem", pb: "1rem", pt: "0" }}>
-                    {userData.data.email !== user.email && (
+                    {userData?.data?.email !== user.email && (
                       <Button
                         size="small"
                         variant="outlined"
@@ -219,7 +219,7 @@ const PeoplePageContainer = () => {
                         onClick={() => handleCancelUserAccess(user.userId)}
                         loading={loadingUserId === user.userId}
                         disabled={
-                          user.isDeleted || userData.data.email === user.email
+                          user.isDeleted || userData?.data?.email === user.email
                         }
                       >
                         {user.isDeleted ? "Access Removed" : "Remove Access"}

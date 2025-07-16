@@ -134,8 +134,6 @@ export default function ChangeSaleModal({
     }
   };
 
-  console.log(form, changeDetails);
-
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
       <DialogTitle>Change Sales Order</DialogTitle>

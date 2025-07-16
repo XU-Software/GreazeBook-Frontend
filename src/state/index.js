@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { userApi } from "./services/userApi";
 
 const initialState = {
   isSidebarCollapsed: false,
@@ -19,6 +20,14 @@ export const globalSlice = createSlice({
     setUserData: (state, action) => {
       state.userData = action.payload;
     },
+  },
+    extraReducers: (builder) => {
+    builder.addMatcher(
+      userApi.endpoints.getUser.matchFulfilled,
+      (state, action) => {
+        state.userData = action.payload; // 👈 Auto-set userData when getUser succeeds
+      }
+    );
   },
 });
 
