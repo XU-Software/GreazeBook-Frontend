@@ -5,7 +5,9 @@ import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 import { Grid, Paper, Typography, Box } from "@mui/material";
 import ReactECharts from "echarts-for-react";
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+const COLORS1 = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+
+const COLORS2 = ["#4caf50", "#ff9800", "#f44336"];
 
 const AccountMetrics = ({ accountMetricsData }) => {
   const {
@@ -15,13 +17,14 @@ const AccountMetrics = ({ accountMetricsData }) => {
     netPaymentsApplied,
     overdueAmount,
     agingBuckets,
+    paymentPerformance,
     arStatusCounts,
     pendingExcess,
     refundedAmount,
     creditMemoAmount,
   } = accountMetricsData.data;
 
-  const pieOptions = {
+  const agingBucketsPieOptions = {
     tooltip: {
       trigger: "item",
       formatter: ({ name, data, percent }) =>
@@ -57,7 +60,49 @@ const AccountMetrics = ({ accountMetricsData }) => {
           name: item.label,
           count: item.count,
           amount: item.amount,
-          itemStyle: { color: COLORS[index % COLORS.length] },
+          itemStyle: { color: COLORS1[index % COLORS1.length] },
+        })),
+      },
+    ],
+  };
+
+  const paymentPerformancePieOptions = {
+    tooltip: {
+      trigger: "item",
+      formatter: ({ name, value, percent, data }) =>
+        `${name}<br/>Count: ${value}<br/>Amount: ${formatToLocalCurrency(
+          data.amount
+        )}<br/>(${percent}%)`,
+    },
+    legend: {
+      orient: "horizontal",
+      bottom: 0,
+    },
+    series: [
+      {
+        name: "Payment Performance",
+        type: "pie",
+        radius: ["40%", "70%"], // Donut style
+        avoidLabelOverlap: false,
+        label: {
+          show: true,
+          formatter: "{b}: {c}",
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: 16,
+            fontWeight: "bold",
+          },
+        },
+        labelLine: {
+          show: true,
+        },
+        data: paymentPerformance.map((item, index) => ({
+          value: item.count,
+          name: item.label,
+          amount: item.amount,
+          itemStyle: { color: COLORS2[index % COLORS2.length] },
         })),
       },
     ],
@@ -95,31 +140,28 @@ const AccountMetrics = ({ accountMetricsData }) => {
             Aging Buckets
           </Typography>
           <Box sx={{ width: "100%", height: 250 }}>
-            <ReactECharts option={pieOptions} style={{ height: "100%" }} />
+            <ReactECharts
+              option={agingBucketsPieOptions}
+              style={{ height: "100%" }}
+            />
           </Box>
         </Paper>
       </Grid>
 
-      {/* <Grid item size={{ xs: 12, md: 6, lg: 6 }}>
-            <Paper elevation={2} className="p-4 bg-gray-50 rounded-xl w-full">
-              <Typography variant="subtitle2" gutterBottom>
-                Sales and Payments
-              </Typography>
-              <Box sx={{ width: "100%", height: 250 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={salesPaymentsTrend}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="sales" stroke="#8884d8" />
-                    <Line type="monotone" dataKey="payments" stroke="#82ca9d" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </Box>
-            </Paper>
-          </Grid> */}
+      {/* Pie graph for payment performance*/}
+      <Grid item size={{ xs: 12, md: 6, lg: 6 }}>
+        <Paper elevation={2} className="p-4 bg-gray-50 rounded-xl w-full">
+          <Typography variant="subtitle2" gutterBottom>
+            Payment Performance
+          </Typography>
+          <Box sx={{ width: "100%", height: 250 }}>
+            <ReactECharts
+              option={paymentPerformancePieOptions}
+              style={{ height: "100%" }}
+            />
+          </Box>
+        </Paper>
+      </Grid>
     </Grid>
   );
 };
