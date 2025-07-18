@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useRef, useEffect } from "react";
 import {
   Accordion,
   AccordionSummary,
@@ -25,7 +25,28 @@ const AccountBreakdownSection = ({
   handleFetchNext = () => {},
   onRowClick = () => {},
   enableSearch = false,
+  hasMore = true,
 }) => {
+  const containerRef = useRef(null);
+  const sentinelRef = useRef(null);
+
+  useEffect(() => {
+    if (!sentinelRef.current || !hasMore) return; // Stop observing if no more data
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          handleFetchNext();
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    observer.observe(sentinelRef.current);
+
+    return () => observer.disconnect();
+  }, [rows, hasMore]); // Re-run if rows update or hasMore changes
+
   return (
     <Accordion>
       <AccordionSummary
@@ -67,15 +88,7 @@ const AccountBreakdownSection = ({
           </Box>
         )}
 
-        <Box
-          className="overflow-y-auto max-h-[60vh]"
-          onScroll={(e) => {
-            const t = e.currentTarget;
-            if (t.scrollTop + t.clientHeight >= t.scrollHeight - 100) {
-              handleFetchNext();
-            }
-          }}
-        >
+        <Box ref={containerRef} className="overflow-y-auto max-h-[60vh]">
           <DataTable
             rows={rows}
             columns={columns}
@@ -92,6 +105,9 @@ const AccountBreakdownSection = ({
               No records found.
             </Typography>
           )}
+
+          {/* Sentinel div for IntersectionObserver */}
+          {hasMore && <div ref={sentinelRef} style={{ height: "1px" }} />}
         </Box>
       </AccordionDetails>
     </Accordion>

@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Chip, Box, Tooltip } from "@mui/material";
+import { Chip, Box, Tooltip, Stack, Typography } from "@mui/material";
 import { useGetAccountBreakdownListsQuery } from "@/state/services/accountsApi";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";
@@ -15,6 +15,38 @@ const accountsReceivablesColumns = [
   {
     field: "salesInvoiceNumber",
     headerName: "Invoice Number",
+    render: (value, row) => (
+      <Stack direction="row" spacing={1} alignItems="center">
+        <Typography>{value}</Typography>
+        {row.hasActivePendingExcess && (
+          <Tooltip title="Please process overpayment in this A/R">
+            <Box
+              sx={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                backgroundColor: "orange",
+                animation: "pulse 1.5s infinite",
+                "@keyframes pulse": {
+                  "0%": {
+                    transform: "scale(0.9)",
+                    opacity: 0.7,
+                  },
+                  "50%": {
+                    transform: "scale(1.3)",
+                    opacity: 1,
+                  },
+                  "100%": {
+                    transform: "scale(0.9)",
+                    opacity: 0.7,
+                  },
+                },
+              }}
+            />
+          </Tooltip>
+        )}
+      </Stack>
+    ),
     minWidth: 150,
   },
   {
@@ -312,6 +344,7 @@ const AccountBreakdownLists = ({
             totalSales: formatToLocalCurrency(ar.totalSales),
             balance: formatToLocalCurrency(ar.balance),
             status: ar.status,
+            hasActivePendingExcess: ar.hasActivePendingExcess,
           })) || []),
         ],
         sales: [
@@ -413,6 +446,7 @@ const AccountBreakdownLists = ({
         setSearch={setSearch}
         setPage={setPage}
         handleFetchNext={handleFetchNext}
+        hasMore={page < accountDetailsData.totalPages}
         onRowClick={(arId) =>
           router.push(`/operations/accounts-receivables/${arId}`)
         }
