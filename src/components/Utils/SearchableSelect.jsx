@@ -2,7 +2,7 @@
 
 import { Autocomplete, TextField } from "@mui/material";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";
 
@@ -19,6 +19,8 @@ export default function SearchableSelect({
   const [input, setInput] = useState("");
   const [page, setPage] = useState(1);
   const [options, setOptions] = useState([]);
+
+  const observer = useRef(null); // IntersectionObserver ref
 
   const debouncedSearch = useDebounce(input, 500);
 
@@ -61,19 +63,19 @@ export default function SearchableSelect({
     setPage(1);
   }, [debouncedSearch]);
 
-  // Infinite scroll trigger
-  const handleScroll = (event) => {
-    const listboxNode = event.currentTarget;
-    const scrollBottom = listboxNode.scrollTop + listboxNode.clientHeight;
-    const scrollHeight = listboxNode.scrollHeight;
+  // Observe the last option for infinite scroll
+  const observeLastOption = (node) => {
+    if (isFetching) return; // Don’t observe while fetching
 
-    if (
-      scrollBottom >= scrollHeight - 100 &&
-      !isFetching &&
-      page < response?.totalPages
-    ) {
-      setPage((prev) => prev + 1);
-    }
+    if (observer.current) observer.current.disconnect();
+
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && page < response?.totalPages) {
+        setPage((prev) => prev + 1);
+      }
+    });
+
+    if (node) observer.current.observe(node);
   };
 
   if (isLoading) {
@@ -105,26 +107,25 @@ export default function SearchableSelect({
       value={value}
       isOptionEqualToValue={isOptionEqualToValue}
       filterOptions={(x) => x} // prevent MUI from client-side filtering
-      slotProps={{
-        listbox: {
-          onScroll: handleScroll,
-        },
-      }}
       disabled={disabled}
+      renderOption={(props, option, { index }) => {
+        const isLast = index === options.length - 1;
+
+        const { key, ...restProps } = props;
+
+        return (
+          <li key={key} {...restProps} ref={isLast ? observeLastOption : null}>
+            {getOptionLabel(option)}
+          </li>
+        );
+      }}
       renderInput={(params) => (
         <TextField
           {...params}
           label={label}
           InputProps={{
             ...params.InputProps,
-            endAdornment: (
-              <>
-                {/* {(isLoading || isFetching) && (
-                    <CircularProgress color="inherit" size={20} />
-                  )} */}
-                {params.InputProps?.endAdornment}
-              </>
-            ),
+            endAdornment: <>{params.InputProps?.endAdornment}</>,
           }}
         />
       )}
