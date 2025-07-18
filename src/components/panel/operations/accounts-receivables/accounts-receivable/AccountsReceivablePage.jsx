@@ -576,7 +576,7 @@ const AccountsReceivablePage = () => {
               <TableBody>
                 {payments.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} align="center">
+                    <TableCell colSpan={7} align="center">
                       <Typography variant="body2" color="textSecondary">
                         No payments made yet. Click on the Record Payment button
                         to proceed payment.
