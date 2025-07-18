@@ -6,7 +6,7 @@ import { Chip, Box, Tooltip, Stack, Typography } from "@mui/material";
 import { useGetAccountBreakdownListsQuery } from "@/state/services/accountsApi";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";
-import { formatDate } from "@/utils/dateFormatter";
+import { formatDate, formatDateWithTime } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 import AccountBreakdownSection from "./AccountBreakdownSection";
 
@@ -165,6 +165,16 @@ const salesColumns = [
 //Payments columns
 const paymentsColumns = [
   {
+    field: "createdAt",
+    headerName: "Date Processed",
+    minWidth: 150,
+  },
+  {
+    field: "createdBy",
+    headerName: "Processed By",
+    minWidth: 150,
+  },
+  {
     field: "amount",
     headerName: "Amount",
     minWidth: 150,
@@ -187,6 +197,18 @@ const paymentsColumns = [
   {
     field: "isVoid",
     headerName: "Void Status",
+    render: (isVoid) =>
+      isVoid ? (
+        <Chip
+          // icon={<Cancel />}
+          label="Voided"
+          color="error"
+          size="small"
+          variant="filled"
+        />
+      ) : (
+        "-"
+      ),
     minWidth: 150,
   },
   {
@@ -194,20 +216,20 @@ const paymentsColumns = [
     headerName: "Voided By",
     minWidth: 150,
   },
-  {
-    field: "createdAt",
-    headerName: "Date Processed",
-    minWidth: 150,
-  },
-  {
-    field: "createdBy",
-    headerName: "Processed By",
-    minWidth: 150,
-  },
 ];
 
 //CreditMemo columns
 const creditMemoColumns = [
+  {
+    field: "createdAt",
+    headerName: "Date Issued",
+    minWidth: 150,
+  },
+  {
+    field: "createdBy",
+    headerName: "Issued By",
+    minWidth: 150,
+  },
   {
     field: "amount",
     headerName: "Amount Available",
@@ -220,7 +242,13 @@ const creditMemoColumns = [
   },
   {
     field: "isFullyUsed",
-    headerName: "Fully Consumed",
+    headerName: "Status",
+    render: (isFullyUsed) =>
+      isFullyUsed ? (
+        <Chip label="Consumed" color="default" size="small" variant="filled" />
+      ) : (
+        <Chip label="Available" color="success" size="small" variant="filled" />
+      ),
     minWidth: 150,
   },
   {
@@ -233,16 +261,7 @@ const creditMemoColumns = [
     headerName: "Note",
     minWidth: 150,
   },
-  {
-    field: "createdAt",
-    headerName: "Date Issued",
-    minWidth: 150,
-  },
-  {
-    field: "createdBy",
-    headerName: "Issued By",
-    minWidth: 150,
-  },
+
   {
     field: "updatedAt",
     headerName: "Date Last Used",
@@ -253,8 +272,23 @@ const creditMemoColumns = [
 //Refunds columns
 const refundsColumns = [
   {
+    field: "createdAt",
+    headerName: "Date Issued",
+    minWidth: 150,
+  },
+  {
+    field: "createdBy",
+    headerName: "Issued By",
+    minWidth: 150,
+  },
+  {
     field: "amount",
     headerName: "Amount Refunded",
+    minWidth: 150,
+  },
+  {
+    field: "method",
+    headerName: "Method",
     minWidth: 150,
   },
   {
@@ -263,13 +297,13 @@ const refundsColumns = [
     minWidth: 150,
   },
   {
-    field: "createdAt",
-    headerName: "Date Issued",
+    field: "reference",
+    headerName: "Reference",
     minWidth: 150,
   },
   {
-    field: "createdBy",
-    headerName: "Issued By",
+    field: "note",
+    headerName: "Note",
     minWidth: 150,
   },
 ];
@@ -361,38 +395,41 @@ const AccountBreakdownLists = ({
           ...prev.payments,
           ...(accountDetailsData.payments.map((p) => ({
             id: p.paymentId,
+            createdAt: formatDateWithTime(p.createdAt),
+            createdBy: p.createdBy.email,
             amount: formatToLocalCurrency(p.amount),
             method: p.method,
             reference: p.reference ? p.reference : "-",
             note: p.note ? p.note : "-",
             isVoid: p.isVoid,
             voidBy: p.voidBy ? p.voidBy.email : "-",
-            createdAt: formatDate(p.createdAt),
-            createdBy: p.createdBy.email,
           })) || []),
         ],
         creditMemos: [
           ...prev.creditMemos,
           ...(accountDetailsData.creditMemos.map((cm) => ({
             id: cm.creditMemoId,
+            createdAt: formatDateWithTime(cm.createdAt),
+            createdBy: cm.createdBy.email,
             amount: formatToLocalCurrency(cm.amount),
             usedAmount: formatToLocalCurrency(cm.usedAmount),
             isFullyUsed: cm.isFullyUsed,
             reason: cm.reason,
             note: cm.note ? cm.note : "-",
-            createdAt: formatDate(cm.createdAt),
-            createdBy: cm.createdBy.email,
-            updatedAt: cm.updatedAt,
+            updatedAt: formatDateWithTime(cm.updatedAt),
           })) || []),
         ],
         refunds: [
           ...prev.refunds,
           ...(accountDetailsData.refunds.map((refund) => ({
             id: refund.refundId,
-            amount: formatToLocalCurrency(refund.amount),
-            reason: refund.reason,
-            createdAt: formatDate(refund.createdAt),
+            createdAt: formatDateWithTime(refund.createdAt),
             createdBy: refund.createdBy.email,
+            amount: formatToLocalCurrency(refund.amount),
+            method: refund.method,
+            reason: refund.reason,
+            reference: refund.reference ? refund.reference : "-",
+            note: refund.note ? refund.note : "-",
           })) || []),
         ],
       }));
