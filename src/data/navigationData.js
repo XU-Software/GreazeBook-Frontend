@@ -20,16 +20,19 @@ export const navigationPageList = [
     title: "Dashboard",
     href: "/company/dashboard",
     icon: DashboardIcon,
+    allowedRoles: ["admin", "user"],
   },
   {
     title: "Invitations",
     href: "/company/invitations",
     icon: GroupAddIcon,
+    allowedRoles: ["admin"],
   },
   {
     title: "People",
     href: "/company/people",
     icon: PeopleIcon,
+    allowedRoles: ["admin"],
   },
   {
     kind: "header",
@@ -39,11 +42,13 @@ export const navigationPageList = [
     title: "Accounts",
     href: "/master-data/accounts",
     icon: AccountCircleIcon,
+    allowedRoles: ["admin", "user"],
   },
   {
     title: "Products",
     href: "/master-data/products",
     icon: Inventory2Icon,
+    allowedRoles: ["admin"],
   },
   {
     kind: "header",
@@ -53,26 +58,31 @@ export const navigationPageList = [
     title: "Accounts Receivables",
     href: "/operations/accounts-receivables",
     icon: AccountBalanceWalletIcon,
+    allowedRoles: ["admin", "user"],
   },
   {
     title: "Bookings",
     href: "/operations/bookings",
     icon: EventNoteIcon,
+    allowedRoles: ["admin", "user"],
   },
   {
     title: "Invoices",
     href: "/operations/invoices",
     icon: ReceiptLongIcon,
+    allowedRoles: ["admin"],
   },
   {
     title: "Orders",
     href: "/operations/orders",
     icon: LocalShippingIcon,
+    allowedRoles: ["admin", "user"],
   },
   {
     title: "Sales",
     href: "/operations/sales",
     icon: BarChartIcon,
+    allowedRoles: ["admin"],
   },
   {
     kind: "header",
@@ -82,21 +92,25 @@ export const navigationPageList = [
     title: "Payment",
     href: "/transaction-history/payment",
     icon: PaymentIcon,
+    allowedRoles: ["admin"],
   },
   {
     title: "Overpayment",
     href: "/transaction-history/overpayment",
     icon: ReplayIcon,
+    allowedRoles: ["admin"],
   },
   {
     title: "Refund",
     href: "/transaction-history/refund",
     icon: UndoIcon,
+    allowedRoles: ["admin"],
   },
   {
     title: "Credit Memo",
     href: "/transaction-history/credit-memo",
     icon: ReceiptIcon,
+    allowedRoles: ["admin"],
   },
   {
     kind: "header",
@@ -106,5 +120,6 @@ export const navigationPageList = [
     title: "Booking Form",
     href: "/forms/booking",
     icon: AssignmentIcon,
+    allowedRoles: ["admin", "user"],
   },
 ];
