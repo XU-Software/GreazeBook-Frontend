@@ -147,10 +147,12 @@ export const bookingsApi = api.injectEndpoints({
         { type: "Sales", id: "LIST" },
         { type: "AccountsReceivables", id: "LIST" },
         { type: "Products", id: "LIST" },
-        ...result?.affectedProductIds.map((productId) => ({
-          type: "Product",
-          id: productId,
-        })),
+        ...(result?.affectedProductIds?.length
+          ? result.affectedProductIds.map((productId) => ({
+              type: "Product",
+              id: productId,
+            }))
+          : []),
       ],
     }),
     deletePendingBooking: build.mutation({

@@ -8,7 +8,7 @@ import {
   useAddSingleProductMutation,
   useImportProductsExcelMutation,
 } from "@/state/services/productsApi";
-import { useAppDispatch } from "@/app/redux";
+import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";
@@ -137,6 +137,9 @@ const ProductsPage = () => {
   const [search, setSearch] = useState("");
 
   const [selected, setSelected] = useState(new Set());
+
+  const userData = useAppSelector((state) => state.global.userData);
+  const role = userData?.data?.role || "user";
 
   const queryArgs = useMemo(
     () => ({
@@ -332,12 +335,14 @@ const ProductsPage = () => {
               fileName="products"
               sheetName="Products"
             />
-            <DeleteSelectedButton
-              selected={selected}
-              setSelected={setSelected}
-              handleDeleteSelected={handleDeleteSelectedProducts}
-              isDeleting={isDeletingProducts}
-            />
+            {role === "admin" && (
+              <DeleteSelectedButton
+                selected={selected}
+                setSelected={setSelected}
+                handleDeleteSelected={handleDeleteSelectedProducts}
+                isDeleting={isDeletingProducts}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -345,7 +350,7 @@ const ProductsPage = () => {
         rows={rows}
         columns={columns}
         onRowClick={(productId) => router.push(`${pathName}/${productId}`)}
-        enableSelection={true}
+        enableSelection={role === "admin"}
         selected={selected}
         setSelected={setSelected}
       />

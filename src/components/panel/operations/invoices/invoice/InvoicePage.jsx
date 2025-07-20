@@ -3,6 +3,7 @@
 import React from "react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useGetSingleInvoiceQuery } from "@/state/services/invoicesApi";
+import { useAppSelector } from "@/app/redux";
 import DynamicBreadcrumbs from "@/components/Utils/DynamicBreadcrumbs";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";
@@ -34,6 +35,9 @@ const InvoicePage = () => {
 
   // Join them back into a path
   const basePath = "/" + baseSegments.join("/");
+
+  const userData = useAppSelector((state) => state.global.userData);
+  const role = userData?.data?.role || "user";
 
   const {
     data: invoiceData,
@@ -210,7 +214,9 @@ const InvoicePage = () => {
               )
             }
           >
-            Manage Accounts Receivable
+            {role === "admin"
+              ? "Manage Accounts Receivable"
+              : "View Accounts Receivable"}
           </Button>
         </Box>
       </Box>

@@ -65,6 +65,11 @@ const accountsReceivablesColumns = [
     minWidth: 150,
   },
   {
+    field: "totalPayments",
+    headerName: "Total Payments",
+    minWidth: 150,
+  },
+  {
     field: "balance",
     headerName: "Balance",
     minWidth: 150,
@@ -376,6 +381,7 @@ const AccountBreakdownLists = ({
             createdAt: formatDate(ar.createdAt),
             dueDate: formatDate(ar.dueDate),
             totalSales: formatToLocalCurrency(ar.totalSales),
+            totalPayments: formatToLocalCurrency(ar.totalPayments),
             balance: formatToLocalCurrency(ar.balance),
             status: ar.status,
             hasActivePendingExcess: ar.hasActivePendingExcess,
