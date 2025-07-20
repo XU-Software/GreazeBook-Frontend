@@ -12,7 +12,7 @@ import {
 import DynamicBreadcrumbs from "@/components/Utils/DynamicBreadcrumbs";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";
-import { useAppDispatch } from "@/app/redux";
+import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
 import { Box, Button, Stack } from "@mui/material";
 
@@ -34,6 +34,9 @@ const BookingPage = () => {
 
   // Join them back into a path
   const basePath = "/" + baseSegments.join("/");
+
+  const userData = useAppSelector((state) => state.global.userData);
+  const role = userData?.data?.role || "user";
 
   const {
     data: bookingData,
@@ -214,7 +217,12 @@ const BookingPage = () => {
 
         {/* Bottom Action Buttons */}
         <Stack direction="row" spacing={2}>
-          <InvoiceNumberModal bookingData={bookingData} bookingId={bookingId} />
+          {role === "admin" && (
+            <InvoiceNumberModal
+              bookingData={bookingData}
+              bookingId={bookingId}
+            />
+          )}
           {bookingData.data.status === "Pending" && (
             <Button
               variant="outlined"

@@ -8,7 +8,7 @@ import {
   useAddSingleAccountMutation,
   useImportAccountsExcelMutation,
 } from "@/state/services/accountsApi";
-import { useAppDispatch } from "@/app/redux";
+import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";
@@ -109,6 +109,9 @@ const AccountsPage = () => {
   const [search, setSearch] = useState("");
 
   const [selected, setSelected] = useState(new Set());
+
+  const userData = useAppSelector((state) => state.global.userData);
+  const role = userData?.data?.role || "user";
 
   const queryArgs = useMemo(
     () => ({
@@ -307,12 +310,14 @@ const AccountsPage = () => {
               fileName="accounts"
               sheetName="Accounts"
             />
-            <DeleteSelectedButton
-              selected={selected}
-              setSelected={setSelected}
-              handleDeleteSelected={handleDeleteSelectedAccounts}
-              isDeleting={isDeletingAccounts}
-            />
+            {role === "admin" && (
+              <DeleteSelectedButton
+                selected={selected}
+                setSelected={setSelected}
+                handleDeleteSelected={handleDeleteSelectedAccounts}
+                isDeleting={isDeletingAccounts}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -320,7 +325,7 @@ const AccountsPage = () => {
         rows={rows}
         columns={columns}
         onRowClick={(accountId) => router.push(`${pathName}/${accountId}`)}
-        enableSelection={true}
+        enableSelection={role === "admin"}
         selected={selected}
         setSelected={setSelected}
       />

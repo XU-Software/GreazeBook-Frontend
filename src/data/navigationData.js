@@ -48,7 +48,7 @@ export const navigationPageList = [
     title: "Products",
     href: "/master-data/products",
     icon: Inventory2Icon,
-    allowedRoles: ["admin"],
+    allowedRoles: ["admin", "user"],
   },
   {
     kind: "header",
@@ -70,7 +70,7 @@ export const navigationPageList = [
     title: "Invoices",
     href: "/operations/invoices",
     icon: ReceiptLongIcon,
-    allowedRoles: ["admin"],
+    allowedRoles: ["admin", "user"],
   },
   {
     title: "Orders",

@@ -5,7 +5,7 @@ import {
   useGetSingleAccountsReceivableQuery,
   useAccountsReceivableVoidPaymentMutation,
 } from "@/state/services/accountsReceivablesApi";
-import { useAppDispatch } from "@/app/redux";
+import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import {
@@ -159,6 +159,9 @@ const AccountsReceivablePage = () => {
     useState(false);
   const [pendingExcessId, setPendingExcessId] = useState("");
 
+  const userData = useAppSelector((state) => state.global.userData);
+  const role = userData?.data?.role || "user";
+
   const {
     data: arData,
     isLoading,
@@ -272,39 +275,41 @@ const AccountsReceivablePage = () => {
         </Typography>
 
         {/* Actions */}
-        <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mb={3}>
-          {status === "Paid" ? (
-            <Tooltip title="AR is already paid">
-              <span>
-                <Button variant="contained" color="primary" disabled>
+        {role === "admin" && (
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mb={3}>
+            {status === "Paid" ? (
+              <Tooltip title="AR is already paid">
+                <span>
+                  <Button variant="contained" color="primary" disabled>
+                    Record Payment
+                  </Button>
+                </span>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Make a payment">
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setTogglePaymentModal(true)}
+                >
                   Record Payment
                 </Button>
-              </span>
-            </Tooltip>
-          ) : (
-            <Tooltip title="Make a payment">
+              </Tooltip>
+            )}
+            {activePendingExcess && (
               <Button
-                variant="contained"
-                color="primary"
-                onClick={() => setTogglePaymentModal(true)}
+                variant="outlined"
+                color="warning"
+                onClick={() => {
+                  setPendingExcessId(activePendingExcess?.pendingExcessId);
+                  setToggleProcessOverpaymentModal(true);
+                }}
               >
-                Record Payment
+                Manage Overpayment
               </Button>
-            </Tooltip>
-          )}
-          {activePendingExcess && (
-            <Button
-              variant="outlined"
-              color="warning"
-              onClick={() => {
-                setPendingExcessId(activePendingExcess?.pendingExcessId);
-                setToggleProcessOverpaymentModal(true);
-              }}
-            >
-              Manage Overpayment
-            </Button>
-          )}
-        </Stack>
+            )}
+          </Stack>
+        )}
 
         {/* Summary */}
         <Paper sx={{ p: 2, mb: 3 }} elevation={2}>
@@ -480,7 +485,7 @@ const AccountsReceivablePage = () => {
                   <TableCell align="center">Action Type</TableCell>
                   <TableCell>Changed To</TableCell>
                   <TableCell>Reason</TableCell>
-                  <TableCell>Actions</TableCell>
+                  {role === "admin" && <TableCell>Actions</TableCell>}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -522,32 +527,34 @@ const AccountsReceivablePage = () => {
                           ? sale.changeReason
                           : "-"}
                       </TableCell>
-                      <TableCell>
-                        <Stack direction="row" spacing={1}>
-                          <Button
-                            variant="outlined"
-                            color="error"
-                            disabled={sale.actionType !== "Fulfilled"}
-                            onClick={() => {
-                              setSaleId(sale.saleId);
-                              setToggleCancelSaleModal(true);
-                            }}
-                          >
-                            Cancel
-                          </Button>
-                          <Button
-                            variant="outlined"
-                            color="primary"
-                            disabled={sale.actionType !== "Fulfilled"}
-                            onClick={() => {
-                              setSaleToChange(sale);
-                              setToggleChangeSaleModal(true);
-                            }}
-                          >
-                            Change
-                          </Button>
-                        </Stack>
-                      </TableCell>
+                      {role === "admin" && (
+                        <TableCell>
+                          <Stack direction="row" spacing={1}>
+                            <Button
+                              variant="outlined"
+                              color="error"
+                              disabled={sale.actionType !== "Fulfilled"}
+                              onClick={() => {
+                                setSaleId(sale.saleId);
+                                setToggleCancelSaleModal(true);
+                              }}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              variant="outlined"
+                              color="primary"
+                              disabled={sale.actionType !== "Fulfilled"}
+                              onClick={() => {
+                                setSaleToChange(sale);
+                                setToggleChangeSaleModal(true);
+                              }}
+                            >
+                              Change
+                            </Button>
+                          </Stack>
+                        </TableCell>
+                      )}
                     </TableRow>
                   );
                 })}
@@ -570,7 +577,7 @@ const AccountsReceivablePage = () => {
                   <TableCell>Void Status</TableCell>
                   <TableCell>Reference</TableCell>
                   <TableCell>Note</TableCell>
-                  <TableCell>Actions</TableCell>
+                  {role === "admin" && <TableCell>Actions</TableCell>}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -604,22 +611,24 @@ const AccountsReceivablePage = () => {
                       </TableCell>
                       <TableCell>{p.reference}</TableCell>
                       <TableCell>{p.note}</TableCell>
-                      <TableCell>
-                        {!p.isVoid ? (
-                          <Button
-                            variant="outlined"
-                            color="error"
-                            onClick={() => {
-                              setPaymentId(p.paymentId);
-                              setToggleVoidPaymentModal(true);
-                            }}
-                          >
-                            Void
-                          </Button>
-                        ) : (
-                          "-"
-                        )}
-                      </TableCell>
+                      {role === "admin" && (
+                        <TableCell>
+                          {!p.isVoid ? (
+                            <Button
+                              variant="outlined"
+                              color="error"
+                              onClick={() => {
+                                setPaymentId(p.paymentId);
+                                setToggleVoidPaymentModal(true);
+                              }}
+                            >
+                              Void
+                            </Button>
+                          ) : (
+                            "-"
+                          )}
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))
                 )}

@@ -42,10 +42,14 @@ const columns = [
     headerName: "Due Date",
     minWidth: 150,
   },
-
   {
     field: "totalSalesAmount",
     headerName: "Total Sales",
+    minWidth: 150,
+  },
+  {
+    field: "totalPayments",
+    headerName: "Total Payments",
     minWidth: 150,
   },
   {
@@ -186,6 +190,7 @@ const AccountsReceivablesPage = () => {
         term: ar.invoice.booking.term,
         dueDate: formatDate(ar.dueDate),
         totalSalesAmount: formatToLocalCurrency(ar.totalSalesAmount),
+        totalPayments: formatToLocalCurrency(ar.totalPayments),
         balance: formatToLocalCurrency(ar.balance),
         status: ar.status,
         customerNumber: ar.account.customerNumber,
@@ -202,6 +207,7 @@ const AccountsReceivablesPage = () => {
         Term: ar.invoice.booking.term,
         "Due Date": formatDate(ar.dueDate),
         "Total Sales": formatToLocalCurrency(ar.totalSalesAmount),
+        "Total Payments": formatToLocalCurrency(ar.totalPayments),
         Balance: formatToLocalCurrency(ar.balance),
         Status: ar.status,
         "Customer Number": ar.account.customerNumber,

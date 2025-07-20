@@ -36,8 +36,10 @@ export async function middleware(req) {
     const USER_ALLOWED_ROUTES = [
       "/company/dashboard",
       "/master-data/accounts",
+      "/master-data/products",
       "/operations/bookings",
       "/operations/orders",
+      "/operations/invoices",
       "/operations/accounts-receivables",
       "/forms",
     ];
