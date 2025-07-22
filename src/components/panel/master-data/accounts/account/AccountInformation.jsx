@@ -1,18 +1,25 @@
 "use client";
 
 import React from "react";
-import { useGetAccountInformationQuery } from "@/state/services/accountsApi";
+import { useSetOpeningARMutation } from "@/state/services/accountsApi";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";
 import DateRangePicker from "@/components/Utils/DateRangePicker";
-import { Paper, Typography, Grid, Box } from "@mui/material";
+import { Paper, Typography, Grid, Box, Stack, Button } from "@mui/material";
 import { formatDateWithTime } from "@/utils/dateFormatter";
+import { useAppDispatch } from "@/app/redux";
+import { setShowSnackbar } from "@/state/snackbarSlice";
+import AddRowButton from "@/components/Utils/AddRowButton";
 
 const AccountInformation = ({
   accountInfoData,
+  accountId = "",
   onFilter = () => {},
   onClear = () => {},
+  setAccumulatedData = () => {},
+  setPage = () => {},
 }) => {
+  const dispatch = useAppDispatch();
 
   const {
     customerNumber,
@@ -24,12 +31,69 @@ const AccountInformation = ({
     createdAt,
   } = accountInfoData.data;
 
+  //Function for handling opening A/R
+  const [setOpeningAR, { isLoading: isSettingOpeningAR }] =
+    useSetOpeningARMutation();
+
+  const handleSetOpeningAR = async (accountId, openingARInfo) => {
+    try {
+      const res = await setOpeningAR({ accountId, openingARInfo }).unwrap();
+      setAccumulatedData({
+        accountsReceivables: [],
+        sales: [],
+        payments: [],
+        creditMemos: [],
+        refunds: [],
+      });
+      setPage(1);
+      dispatch(
+        setShowSnackbar({
+          severity: "success",
+          message: res.message || "Opening A/R has been set",
+        })
+      );
+    } catch (error) {
+      dispatch(
+        setShowSnackbar({
+          severity: "error",
+          message:
+            error.data?.message || error.message || "Failed to set Opening A/R",
+        })
+      );
+    }
+  };
+
+  const handleWrapperFunction = async (openingARInfo) => {
+    handleSetOpeningAR(accountId, openingARInfo);
+  };
+
   return (
     <Paper elevation={2} className="p-4 rounded-xl h-full w-full mb-4">
       <Box className="flex flex-wrap items-center justify-between">
-        <Typography variant="h4" gutterBottom>
-          {accountName}
-        </Typography>
+        <Stack
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
+          <Typography variant="h4" gutterBottom>
+            {accountName}
+          </Typography>
+          <AddRowButton
+            buttonLabel="Set Opening A/R"
+            title="Set Opening A/R"
+            columns={[
+              { field: "amount", headerName: "Amount", type: "number" },
+              { field: "dueDate", headerName: "Due Date", type: "date" },
+              { field: "note", headerName: "Note", type: "text" },
+            ]}
+            initialValues={{ amount: "", dueDate: "", note: "" }}
+            onSubmit={handleWrapperFunction} // Pass wrapper
+          />
+        </Stack>
 
         <DateRangePicker onFilter={onFilter} onClear={onClear} />
       </Box>

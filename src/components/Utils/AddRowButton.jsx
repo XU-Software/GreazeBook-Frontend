@@ -68,6 +68,9 @@ export default function AddRowButton({
                 onChange={(e) => handleChange(col.field, e.target.value)}
                 type={col.type || "text"}
                 required
+                slotProps={
+                  col.type === "date" ? { inputLabel: { shrink: true } } : {}
+                }
               />
             ))}
           </DialogContent>

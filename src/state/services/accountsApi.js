@@ -88,6 +88,26 @@ export const accountsApi = api.injectEndpoints({
         { type: "AccountDetails", id: arg.accountId },
       ],
     }),
+    setOpeningAR: build.mutation({
+      query: ({ accountId, openingARInfo }) => ({
+        url: `/account/${accountId}/set-opening-ar`,
+        method: "POST",
+        body: { openingARInfo },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: (result, error, arg) => [
+        {
+          type: "Accounts",
+          id: "LIST",
+        },
+        { type: "Account", id: arg.accountId },
+        { type: "AccountMetrics", id: arg.accountId },
+        { type: "AccountDetails", id: arg.accountId },
+        { type: "AccountsReceivables", id: "LIST" },
+      ],
+    }),
   }),
 });
 
@@ -99,4 +119,5 @@ export const {
   useGetAccountInformationQuery,
   useGetAccountMetricsQuery,
   useGetAccountBreakdownListsQuery,
+  useSetOpeningARMutation,
 } = accountsApi;

@@ -21,6 +21,18 @@ const AccountPage = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
+  const [page, setPage] = useState(1);
+  const pageSize = 20;
+  const [search, setSearch] = useState("");
+
+  const [accumulatedData, setAccumulatedData] = useState({
+    accountsReceivables: [],
+    sales: [],
+    payments: [],
+    creditMemos: [],
+    refunds: [],
+  });
+
   //Query for fetching basic account information
   const {
     data: accountInfoData,
@@ -101,8 +113,11 @@ const AccountPage = () => {
         {/* Account information*/}
         <AccountInformation
           accountInfoData={accountInfoData}
+          accountId={accountId}
           onFilter={handleFilterDateRange}
           onClear={handleClearInput}
+          setAccumulatedData={setAccumulatedData}
+          setPage={setPage}
         />
 
         {/* Account metrics*/}
@@ -122,6 +137,13 @@ const AccountPage = () => {
           accountId={accountId}
           startDate={startDate}
           endDate={endDate}
+          page={page}
+          setPage={setPage}
+          pageSize={pageSize}
+          search={search}
+          setSearch={setSearch}
+          accumulatedData={accumulatedData}
+          setAccumulatedData={setAccumulatedData}
         />
       </Box>
     </>

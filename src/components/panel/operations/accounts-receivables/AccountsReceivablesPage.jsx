@@ -185,9 +185,9 @@ const AccountsReceivablesPage = () => {
     accountsReceivablesData?.data.forEach((ar) => {
       rows.push({
         id: ar.accountsReceivableId,
-        salesInvoiceNumber: ar.invoice.salesInvoiceNumber,
+        salesInvoiceNumber: ar.invoice?.salesInvoiceNumber || "Opening A/R",
         createdAt: formatDate(ar.createdAt),
-        term: ar.invoice.booking.term,
+        term: ar.invoice?.booking?.term || "-",
         dueDate: formatDate(ar.dueDate),
         totalSalesAmount: formatToLocalCurrency(ar.totalSalesAmount),
         totalPayments: formatToLocalCurrency(ar.totalPayments),
@@ -195,16 +195,16 @@ const AccountsReceivablesPage = () => {
         status: ar.status,
         customerNumber: ar.account.customerNumber,
         accountName: ar.account.accountName,
-        customerName: ar.invoice.booking.customerName,
+        customerName: ar.invoice?.booking?.customerName || "-",
         tradeType: ar.account.tradeType,
         location: ar.account.location,
         dsp: ar.account.dsp,
       });
 
       exportData.push({
-        "Invoice Number": ar.invoice.salesInvoiceNumber,
+        "Invoice Number": ar.invoice?.salesInvoiceNumber || "Opening A/R",
         "Invoice Date": formatDate(ar.createdAt),
-        Term: ar.invoice.booking.term,
+        Term: ar.invoice?.booking?.term || "-",
         "Due Date": formatDate(ar.dueDate),
         "Total Sales": formatToLocalCurrency(ar.totalSalesAmount),
         "Total Payments": formatToLocalCurrency(ar.totalPayments),
@@ -212,7 +212,7 @@ const AccountsReceivablesPage = () => {
         Status: ar.status,
         "Customer Number": ar.account.customerNumber,
         "Account Name": ar.account.accountName,
-        "Customer Name": ar.invoice.booking.customerName,
+        "Customer Name": ar.invoice?.booking?.customerName || "-",
         "Trade Type": ar.account.tradeType,
         Location: ar.account.location,
         DSP: ar.account.dsp,
