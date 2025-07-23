@@ -14,7 +14,7 @@ import PaginationControls from "@/components/Utils/TablePagination";
 import { formatDate } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 import { usePathname } from "next/navigation";
-import { Chip, Tooltip } from "@mui/material";
+import { Chip, Tooltip, Stack, Typography, Box } from "@mui/material";
 import {
   HourglassEmpty,
   HourglassBottom,
@@ -25,6 +25,38 @@ const columns = [
   {
     field: "salesInvoiceNumber",
     headerName: "Invoice Number",
+    render: (value, row) => (
+      <Stack direction="row" spacing={1} alignItems="center">
+        <Typography>{value}</Typography>
+        {row.hasActivePendingExcess && (
+          <Tooltip title="Please process overpayment in this A/R">
+            <Box
+              sx={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                backgroundColor: "orange",
+                animation: "pulse 1.5s infinite",
+                "@keyframes pulse": {
+                  "0%": {
+                    transform: "scale(0.9)",
+                    opacity: 0.7,
+                  },
+                  "50%": {
+                    transform: "scale(1.3)",
+                    opacity: 1,
+                  },
+                  "100%": {
+                    transform: "scale(0.9)",
+                    opacity: 0.7,
+                  },
+                },
+              }}
+            />
+          </Tooltip>
+        )}
+      </Stack>
+    ),
     minWidth: 150,
   },
   {
@@ -199,10 +231,14 @@ const AccountsReceivablesPage = () => {
         tradeType: ar.account.tradeType,
         location: ar.account.location,
         dsp: ar.account.dsp,
+        hasActivePendingExcess: ar.hasActivePendingExcess,
       });
 
       exportData.push({
         "Invoice Number": ar.invoice?.salesInvoiceNumber || "Opening A/R",
+        "Unprocessed Overpayment": formatToLocalCurrency(
+          ar.pendingExcessAmount
+        ),
         "Invoice Date": formatDate(ar.createdAt),
         Term: ar.invoice?.booking?.term || "-",
         "Due Date": formatDate(ar.dueDate),
