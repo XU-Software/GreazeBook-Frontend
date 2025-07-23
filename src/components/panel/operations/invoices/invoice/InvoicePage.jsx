@@ -20,7 +20,7 @@ import {
   TableBody,
   Button,
 } from "@mui/material";
-import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import { EastOutlined } from "@mui/icons-material";
 import { formatDateWithTime, formatDate } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 
@@ -205,9 +205,9 @@ const InvoicePage = () => {
         </Paper>
         <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
           <Button
-            variant="contained"
+            variant="outlined"
             color="primary"
-            startIcon={<AccountBalanceIcon />}
+            endIcon={<EastOutlined />}
             onClick={() =>
               router.push(
                 `/operations/accounts-receivables/${accountsReceivable.accountsReceivableId}`
