@@ -96,12 +96,7 @@ const columns = [
       if (value === "Paid") {
         return (
           <Tooltip title="Fully paid">
-            <Chip
-              icon={<CheckCircle sx={{ fontSize: 18 }} />}
-              label={value}
-              color="success"
-              size="small"
-            />
+            <Chip label={value} color="success" size="small" />
           </Tooltip>
         );
       }
@@ -109,10 +104,17 @@ const columns = [
       if (value === "Partial") {
         return (
           <Tooltip title="Partial payment received">
+            <Chip label={value} color="warning" size="small" />
+          </Tooltip>
+        );
+      }
+
+      if (value === "Unpaid") {
+        return (
+          <Tooltip title="No payment received">
             <Chip
-              icon={<HourglassBottom sx={{ fontSize: 18 }} />}
               label={value}
-              color="warning"
+              color="default" // Grey, less aggressive
               size="small"
             />
           </Tooltip>
@@ -120,13 +122,8 @@ const columns = [
       }
 
       return (
-        <Tooltip title="No payment received">
-          <Chip
-            icon={<HourglassEmpty sx={{ fontSize: 18 }} />}
-            label={value}
-            color="default" // Grey, less aggressive
-            size="small"
-          />
+        <Tooltip title="Payment overdue">
+          <Chip label={value} color="error" size="small" />
         </Tooltip>
       );
     },

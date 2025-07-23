@@ -108,11 +108,7 @@ const accountsReceivablesColumns = [
 
       return (
         <Tooltip title="Payment overdue">
-          <Chip
-            label={value}
-            color="error" // Grey, less aggressive
-            size="small"
-          />
+          <Chip label={value} color="error" size="small" />
         </Tooltip>
       );
     },
