@@ -28,10 +28,12 @@ const EditableField = ({
   }
 
   return (
-    <Typography>
-      <strong>{label}:</strong>{" "}
-      {type === "date" && value !== "" ? formatToLongDate(value) : value}
-    </Typography>
+    <>
+      <Typography variant="subtitle2">{label}</Typography>
+      <Typography>
+        {type === "date" && value !== "" ? formatToLongDate(value) : value}
+      </Typography>
+    </>
   );
 };
 

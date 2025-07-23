@@ -15,6 +15,7 @@ import {
   Divider,
   IconButton,
   Tooltip,
+  Grid,
 } from "@mui/material";
 import ColoredLink from "@/components/Utils/ColoredLink";
 
@@ -80,123 +81,143 @@ const BookingDetails = ({
           )}
         </Typography>
         <Divider sx={{ mb: 2 }} />
-        <Box
-          display="grid"
-          gridTemplateColumns="repeat(auto-fit, minmax(200px, 1fr))"
-          gap={2}
-        >
-          <EditableField
-            label="Order Date"
-            value={
-              bookingFormData.orderDate !== undefined
-                ? bookingFormData.orderDate
-                : formatDateForInput(bookingData.orderDate) || ""
-            }
-            editing={editBooking}
-            type="date"
-            name="orderDate"
-            onChange={(e) =>
-              setBookingFormData((prev) => ({
-                ...prev,
-                [e.target.name]: e.target.value,
-              }))
-            }
-          />
-          <EditableField
-            label="Delivery Date"
-            value={
-              bookingFormData.deliveryDate !== undefined
-                ? bookingFormData.deliveryDate
-                : formatDateForInput(bookingData.deliveryDate) || ""
-            }
-            editing={editBooking}
-            type="date"
-            name="deliveryDate"
-            onChange={(e) =>
-              setBookingFormData((prev) => ({
-                ...prev,
-                [e.target.name]: e.target.value,
-              }))
-            }
-          />
-          <Typography>
-            <strong>Account Name:</strong>{" "}
+        <Grid container columnSpacing={4} rowSpacing={1} mb={2}>
+          <Grid item xs={12} sm={6} md={3}>
+            <EditableField
+              label="Order Date"
+              value={
+                bookingFormData.orderDate !== undefined
+                  ? bookingFormData.orderDate
+                  : formatDateForInput(bookingData.orderDate) || ""
+              }
+              editing={editBooking}
+              type="date"
+              name="orderDate"
+              onChange={(e) =>
+                setBookingFormData((prev) => ({
+                  ...prev,
+                  [e.target.name]: e.target.value,
+                }))
+              }
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={3}>
+            <EditableField
+              label="Delivery Date"
+              value={
+                bookingFormData.deliveryDate !== undefined
+                  ? bookingFormData.deliveryDate
+                  : formatDateForInput(bookingData.deliveryDate) || ""
+              }
+              editing={editBooking}
+              type="date"
+              name="deliveryDate"
+              onChange={(e) =>
+                setBookingFormData((prev) => ({
+                  ...prev,
+                  [e.target.name]: e.target.value,
+                }))
+              }
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={3}>
+            <Typography variant="subtitle2">Account Name</Typography>
             <ColoredLink
               href={`/master-data/accounts/${bookingData.accountId}`}
               linkText={bookingData.account.accountName}
             />
-          </Typography>
-          <EditableField
-            label="Customer Name"
-            value={
-              bookingFormData.customerName !== undefined
-                ? bookingFormData.customerName
-                : bookingData.customerName || ""
-            }
-            editing={editBooking}
-            type="text"
-            name="customerName"
-            onChange={(e) =>
-              setBookingFormData((prev) => ({
-                ...prev,
-                [e.target.name]: e.target.value,
-              }))
-            }
-          />
-          <Typography>
-            <strong>Total Amount:</strong>{" "}
-            {formatToLocalCurrency(bookingData.totalAmount)}
-          </Typography>
-          <EditableField
-            label="Term"
-            value={
-              bookingFormData.term !== undefined
-                ? bookingFormData.term
-                : bookingData.term || ""
-            }
-            editing={editBooking}
-            type="number"
-            name="term"
-            onChange={(e) =>
-              setBookingFormData((prev) => ({
-                ...prev,
-                [e.target.name]: e.target.value,
-              }))
-            }
-          />
-          <EditableField
-            label="Freebies/Remarks/Concern"
-            value={
-              bookingFormData.freebiesRemarksConcern !== undefined
-                ? bookingFormData.freebiesRemarksConcern
-                : bookingData.freebiesRemarksConcern || ""
-            }
-            editing={editBooking}
-            type="text"
-            name="freebiesRemarksConcern"
-            onChange={(e) =>
-              setBookingFormData((prev) => ({
-                ...prev,
-                [e.target.name]: e.target.value,
-              }))
-            }
-          />
-          <Typography>
-            <strong>Created At:</strong>{" "}
-            {formatDateWithTime(bookingData.createdAt)}
-          </Typography>
-          <Typography>
-            <strong>Created By:</strong> {bookingData.createdBy.name} |{" "}
-            {bookingData.createdBy.email}
-          </Typography>
-          <Typography>
-            <strong>Approved By:</strong> {bookingData.approvedBy?.name} |{" "}
-            {bookingData.approvedBy?.email}
-          </Typography>
-          <Stack direction="row" alignItems="center" spacing={1}>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={3}>
+            <EditableField
+              label="Customer Name"
+              value={
+                bookingFormData.customerName !== undefined
+                  ? bookingFormData.customerName
+                  : bookingData.customerName || ""
+              }
+              editing={editBooking}
+              type="text"
+              name="customerName"
+              onChange={(e) =>
+                setBookingFormData((prev) => ({
+                  ...prev,
+                  [e.target.name]: e.target.value,
+                }))
+              }
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={3}>
+            <Typography variant="subtitle2">Total Amount</Typography>
             <Typography>
-              <strong>Status:</strong>
+              {formatToLocalCurrency(bookingData.totalAmount)}
             </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={3}>
+            <EditableField
+              label="Term"
+              value={
+                bookingFormData.term !== undefined
+                  ? bookingFormData.term
+                  : bookingData.term || ""
+              }
+              editing={editBooking}
+              type="number"
+              name="term"
+              onChange={(e) =>
+                setBookingFormData((prev) => ({
+                  ...prev,
+                  [e.target.name]: e.target.value,
+                }))
+              }
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={3}>
+            <EditableField
+              label="Freebies/Remarks/Concern"
+              value={
+                bookingFormData.freebiesRemarksConcern !== undefined
+                  ? bookingFormData.freebiesRemarksConcern
+                  : bookingData.freebiesRemarksConcern || ""
+              }
+              editing={editBooking}
+              type="text"
+              name="freebiesRemarksConcern"
+              onChange={(e) =>
+                setBookingFormData((prev) => ({
+                  ...prev,
+                  [e.target.name]: e.target.value,
+                }))
+              }
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={3}>
+            <Typography variant="subtitle2">Created At</Typography>
+            <Typography>{formatDateWithTime(bookingData.createdAt)}</Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={3}>
+            <Typography variant="subtitle2">Created By</Typography>
+            <Typography>
+              {bookingData.createdBy.name} | {bookingData.createdBy.email}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={3}>
+            <Typography variant="subtitle2">Approved By</Typography>
+            <Typography>
+              {bookingData.approvedBy?.name} | {bookingData.approvedBy?.email}
+            </Typography>
+          </Grid>
+
+          <Stack direction="column" alignItems="center" spacing={1}>
+            <Typography variant="subtitle2">Status</Typography>
             <Chip
               label={bookingData.status}
               color={bookingData.status === "Approved" ? "success" : "warning"}
@@ -204,15 +225,15 @@ const BookingDetails = ({
             />
           </Stack>
           {bookingData.status !== "Pending" && bookingData.invoice && (
-            <Typography>
-              <strong>Generated Invoice:</strong>{" "}
+            <Grid item xs={12} sm={6} md={3}>
+              <Typography variant="subtitle2">Generated Invoice</Typography>
               <ColoredLink
                 href={`/operations/invoices/${bookingData.invoice?.invoiceId}`}
                 linkText={bookingData.invoice?.salesInvoiceNumber}
               />
-            </Typography>
+            </Grid>
           )}
-        </Box>
+        </Grid>
       </CardContent>
     </Card>
   );
