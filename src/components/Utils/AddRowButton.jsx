@@ -7,6 +7,7 @@ import {
   DialogActions,
   Button,
   TextField,
+  Typography,
 } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { useState } from "react";
@@ -14,6 +15,8 @@ import { useState } from "react";
 export default function AddRowButton({
   buttonLabel = "Add",
   title = "Add New",
+  description = "",
+  descriptionColor = "default",
   columns = [],
   initialValues = {},
   onSubmit,
@@ -55,8 +58,14 @@ export default function AddRowButton({
 
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>{title}</DialogTitle>
+
         <form onSubmit={handleSubmit}>
           <DialogContent dividers>
+            {description && (
+              <Typography gutterBottom color={descriptionColor}>
+                {description}
+              </Typography>
+            )}
             {columns.map((col) => (
               <TextField
                 key={col.field}

@@ -77,14 +77,15 @@ const AccountInformation = ({
             flexWrap: "wrap",
             alignItems: "center",
             gap: 2,
+            marginBottom: 2,
           }}
         >
-          <Typography variant="h4" gutterBottom>
-            {accountName}
-          </Typography>
+          <Typography variant="h4">{accountName}</Typography>
           <AddRowButton
-            buttonLabel="Set Opening A/R"
+            buttonLabel="Opening A/R"
             title="Set Opening A/R"
+            description="⚠️ Important: Once the Opening A/R is set, it cannot be modified or revoked. Please proceed only when the details are finalized and fully validated."
+            descriptionColor="error"
             columns={[
               { field: "amount", headerName: "Amount", type: "number" },
               { field: "dueDate", headerName: "Due Date", type: "date" },
