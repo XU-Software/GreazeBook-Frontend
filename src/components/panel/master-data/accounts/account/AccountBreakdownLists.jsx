@@ -108,11 +108,7 @@ const accountsReceivablesColumns = [
 
       return (
         <Tooltip title="Payment overdue">
-          <Chip
-            label={value}
-            color="error" // Grey, less aggressive
-            size="small"
-          />
+          <Chip label={value} color="error" size="small" />
         </Tooltip>
       );
     },
@@ -318,20 +314,21 @@ const AccountBreakdownLists = ({
   accountId = "",
   startDate = "",
   endDate = "",
-}) => {
-  const router = useRouter();
-
-  const [page, setPage] = useState(1);
-  const pageSize = 20;
-  const [search, setSearch] = useState("");
-
-  const [accumulatedData, setAccumulatedData] = useState({
+  page = "",
+  setPage = () => {},
+  pageSize = 20,
+  search = "",
+  setSearch = () => {},
+  accumulatedData = {
     accountsReceivables: [],
     sales: [],
     payments: [],
     creditMemos: [],
     refunds: [],
-  });
+  },
+  setAccumulatedData = () => {},
+}) => {
+  const router = useRouter();
 
   const queryArgs = useMemo(
     () => ({
@@ -377,7 +374,9 @@ const AccountBreakdownLists = ({
           ...prev.accountsReceivables,
           ...(accountDetailsData.accountsReceivables.map((ar) => ({
             id: ar.accountsReceivableId,
-            salesInvoiceNumber: ar.salesInvoiceNumber,
+            salesInvoiceNumber: ar.salesInvoiceNumber
+              ? ar.salesInvoiceNumber
+              : "Opening A/R",
             createdAt: formatDate(ar.createdAt),
             dueDate: formatDate(ar.dueDate),
             totalSales: formatToLocalCurrency(ar.totalSales),

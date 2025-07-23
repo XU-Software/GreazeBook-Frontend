@@ -259,6 +259,7 @@ const AccountsReceivablePage = () => {
     creditMemo, //can be null
     balance,
     status,
+    type,
   } = arData.data;
 
   return (
@@ -268,10 +269,14 @@ const AccountsReceivablePage = () => {
         {/* Header */}
         <Typography variant="h4" gutterBottom>
           Accounts Receivable:{" "}
-          <ColoredLink
-            href={`/operations/invoices/${invoice.invoiceId}`}
-            linkText={`#${invoice.salesInvoiceNumber}`}
-          />
+          {invoice ? (
+            <ColoredLink
+              href={`/operations/invoices/${invoice.invoiceId}`}
+              linkText={`#${invoice.salesInvoiceNumber}`}
+            />
+          ) : (
+            "Opening A/R"
+          )}
         </Typography>
 
         {/* Actions */}
@@ -397,9 +402,9 @@ const AccountsReceivablePage = () => {
               sx={{ display: "flex", flexDirection: "column", gap: 0.7 }}
             >
               <Typography variant="body2" color="text.secondary">
-                Invoice Date
+                {invoice ? "Invoice Date" : "Created At"}
               </Typography>
-              {formatDate(invoice.createdAt)}
+              {invoice ? formatDate(invoice.createdAt) : formatDate(createdAt)}
             </Grid>
             <Grid
               item
@@ -445,7 +450,9 @@ const AccountsReceivablePage = () => {
               <Typography variant="body2" color="text.secondary">
                 Customer Name
               </Typography>
-              <Typography>{invoice.booking.customerName}</Typography>
+              <Typography>
+                {invoice ? invoice.booking.customerName : "-"}
+              </Typography>
             </Grid>
 
             <Grid item xs={12} sm={6} md={4}>
@@ -489,75 +496,88 @@ const AccountsReceivablePage = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {sales.map((sale) => {
-                  const changedTo = sales.find(
-                    (s) => s.saleId === sale?.replacementSale?.saleId
-                  );
-                  return (
-                    <TableRow key={sale.saleId}>
-                      <TableCell>{sale.order.product.productName}</TableCell>
-                      <TableCell align="right">{sale.order.quantity}</TableCell>
-                      <TableCell align="right">
-                        {formatToLocalCurrency(sale.order.price)}
-                      </TableCell>
-                      <TableCell align="right">
-                        {formatToLocalCurrency(
-                          sale.order.quantity * sale.order.price
-                        )}
-                      </TableCell>
-                      <TableCell align="center">
-                        {getFulfillmentChip(sale.actionType)}
-                      </TableCell>
-                      <TableCell>
-                        {changedTo ? (
-                          <Chip
-                            size="small"
-                            label={changedTo.order.product.productName}
-                            variant="outlined"
-                            color="info"
-                          />
-                        ) : (
-                          "-"
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {sale.cancellationReason
-                          ? sale.cancellationReason
-                          : sale.changeReason
-                          ? sale.changeReason
-                          : "-"}
-                      </TableCell>
-                      {role === "admin" && (
-                        <TableCell>
-                          <Stack direction="row" spacing={1}>
-                            <Button
-                              variant="outlined"
-                              color="error"
-                              disabled={sale.actionType !== "Fulfilled"}
-                              onClick={() => {
-                                setSaleId(sale.saleId);
-                                setToggleCancelSaleModal(true);
-                              }}
-                            >
-                              Cancel
-                            </Button>
-                            <Button
-                              variant="outlined"
-                              color="primary"
-                              disabled={sale.actionType !== "Fulfilled"}
-                              onClick={() => {
-                                setSaleToChange(sale);
-                                setToggleChangeSaleModal(true);
-                              }}
-                            >
-                              Change
-                            </Button>
-                          </Stack>
+                {type === "Opening" ? (
+                  <TableRow>
+                    <TableCell colSpan={8} align="center">
+                      <Typography variant="body2" color="textSecondary">
+                        This is an Opening A/R and doesn't include system
+                        generated sales
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  sales.map((sale) => {
+                    const changedTo = sales.find(
+                      (s) => s.saleId === sale?.replacementSale?.saleId
+                    );
+                    return (
+                      <TableRow key={sale.saleId}>
+                        <TableCell>{sale.order.product.productName}</TableCell>
+                        <TableCell align="right">
+                          {sale.order.quantity}
                         </TableCell>
-                      )}
-                    </TableRow>
-                  );
-                })}
+                        <TableCell align="right">
+                          {formatToLocalCurrency(sale.order.price)}
+                        </TableCell>
+                        <TableCell align="right">
+                          {formatToLocalCurrency(
+                            sale.order.quantity * sale.order.price
+                          )}
+                        </TableCell>
+                        <TableCell align="center">
+                          {getFulfillmentChip(sale.actionType)}
+                        </TableCell>
+                        <TableCell>
+                          {changedTo ? (
+                            <Chip
+                              size="small"
+                              label={changedTo.order.product.productName}
+                              variant="outlined"
+                              color="info"
+                            />
+                          ) : (
+                            "-"
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {sale.cancellationReason
+                            ? sale.cancellationReason
+                            : sale.changeReason
+                            ? sale.changeReason
+                            : "-"}
+                        </TableCell>
+                        {role === "admin" && (
+                          <TableCell>
+                            <Stack direction="row" spacing={1}>
+                              <Button
+                                variant="outlined"
+                                color="error"
+                                disabled={sale.actionType !== "Fulfilled"}
+                                onClick={() => {
+                                  setSaleId(sale.saleId);
+                                  setToggleCancelSaleModal(true);
+                                }}
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                variant="outlined"
+                                color="primary"
+                                disabled={sale.actionType !== "Fulfilled"}
+                                onClick={() => {
+                                  setSaleToChange(sale);
+                                  setToggleChangeSaleModal(true);
+                                }}
+                              >
+                                Change
+                              </Button>
+                            </Stack>
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    );
+                  })
+                )}
               </TableBody>
             </Table>
           </Box>
@@ -652,18 +672,23 @@ const AccountsReceivablePage = () => {
           cancelText="Cancel"
           cancelButtonColor="primary"
         />
-        <CancelSaleModal
-          open={toggleCancelSaleModal}
-          onClose={handleCloseCancelSaleModal}
-          accountsReceivableId={accountsReceivableId}
-          saleId={saleId}
-        />
-        <ChangeSaleModal
-          open={toggleChangeSaleModal}
-          onClose={handleCloseChangeSaleModal}
-          accountsReceivableId={accountsReceivableId}
-          sale={saleToChange}
-        />
+        {type === "System" && (
+          <>
+            <CancelSaleModal
+              open={toggleCancelSaleModal}
+              onClose={handleCloseCancelSaleModal}
+              accountsReceivableId={accountsReceivableId}
+              saleId={saleId}
+            />
+            <ChangeSaleModal
+              open={toggleChangeSaleModal}
+              onClose={handleCloseChangeSaleModal}
+              accountsReceivableId={accountsReceivableId}
+              sale={saleToChange}
+            />
+          </>
+        )}
+
         <ProcessOverpaymentModal
           open={toggleProcessOverpaymentModal}
           onClose={handleCloseProcessOverpaymentModal}

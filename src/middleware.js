@@ -50,7 +50,7 @@ export async function middleware(req) {
 
     if (!isAllowed) {
       // User tried to access restricted route
-      return NextResponse.redirect(new URL("/unauthorized", req.url));
+      return NextResponse.redirect(new URL("/company/dashboard", req.url));
     }
 
     // Allowed route for user

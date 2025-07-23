@@ -14,7 +14,7 @@ import PaginationControls from "@/components/Utils/TablePagination";
 import { formatDate } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 import { usePathname } from "next/navigation";
-import { Chip, Tooltip } from "@mui/material";
+import { Chip, Tooltip, Stack, Typography, Box } from "@mui/material";
 import {
   HourglassEmpty,
   HourglassBottom,
@@ -25,6 +25,38 @@ const columns = [
   {
     field: "salesInvoiceNumber",
     headerName: "Invoice Number",
+    render: (value, row) => (
+      <Stack direction="row" spacing={1} alignItems="center">
+        <Typography>{value}</Typography>
+        {row.hasActivePendingExcess && (
+          <Tooltip title="Please process overpayment in this A/R">
+            <Box
+              sx={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                backgroundColor: "orange",
+                animation: "pulse 1.5s infinite",
+                "@keyframes pulse": {
+                  "0%": {
+                    transform: "scale(0.9)",
+                    opacity: 0.7,
+                  },
+                  "50%": {
+                    transform: "scale(1.3)",
+                    opacity: 1,
+                  },
+                  "100%": {
+                    transform: "scale(0.9)",
+                    opacity: 0.7,
+                  },
+                },
+              }}
+            />
+          </Tooltip>
+        )}
+      </Stack>
+    ),
     minWidth: 150,
   },
   {
@@ -64,12 +96,7 @@ const columns = [
       if (value === "Paid") {
         return (
           <Tooltip title="Fully paid">
-            <Chip
-              icon={<CheckCircle sx={{ fontSize: 18 }} />}
-              label={value}
-              color="success"
-              size="small"
-            />
+            <Chip label={value} color="success" size="small" />
           </Tooltip>
         );
       }
@@ -77,10 +104,17 @@ const columns = [
       if (value === "Partial") {
         return (
           <Tooltip title="Partial payment received">
+            <Chip label={value} color="warning" size="small" />
+          </Tooltip>
+        );
+      }
+
+      if (value === "Unpaid") {
+        return (
+          <Tooltip title="No payment received">
             <Chip
-              icon={<HourglassBottom sx={{ fontSize: 18 }} />}
               label={value}
-              color="warning"
+              color="default" // Grey, less aggressive
               size="small"
             />
           </Tooltip>
@@ -88,13 +122,8 @@ const columns = [
       }
 
       return (
-        <Tooltip title="No payment received">
-          <Chip
-            icon={<HourglassEmpty sx={{ fontSize: 18 }} />}
-            label={value}
-            color="default" // Grey, less aggressive
-            size="small"
-          />
+        <Tooltip title="Payment overdue">
+          <Chip label={value} color="error" size="small" />
         </Tooltip>
       );
     },
@@ -185,9 +214,9 @@ const AccountsReceivablesPage = () => {
     accountsReceivablesData?.data.forEach((ar) => {
       rows.push({
         id: ar.accountsReceivableId,
-        salesInvoiceNumber: ar.invoice.salesInvoiceNumber,
+        salesInvoiceNumber: ar.invoice?.salesInvoiceNumber || "Opening A/R",
         createdAt: formatDate(ar.createdAt),
-        term: ar.invoice.booking.term,
+        term: ar.invoice?.booking?.term || "-",
         dueDate: formatDate(ar.dueDate),
         totalSalesAmount: formatToLocalCurrency(ar.totalSalesAmount),
         totalPayments: formatToLocalCurrency(ar.totalPayments),
@@ -195,16 +224,20 @@ const AccountsReceivablesPage = () => {
         status: ar.status,
         customerNumber: ar.account.customerNumber,
         accountName: ar.account.accountName,
-        customerName: ar.invoice.booking.customerName,
+        customerName: ar.invoice?.booking?.customerName || "-",
         tradeType: ar.account.tradeType,
         location: ar.account.location,
         dsp: ar.account.dsp,
+        hasActivePendingExcess: ar.hasActivePendingExcess,
       });
 
       exportData.push({
-        "Invoice Number": ar.invoice.salesInvoiceNumber,
+        "Invoice Number": ar.invoice?.salesInvoiceNumber || "Opening A/R",
+        "Unprocessed Overpayment": formatToLocalCurrency(
+          ar.pendingExcessAmount
+        ),
         "Invoice Date": formatDate(ar.createdAt),
-        Term: ar.invoice.booking.term,
+        Term: ar.invoice?.booking?.term || "-",
         "Due Date": formatDate(ar.dueDate),
         "Total Sales": formatToLocalCurrency(ar.totalSalesAmount),
         "Total Payments": formatToLocalCurrency(ar.totalPayments),
@@ -212,7 +245,7 @@ const AccountsReceivablesPage = () => {
         Status: ar.status,
         "Customer Number": ar.account.customerNumber,
         "Account Name": ar.account.accountName,
-        "Customer Name": ar.invoice.booking.customerName,
+        "Customer Name": ar.invoice?.booking?.customerName || "-",
         "Trade Type": ar.account.tradeType,
         Location: ar.account.location,
         DSP: ar.account.dsp,
