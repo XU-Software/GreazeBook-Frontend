@@ -108,6 +108,20 @@ export const accountsApi = api.injectEndpoints({
         { type: "AccountsReceivables", id: "LIST" },
       ],
     }),
+    updateAccountInfo: build.mutation({
+      query: ({ accountId, accountInfoData }) => ({
+        url: `/account/${accountId}/update`,
+        method: "PATCH",
+        body: { accountInfoData },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: (result, error, arg) => [
+        { type: "Accounts", id: "LIST" },
+        { type: "Account", id: arg.accountId },
+      ],
+    }),
   }),
 });
 
@@ -120,4 +134,5 @@ export const {
   useGetAccountMetricsQuery,
   useGetAccountBreakdownListsQuery,
   useSetOpeningARMutation,
+  useUpdateAccountInfoMutation,
 } = accountsApi;
