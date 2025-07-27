@@ -8,6 +8,8 @@ import dayjs from "dayjs";
 export default function DateRangePicker({
   onFilter = () => {},
   onClear = () => {},
+  filterButtonText = "Filter",
+  clearButtonText = "Clear",
 }) {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -56,14 +58,14 @@ export default function DateRangePicker({
         onClick={handleSubmit}
         disabled={!startDate || !endDate}
       >
-        Filter
+        {filterButtonText}
       </Button>
       <Button
         variant="outlined"
         onClick={handleClear}
         disabled={!startDate || !endDate}
       >
-        Clear
+        {clearButtonText}
       </Button>
     </Box>
   );

@@ -187,7 +187,12 @@ const AccountInformation = ({
           />
         </Stack>
 
-        <DateRangePicker onFilter={onFilter} onClear={onClear} />
+        <DateRangePicker
+          onFilter={onFilter}
+          onClear={onClear}
+          filterButtonText="Filter By Invoice Date"
+          clearButtonText="Clear"
+        />
       </Box>
 
       <Grid container columnSpacing={4} rowSpacing={1} mb={2}>
