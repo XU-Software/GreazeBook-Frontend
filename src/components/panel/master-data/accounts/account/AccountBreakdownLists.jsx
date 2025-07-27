@@ -9,6 +9,7 @@ import ErrorMessage from "@/components/Utils/ErrorMessage";
 import { formatDate, formatDateWithTime } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 import AccountBreakdownSection from "./AccountBreakdownSection";
+import ColoredLink from "@/components/Utils/ColoredLink";
 
 //AR column fields
 const accountsReceivablesColumns = [
@@ -127,6 +128,19 @@ const accountsReceivablesColumns = [
 //Sales columns
 const salesColumns = [
   {
+    field: "salesInvoiceNumber",
+    headerName: "Invoice Number",
+    render: (value, row) => {
+      return (
+        <ColoredLink
+          href={`/operations/accounts-receivables/${row.accountsReceivableId}`}
+          linkText={value}
+        />
+      );
+    },
+    minWidth: 150,
+  },
+  {
     field: "productName",
     headerName: "Product",
     minWidth: 150,
@@ -173,6 +187,19 @@ const salesColumns = [
 
 //Payments columns
 const paymentsColumns = [
+  {
+    field: "salesInvoiceNumber",
+    headerName: "Invoice Number",
+    render: (value, row) => {
+      return (
+        <ColoredLink
+          href={`/operations/accounts-receivables/${row.accountsReceivableId}`}
+          linkText={value}
+        />
+      );
+    },
+    minWidth: 150,
+  },
   {
     field: "createdAt",
     headerName: "Date Processed",
@@ -230,6 +257,19 @@ const paymentsColumns = [
 //CreditMemo columns
 const creditMemoColumns = [
   {
+    field: "salesInvoiceNumber",
+    headerName: "Invoice Number",
+    render: (value, row) => {
+      return (
+        <ColoredLink
+          href={`/operations/accounts-receivables/${row.accountsReceivableId}`}
+          linkText={value}
+        />
+      );
+    },
+    minWidth: 150,
+  },
+  {
     field: "createdAt",
     headerName: "Date Issued",
     minWidth: 150,
@@ -280,6 +320,19 @@ const creditMemoColumns = [
 
 //Refunds columns
 const refundsColumns = [
+  {
+    field: "salesInvoiceNumber",
+    headerName: "Invoice Number",
+    render: (value, row) => {
+      return (
+        <ColoredLink
+          href={`/operations/accounts-receivables/${row.accountsReceivableId}`}
+          linkText={value}
+        />
+      );
+    },
+    minWidth: 150,
+  },
   {
     field: "createdAt",
     headerName: "Date Issued",
@@ -398,6 +451,8 @@ const AccountBreakdownLists = ({
           ...prev.sales,
           ...(accountDetailsData.sales.map((sale) => ({
             id: sale.saleId,
+            salesInvoiceNumber: sale.salesInvoiceNumber,
+            accountsReceivableId: sale.accountsReceivableId,
             productName: sale.order.product.productName,
             quantity: sale.order.quantity,
             price: formatToLocalCurrency(sale.order.price),
@@ -408,6 +463,10 @@ const AccountBreakdownLists = ({
           ...prev.payments,
           ...(accountDetailsData.payments.map((p) => ({
             id: p.paymentId,
+            salesInvoiceNumber: p.salesInvoiceNumber
+              ? p.salesInvoiceNumber
+              : "Opening A/R",
+            accountsReceivableId: p.accountsReceivableId,
             createdAt: formatDateWithTime(p.createdAt),
             createdBy: p.createdBy.email,
             amount: formatToLocalCurrency(p.amount),
@@ -422,6 +481,10 @@ const AccountBreakdownLists = ({
           ...prev.creditMemos,
           ...(accountDetailsData.creditMemos.map((cm) => ({
             id: cm.creditMemoId,
+            salesInvoiceNumber: cm.salesInvoiceNumber
+              ? cm.salesInvoiceNumber
+              : "Opening A/R",
+            accountsReceivableId: cm.accountsReceivableId,
             createdAt: formatDateWithTime(cm.createdAt),
             createdBy: cm.createdBy.email,
             amount: formatToLocalCurrency(cm.amount),
@@ -436,6 +499,10 @@ const AccountBreakdownLists = ({
           ...prev.refunds,
           ...(accountDetailsData.refunds.map((refund) => ({
             id: refund.refundId,
+            salesInvoiceNumber: refund.salesInvoiceNumber
+              ? refund.salesInvoiceNumber
+              : "Opening A/R",
+            accountsReceivableId: refund.accountsReceivableId,
             createdAt: formatDateWithTime(refund.createdAt),
             createdBy: refund.createdBy.email,
             amount: formatToLocalCurrency(refund.amount),
