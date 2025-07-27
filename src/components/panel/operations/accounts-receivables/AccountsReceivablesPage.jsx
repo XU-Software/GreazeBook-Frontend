@@ -121,8 +121,16 @@ const columns = [
         );
       }
 
+      if (value === "Overdue") {
+        return (
+          <Tooltip title="Payment overdue">
+            <Chip label={value} color="error" size="small" />
+          </Tooltip>
+        );
+      }
+
       return (
-        <Tooltip title="Payment overdue">
+        <Tooltip title="A/R Cancelled">
           <Chip label={value} color="error" size="small" />
         </Tooltip>
       );

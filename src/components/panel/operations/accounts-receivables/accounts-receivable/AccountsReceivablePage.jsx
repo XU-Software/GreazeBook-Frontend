@@ -51,8 +51,10 @@ const getStatusChip = (status) => {
       return <Chip label="Partial" color="warning" size="small" />;
     case "Paid":
       return <Chip label="Paid" color="success" size="small" />;
+    case "Overdue":
+      return <Chip label="Overdue" color="error" size="small" />;
     default:
-      return <Chip label={status} size="small" />;
+      return <Chip label="Cancelled" color="error" size="small" />;
   }
 };
 
@@ -421,7 +423,9 @@ const AccountsReceivablePage = () => {
               <Typography variant="body2" color="text.secondary">
                 Aging
               </Typography>
-              {status !== "Paid" ? getAgingChip(dueDate) : "-"}
+              {status !== "Paid" && status !== "Cancelled"
+                ? getAgingChip(dueDate)
+                : "-"}
             </Grid>
           </Grid>
         </Paper>

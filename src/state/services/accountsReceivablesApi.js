@@ -47,6 +47,14 @@ export const accountsReceivablesApi = api.injectEndpoints({
           { type: "Payments", id: "LIST" },
         ];
 
+        // If success we will have affectedAccountId as part of response from the backend
+        if (result?.affectedAccountId) {
+          tags.push(
+            { type: "AccountMetrics", id: result.affectedAccountId },
+            { type: "AccountDetails", id: result.affectedAccountId }
+          );
+        }
+
         // PendingExcesses (We check if pendingExcessIds is not empty, it can be empty because we invalidate all active pendingExcess every transaction and we only create new active pendingExcess if theres overpaid calculated)
         const hasUpdatedItems =
           Array.isArray(result?.affectedPendingExcessIds) &&
@@ -86,6 +94,14 @@ export const accountsReceivablesApi = api.injectEndpoints({
           { type: "Payments", id: "LIST" },
           { type: "Payment", id: arg.paymentId },
         ];
+
+        // If success we will have affectedAccountId as part of response from the backend
+        if (result?.affectedAccountId) {
+          tags.push(
+            { type: "AccountMetrics", id: result.affectedAccountId },
+            { type: "AccountDetails", id: result.affectedAccountId }
+          );
+        }
 
         // PendingExcesses (We check if pendingExcessIds is not empty, it can be empty because we invalidate all active pendingExcess every transaction and we only create new active pendingExcess if theres overpaid calculated)
         const hasUpdatedItems =
@@ -130,6 +146,14 @@ export const accountsReceivablesApi = api.injectEndpoints({
           { type: "Sales", id: "LIST" },
           { type: "Sale", id: arg.saleId },
         ];
+
+        // If success we will have affectedAccountId as part of response from the backend
+        if (result?.affectedAccountId) {
+          tags.push(
+            { type: "AccountMetrics", id: result.affectedAccountId },
+            { type: "AccountDetails", id: result.affectedAccountId }
+          );
+        }
 
         // Products (We check if affectedProductId is not null, it can be null from backend response as it's totalStocks is either replenished or not)
         if (result?.affectedProductId) {
@@ -183,6 +207,14 @@ export const accountsReceivablesApi = api.injectEndpoints({
           { type: "Products", id: "LIST" },
           // { type: "Product", id: arg.newSale.productId },
         ];
+
+        // If success we will have affectedAccountId as part of response from the backend
+        if (result?.affectedAccountId) {
+          tags.push(
+            { type: "AccountMetrics", id: result.affectedAccountId },
+            { type: "AccountDetails", id: result.affectedAccountId }
+          );
+        }
 
         // Invalidate all affected product stocks (from backend response)
         Array.from(new Set(result?.affectedProductIds || [])).forEach(
@@ -240,6 +272,12 @@ export const accountsReceivablesApi = api.injectEndpoints({
         { type: "PendingExcesses", id: "LIST" },
         { type: "PendingExcess", id: arg.pendingExcessId },
         { type: "Refunds", id: "LIST" },
+        ...(result?.affectedAccountId
+          ? [
+              { type: "AccountMetrics", id: result.affectedAccountId },
+              { type: "AccountDetails", id: result.affectedAccountId },
+            ]
+          : []),
       ],
     }),
     accountsReceivableProcessOverpaymentToCreditMemo: build.mutation({
@@ -261,6 +299,12 @@ export const accountsReceivablesApi = api.injectEndpoints({
         { type: "PendingExcesses", id: "LIST" },
         { type: "PendingExcess", id: arg.pendingExcessId },
         { type: "CreditMemos", id: "LIST" },
+        ...(result?.affectedAccountId
+          ? [
+              { type: "AccountMetrics", id: result.affectedAccountId },
+              { type: "AccountDetails", id: result.affectedAccountId },
+            ]
+          : []),
       ],
     }),
   }),

@@ -106,8 +106,16 @@ const accountsReceivablesColumns = [
         );
       }
 
+      if (value === "Overdue") {
+        return (
+          <Tooltip title="Payment overdue">
+            <Chip label={value} color="error" size="small" />
+          </Tooltip>
+        );
+      }
+
       return (
-        <Tooltip title="Payment overdue">
+        <Tooltip title="A/R Cancelled">
           <Chip label={value} color="error" size="small" />
         </Tooltip>
       );
@@ -481,6 +489,11 @@ const AccountBreakdownLists = ({
           { label: "Partial", count: arStatusCounts.partial, color: "warning" },
           { label: "Paid", count: arStatusCounts.paid, color: "success" },
           { label: "Overdue", count: arStatusCounts.overdue, color: "error" },
+          {
+            label: "Cancelled A/R",
+            count: arStatusCounts.cancelled,
+            color: "error",
+          },
         ]}
         rows={accumulatedData.accountsReceivables}
         columns={accountsReceivablesColumns}
