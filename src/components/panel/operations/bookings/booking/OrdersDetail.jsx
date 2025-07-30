@@ -20,7 +20,6 @@ import {
 import { Edit, Check, Close, Delete } from "@mui/icons-material";
 import EditableCell from "@/components/Utils/EditableCell";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
-import AddRowButton from "@/components/Utils/AddRowButton";
 import AddOrderModal from "./AddOrderModal";
 
 const OrdersDetail = ({

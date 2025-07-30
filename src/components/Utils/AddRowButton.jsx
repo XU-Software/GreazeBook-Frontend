@@ -17,6 +17,7 @@ export default function AddRowButton({
   title = "Add New",
   description = "",
   descriptionColor = "default",
+  startIcon = "",
   columns = [],
   initialValues = {},
   onSubmit,
@@ -49,7 +50,7 @@ export default function AddRowButton({
         variant="contained"
         color="primary"
         onClick={handleOpen}
-        startIcon={<Add />}
+        startIcon={startIcon}
         loading={isLoading}
         disabled={isDisabled}
       >

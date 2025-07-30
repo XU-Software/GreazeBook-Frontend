@@ -21,9 +21,9 @@ import ImportExcel from "@/components/Utils/ImportExcel";
 import ExportExcel from "@/components/Utils/ExportExcel";
 import DeleteSelectedButton from "@/components/Utils/DeleteSelectedButton";
 import PaginationControls from "@/components/Utils/TablePagination";
-import numeral from "numeral";
 import { formatDate } from "@/utils/dateFormatter";
 import { usePathname } from "next/navigation";
+import { Add } from "@mui/icons-material";
 
 const columns = [
   {
@@ -298,6 +298,7 @@ const AccountsPage = () => {
               onSubmit={handleAddSingleAccount}
               title="Add New Account"
               buttonLabel="Account"
+              startIcon={<Add />}
             />
             <ImportExcel
               handleImportExcel={handleImportAccountsExcel}

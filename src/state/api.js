@@ -18,6 +18,8 @@ export const api = createApi({
     "AccountDetails",
     "Products",
     "Product",
+    "StockHistoryList",
+    "StockHistoryItem",
     "Bookings",
     "Booking",
     "Orders",

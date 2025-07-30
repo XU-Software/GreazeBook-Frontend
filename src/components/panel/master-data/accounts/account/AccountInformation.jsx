@@ -5,8 +5,6 @@ import {
   useSetOpeningARMutation,
   useUpdateAccountInfoMutation,
 } from "@/state/services/accountsApi";
-import LoadingSpinner from "@/components/Utils/LoadingSpinner";
-import ErrorMessage from "@/components/Utils/ErrorMessage";
 import DateRangePicker from "@/components/Utils/DateRangePicker";
 import {
   Paper,
@@ -14,11 +12,10 @@ import {
   Grid,
   Box,
   Stack,
-  Button,
   Tooltip,
   IconButton,
 } from "@mui/material";
-import { Edit, Close, Check } from "@mui/icons-material";
+import { Edit, Close, Check, Add } from "@mui/icons-material";
 import { formatDateWithTime } from "@/utils/dateFormatter";
 import { useAppDispatch } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
@@ -177,6 +174,7 @@ const AccountInformation = ({
             title="Set Opening A/R"
             description="⚠️ Important: Once the Opening A/R is set, it cannot be modified or revoked. Please proceed only when the details are finalized and fully validated."
             descriptionColor="error"
+            startIcon={<Add />}
             columns={[
               { field: "amount", headerName: "Amount", type: "number" },
               { field: "dueDate", headerName: "Due Date", type: "date" },

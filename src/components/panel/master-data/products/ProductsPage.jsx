@@ -23,7 +23,7 @@ import DeleteSelectedButton from "@/components/Utils/DeleteSelectedButton";
 import PaginationControls from "@/components/Utils/TablePagination";
 import { formatDate } from "@/utils/dateFormatter";
 import { Chip, Tooltip } from "@mui/material";
-import { WarningAmber, Error, CheckCircle } from "@mui/icons-material";
+import { WarningAmber, Error, CheckCircle, Add } from "@mui/icons-material";
 import { usePathname } from "next/navigation";
 
 const columns = [
@@ -323,6 +323,7 @@ const ProductsPage = () => {
               onSubmit={handleAddSingleProduct}
               title="Add New Product"
               buttonLabel="Product"
+              startIcon={<Add />}
             />
             <ImportExcel
               handleImportExcel={handleImportProductsExcel}
