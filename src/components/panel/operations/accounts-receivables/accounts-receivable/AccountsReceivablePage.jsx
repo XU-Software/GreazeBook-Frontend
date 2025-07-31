@@ -22,6 +22,7 @@ import {
   Button,
   Stack,
   Tooltip,
+  TableFooter,
 } from "@mui/material";
 import {
   CheckCircle,
@@ -255,6 +256,7 @@ const AccountsReceivablePage = () => {
     sales,
     payments,
     totalSalesAmount,
+    totalVolume,
     totalPayments,
     activePendingExcess, //can be null
     refund, //can be null
@@ -490,9 +492,11 @@ const AccountsReceivablePage = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>Product</TableCell>
+                  <TableCell>UOM</TableCell>
                   <TableCell align="right">Quantity</TableCell>
                   <TableCell align="right">Unit Price</TableCell>
                   <TableCell align="right">Subtotal</TableCell>
+                  <TableCell align="right">Volume</TableCell>
                   <TableCell align="center">Action Type</TableCell>
                   <TableCell>Changed To</TableCell>
                   <TableCell>Reason</TableCell>
@@ -517,6 +521,7 @@ const AccountsReceivablePage = () => {
                     return (
                       <TableRow key={sale.saleId}>
                         <TableCell>{sale.order.product.productName}</TableCell>
+                        <TableCell>{sale.order.product.uom}</TableCell>
                         <TableCell align="right">
                           {sale.order.quantity}
                         </TableCell>
@@ -527,6 +532,9 @@ const AccountsReceivablePage = () => {
                           {formatToLocalCurrency(
                             sale.order.quantity * sale.order.price
                           )}
+                        </TableCell>
+                        <TableCell align="right">
+                          {sale.order.product.uom * sale.order.quantity}
                         </TableCell>
                         <TableCell align="center">
                           {getFulfillmentChip(sale.actionType)}
@@ -583,6 +591,21 @@ const AccountsReceivablePage = () => {
                   })
                 )}
               </TableBody>
+              <TableFooter>
+                <TableRow>
+                  <TableCell colSpan={4} align="right">
+                    <Typography fontWeight="bold">Total</Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography fontWeight="bold">
+                      {formatToLocalCurrency(totalSalesAmount)}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography fontWeight="bold">{totalVolume}</Typography>
+                  </TableCell>
+                </TableRow>
+              </TableFooter>
             </Table>
           </Box>
         </Paper>

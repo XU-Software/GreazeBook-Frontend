@@ -13,7 +13,7 @@ import ErrorMessage from "@/components/Utils/ErrorMessage";
 import ProductInformation from "./ProductInformation";
 import Table from "@/components/Utils/DataTable";
 import PaginationControls from "@/components/Utils/TablePagination";
-import { formatDate, formatDateWithTime } from "@/utils/dateFormatter";
+import { formatDateWithTime } from "@/utils/dateFormatter";
 
 const columns = [
   {

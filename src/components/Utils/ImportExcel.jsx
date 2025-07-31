@@ -92,7 +92,8 @@ const ImportExcel = ({
           </ul>
 
           <Typography variant="body2" mt={2}>
-            Example Row:
+            Example Row: Format should be followed strictly from column names
+            and data type
           </Typography>
 
           <TableContainer component={Paper} sx={{ mt: 1, mb: 2 }}>

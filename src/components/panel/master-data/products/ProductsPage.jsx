@@ -40,7 +40,7 @@ const columns = [
   },
   {
     field: "uom",
-    headerName: "UOM",
+    headerName: "UOM (L)",
     minWidth: 150,
   },
   {
@@ -98,7 +98,7 @@ const rowGuide = {
   materialCode: "MC-12345",
   productName: "Product1",
   productFamily: "Product Family1",
-  uom: "123",
+  uom: "123 or 1 or 1.5 (In Liters)",
   totalStocks: "123 or 0",
 };
 
@@ -117,7 +117,7 @@ const columnsGuide = [
   {
     field: "uom",
     headerName: "UOM",
-    type: "text",
+    type: "number",
   },
   {
     field: "totalStocks",
@@ -272,7 +272,7 @@ const ProductsPage = () => {
         "Material Code": prod.materialCode,
         "Product Name": prod.productName,
         "Product Family": prod.productFamily,
-        UOM: prod.uom,
+        "UOM (L)": prod.uom,
         "Total Stocks": prod.totalStocks,
         "Created At": formattedDate,
       });

@@ -290,7 +290,7 @@ const ProductInformation = ({ productInfoData, productId = "" }) => {
                 : uom || ""
             }
             editing={editProduct}
-            type="text"
+            type="number"
             name="uom"
             onChange={(e) =>
               setProductFormData((prev) => ({
