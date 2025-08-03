@@ -5,6 +5,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, Provider } from "react-redux";
 import globalReducer from "@/state";
 import snackbarReducer from "@/state/snackbarSlice";
+import dashboardReducer from "@/state/dashboardSlice";
 import { api } from "@/state/api";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import {
@@ -37,12 +38,13 @@ const storage =
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["global"],
+  whitelist: ["global", "dashboard"],
 };
 
 const rootReducer = combineReducers({
   global: globalReducer,
   snackbar: snackbarReducer,
+  dashboard: dashboardReducer,
   [api.reducerPath]: api.reducer,
 });
 

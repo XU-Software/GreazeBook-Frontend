@@ -63,7 +63,7 @@ export default function DateRangePicker({
       <Button
         variant="outlined"
         onClick={handleClear}
-        disabled={!startDate || !endDate}
+        // disabled={!startDate || !endDate}
       >
         {clearButtonText}
       </Button>

@@ -12,6 +12,7 @@ export const api = createApi({
     "CompanyInvite",
     "CompanyUsers",
     "CompanyUser",
+    "CompanyDashboard",
     "Accounts",
     "Account",
     "AccountMetrics",
