@@ -49,12 +49,14 @@ const DashboardTable = ({
                 <TableRow key={idx}>
                   {columns.map(({ field }) => {
                     const rawValue = row[field] ?? "";
-                    const formatted =
-                      formatters[field] &&
-                      typeof formatters[field] === "function"
-                        ? formatters[field](rawValue)
-                        : rawValue;
-                    return <TableCell key={field}>{formatted}</TableCell>;
+                    const column = columns.find((col) => col.field === field);
+                    const rendered = column.render
+                      ? column.render(rawValue, row)
+                      : formatters[field]
+                      ? formatters[field](rawValue)
+                      : rawValue;
+
+                    return <TableCell key={field}>{rendered}</TableCell>;
                   })}
                 </TableRow>
               ))

@@ -1,71 +1,52 @@
 "use client";
 
-import React from "react";
+import React, { useState, useMemo } from "react";
 import { useLazyCompanyDashboardQuery } from "@/state/services/companyApi";
 import { setDashboardData, clearDashboardData } from "@/state/dashboardSlice";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
-import { Box, Grid, Paper, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Paper,
+  Stack,
+  Typography,
+  Tooltip,
+  IconButton,
+} from "@mui/material";
+import { Check, Close, Edit } from "@mui/icons-material";
 import DashboardTable from "./DashboardTable";
 import DashboardBarChart from "./DashboardBarChart";
 import DynamicBreadcrumbs from "@/components/Utils/DynamicBreadcrumbs";
 import DateRangePicker from "@/components/Utils/DateRangePicker";
+import EditableField from "@/components/Utils/EditableField";
 import { formatDate } from "@/utils/dateFormatter";
-
-const mockDashboardData = {
-  sales: [
-    {
-      dsp: "Lauren Ellis",
-      salesToTrade: 156,
-      oplan: 10000,
-      attainment: 1.56,
-      pesoValue: 21870,
-    },
-    // ...
-  ],
-  penetration: [
-    {
-      dsp: "Lauren Ellis",
-      activeAccounts: 1,
-      totalAccounts: 1,
-      attainment: 100,
-    },
-    // ...
-  ],
-  collection: [
-    {
-      dsp: "Lauren Ellis",
-      totalAR: 21870,
-      totalOverdue: 5800,
-      overdueToTARRatio: 26.52,
-    },
-    // ...
-  ],
-  penetrationByTradeType: [
-    {
-      tradeType: "Retail",
-      totalVolume: 156,
-      totalAccounts: 1,
-      activeAccounts: 1,
-    },
-    // ...
-  ],
-};
+import dayjs from "dayjs";
 
 const DashboardPage = () => {
-  const sales = mockDashboardData.sales;
-  const penetration = mockDashboardData.penetration;
-  const collection = mockDashboardData.collection;
-  const penetrationByTradeType = mockDashboardData.penetrationByTradeType;
-
   const dispatch = useAppDispatch();
-  const dashboardState = useAppSelector((state) => state.dashboard);
+  const dashboardState = useAppSelector((state) => state.dashboard); // from persisted global store state of dashboard
 
+  // for opening and editing oplans for each grouped DSP
+  const [editOplan, setEditOplan] = useState(false);
+  const [oplan, setOplan] = useState([]); // initially 0, when edited becomes object
+
+  // Query for fetching dashboard data
   const [companyDashboard, { isLoading }] = useLazyCompanyDashboardQuery();
 
-  const handleFilter = async (startDate, endDate) => {
+  const handleFilter = async (startDate, endDate, oplan) => {
     try {
-      const res = await companyDashboard({ startDate, endDate }).unwrap();
+      //convert to oplan keys to number first
+      const normalizedOplan = oplan?.map((item) => ({
+        dsp: item.dsp,
+        oplan: Number(item.oplan), // ensure it's a number
+      }));
+
+      const res = await companyDashboard({
+        startDate,
+        endDate,
+        normalizedOplan,
+      }).unwrap();
       dispatch(setDashboardData({ data: res, params: { startDate, endDate } }));
     } catch (error) {
       dispatch(
@@ -81,8 +62,32 @@ const DashboardPage = () => {
   };
 
   const handleClear = () => {
+    setEditOplan(false);
+    setOplan([]);
     dispatch(clearDashboardData());
   };
+
+  // handler for changing oplan for a specfic DSP, can be multiple at once
+  const handleOplanChange = (dsp, value) => {
+    setOplan((prev) => {
+      const existing = prev.find((item) => item.dsp === dsp);
+      if (existing) {
+        return prev.map((item) =>
+          item.dsp === dsp ? { ...item, oplan: value } : item
+        );
+      } else {
+        return [...prev, { dsp, oplan: value }];
+      }
+    });
+  };
+
+  // conditional for fetching dashboard data, only when changing oplans
+  const dateRange = dashboardState.lastParams
+    ? [
+        dayjs(dashboardState.lastParams.startDate).startOf("day").toISOString(),
+        dayjs(dashboardState.lastParams.endDate).startOf("day").toISOString(),
+      ]
+    : ["", ""];
 
   return (
     <Box sx={{ p: 2, mx: "auto" }}>
@@ -134,7 +139,87 @@ const DashboardPage = () => {
             columns={[
               { field: "dsp", headerName: "DSP NAME" },
               { field: "salesToTrade", headerName: "SALES-TO-TRADE" },
-              { field: "oplan", headerName: "OPLAN" },
+              {
+                field: "oplan",
+                headerName: (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      // justifyContent: "space-between",
+                      gap: 2,
+                    }}
+                  >
+                    <Typography>OPLAN</Typography>{" "}
+                    {editOplan ? (
+                      <Stack direction="row" spacing={2}>
+                        <Tooltip title="Save Changes">
+                          <IconButton
+                            variant="contained"
+                            color="primary"
+                            onClick={async () => {
+                              if (oplan.length === 0) return;
+                              await handleFilter(...dateRange, oplan);
+                              // setOplan([]);
+                              setEditOplan(false);
+                              {
+                              }
+                            }}
+                            // loading={isUpdating}
+                            size="medium"
+                          >
+                            <Check fontSize="medium" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Cancel Editing">
+                          <IconButton
+                            variant="outlined"
+                            size="medium"
+                            color="secondary"
+                            onClick={() => {
+                              // setOplan([]);
+                              setEditOplan(false);
+                            }}
+                            // loading={isUpdating}
+                          >
+                            <Close fontSize="medium" />
+                          </IconButton>
+                        </Tooltip>
+                      </Stack>
+                    ) : (
+                      <IconButton
+                        size="medium"
+                        color="primary"
+                        onClick={() => setEditOplan(true)}
+                      >
+                        <Edit fontSize="medium" />
+                      </IconButton>
+                    )}
+                  </Box>
+                ),
+                render: (value, row) => {
+                  const dsp = row.dsp;
+
+                  const currentOplan =
+                    oplan.find((item) => item.dsp === dsp)?.oplan ??
+                    dashboardState.data?.sales?.rows?.find(
+                      (item) => item.dsp === dsp
+                    )?.oplan ??
+                    0;
+
+                  return (
+                    <EditableField
+                      editing={editOplan}
+                      type="number"
+                      value={currentOplan}
+                      name={dsp}
+                      onChange={(e) =>
+                        handleOplanChange(e.target.name, e.target.value)
+                      }
+                    />
+                  );
+                },
+              },
               { field: "attainment", headerName: "ATTAINMENT" },
               { field: "pesoValue", headerName: "PESO VALUE" },
             ]}
