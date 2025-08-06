@@ -42,6 +42,7 @@ import ConfirmationModal from "@/components/Utils/ConfirmationModal";
 import CancelSaleModal from "./CancelSaleModal";
 import ChangeSaleModal from "./ChangeSaleModal";
 import ProcessOverpaymentModal from "./ProcessPendingExcessModal";
+import CreditMemoPaymentModal from "./CreditMemoPaymentModal";
 
 // Helper chips
 const getStatusChip = (status) => {
@@ -161,6 +162,10 @@ const AccountsReceivablePage = () => {
   const [toggleProcessOverpaymentModal, setToggleProcessOverpaymentModal] =
     useState(false);
   const [pendingExcessId, setPendingExcessId] = useState("");
+
+  // Toggling credit memo payment modal
+  const [toggleCreditMemoPaymentModal, setToggleCreditMemoPaymentModal] =
+    useState(false);
 
   const userData = useAppSelector((state) => state.global.userData);
   const role = userData?.data?.role || "user";
@@ -295,15 +300,28 @@ const AccountsReceivablePage = () => {
                 </span>
               </Tooltip>
             ) : (
-              <Tooltip title="Make a payment">
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setTogglePaymentModal(true)}
-                >
-                  Record Payment
-                </Button>
-              </Tooltip>
+              <>
+                <Tooltip title="Make a payment">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setTogglePaymentModal(true)}
+                  >
+                    Record Payment
+                  </Button>
+                </Tooltip>
+                {account.creditMemos.length > 0 && (
+                  <Tooltip title="This account has credit memo available which can be used for payment">
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => setToggleCreditMemoPaymentModal(true)}
+                    >
+                      Credit Memo Available
+                    </Button>
+                  </Tooltip>
+                )}
+              </>
             )}
             {activePendingExcess && (
               <Button
@@ -688,6 +706,14 @@ const AccountsReceivablePage = () => {
           onClose={() => setTogglePaymentModal(false)}
           accountsReceivableId={accountsReceivableId}
         />
+
+        <CreditMemoPaymentModal
+          open={toggleCreditMemoPaymentModal}
+          onClose={() => setToggleCreditMemoPaymentModal(false)}
+          creditMemos={account.creditMemos}
+          accountsReceivableId={accountsReceivableId}
+        />
+
         <ConfirmationModal
           open={toggleVoidPaymentModal}
           onClose={handleCloseVoidModal}

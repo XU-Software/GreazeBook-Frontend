@@ -47,6 +47,14 @@ export const accountsReceivablesApi = api.injectEndpoints({
           { type: "Payments", id: "LIST" },
         ];
 
+        // Check if payment is made with creditMemo, check for usedCreditMemoId variable
+        if (result?.usedCreditMemoId) {
+          tags.push(
+            { type: "CreditMemos", id: "LIST" },
+            { type: "CreditMemo", id: result.usedCreditMemoId }
+          );
+        }
+
         // If success we will have affectedAccountId as part of response from the backend
         if (result?.affectedAccountId) {
           tags.push(
