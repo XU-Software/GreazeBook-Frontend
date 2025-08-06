@@ -506,7 +506,7 @@ const AccountsReceivablePage = () => {
               <TableBody>
                 {type === "Opening" ? (
                   <TableRow>
-                    <TableCell colSpan={8} align="center">
+                    <TableCell colSpan={10} align="center">
                       <Typography variant="body2" color="textSecondary">
                         This is an Opening A/R and doesn't include system
                         generated sales
