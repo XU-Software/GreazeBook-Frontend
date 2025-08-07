@@ -258,7 +258,7 @@ const paymentsColumns = [
 const creditMemoColumns = [
   {
     field: "salesInvoiceNumber",
-    headerName: "Invoice Number",
+    headerName: "Processed From",
     render: (value, row) => {
       return (
         <ColoredLink

@@ -20,7 +20,7 @@ import { Chip } from "@mui/material";
 const columns = [
   {
     field: "salesInvoiceNumber",
-    headerName: "Invoice Number",
+    headerName: "Processed From",
     render: (value, row) => {
       return (
         <ColoredLink
@@ -185,7 +185,7 @@ const OverpaymentsPage = () => {
       });
 
       exportData.push({
-        "Invoice Number": pe.accountsReceivable.invoice
+        "Processed From": pe.accountsReceivable.invoice
           ? pe.accountsReceivable.invoice.salesInvoiceNumber
           : "Opening A/R",
         "Customer Number": pe.accountsReceivable.account.customerNumber,
