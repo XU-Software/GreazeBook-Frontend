@@ -22,7 +22,7 @@ import ExportExcel from "@/components/Utils/ExportExcel";
 import DeleteSelectedButton from "@/components/Utils/DeleteSelectedButton";
 import PaginationControls from "@/components/Utils/TablePagination";
 import { formatDate } from "@/utils/dateFormatter";
-import { Chip, Tooltip } from "@mui/material";
+import { Chip, Tooltip, Typography } from "@mui/material";
 import { WarningAmber, Error, CheckCircle, Add } from "@mui/icons-material";
 import { usePathname } from "next/navigation";
 
@@ -309,6 +309,7 @@ const ProductsPage = () => {
             <SearchBar setSearch={setSearch} setPage={setPage} />
             <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
           </div>
+          <Typography>Number of Products: {productsData?.total}</Typography>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <AddRowButton
               columns={columnsGuide}

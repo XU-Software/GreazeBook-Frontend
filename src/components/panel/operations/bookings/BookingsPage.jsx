@@ -19,7 +19,7 @@ import DeleteSelectedButton from "@/components/Utils/DeleteSelectedButton";
 import PaginationControls from "@/components/Utils/TablePagination";
 import { formatDate } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
-import { Chip } from "@mui/material";
+import { Chip, Typography } from "@mui/material";
 import { usePathname } from "next/navigation";
 
 const statusColorMap = {
@@ -230,6 +230,7 @@ const BookingsPage = () => {
             <SearchBar setSearch={setSearch} setPage={setPage} />
             <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
           </div>
+          <Typography>Number of Bookings: {bookingsData?.total}</Typography>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <ExportExcel
               exportData={exportData}

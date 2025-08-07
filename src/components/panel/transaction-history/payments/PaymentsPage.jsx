@@ -15,7 +15,7 @@ import { formatDateWithTime } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 import { usePathname } from "next/navigation";
 import ColoredLink from "@/components/Utils/ColoredLink";
-import { Chip } from "@mui/material";
+import { Chip, Typography } from "@mui/material";
 
 const columns = [
   {
@@ -196,6 +196,7 @@ const PaymentsPage = () => {
             <SearchBar setSearch={setSearch} setPage={setPage} />
             <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
           </div>
+          <Typography>Number of Payments: {paymentsData?.total}</Typography>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <ExportExcel
               exportData={exportData}

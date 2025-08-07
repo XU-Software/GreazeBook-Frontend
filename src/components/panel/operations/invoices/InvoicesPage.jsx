@@ -14,6 +14,7 @@ import PaginationControls from "@/components/Utils/TablePagination";
 import { formatDate } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 import { usePathname } from "next/navigation";
+import { Typography } from "@mui/material";
 
 const columns = [
   {
@@ -162,6 +163,7 @@ const InvoicesPage = () => {
             <SearchBar setSearch={setSearch} setPage={setPage} />
             <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
           </div>
+          <Typography>Number of Invoices: {invoicesData?.total}</Typography>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <ExportExcel
               exportData={exportData}

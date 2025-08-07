@@ -24,6 +24,7 @@ import PaginationControls from "@/components/Utils/TablePagination";
 import { formatDate } from "@/utils/dateFormatter";
 import { usePathname } from "next/navigation";
 import { Add } from "@mui/icons-material";
+import { Typography } from "@mui/material";
 
 const columns = [
   {
@@ -283,6 +284,7 @@ const AccountsPage = () => {
             <SearchBar setSearch={setSearch} setPage={setPage} />
             <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
           </div>
+          <Typography>Number of Accounts: {accountsData?.total}</Typography>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <AddRowButton
               columns={columnsGuide}

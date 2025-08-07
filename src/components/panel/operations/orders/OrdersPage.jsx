@@ -11,11 +11,10 @@ import SearchBar from "@/components/Utils/SearchBar";
 import SortToggle from "@/components/Utils/SortToggle";
 import ExportExcel from "@/components/Utils/ExportExcel";
 import PaginationControls from "@/components/Utils/TablePagination";
-import { formatDate } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 import { usePathname } from "next/navigation";
 import ColoredLink from "@/components/Utils/ColoredLink";
-import { Chip } from "@mui/material";
+import { Chip, Typography } from "@mui/material";
 
 const columns = [
   {
@@ -228,6 +227,7 @@ const OrdersPage = () => {
             <SearchBar setSearch={setSearch} setPage={setPage} />
             <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
           </div>
+          <Typography>Number of Orders: {ordersData?.total}</Typography>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <ExportExcel
               exportData={exportData}
