@@ -103,6 +103,14 @@ export const accountsReceivablesApi = api.injectEndpoints({
           { type: "Payment", id: arg.paymentId },
         ];
 
+        // Check if affectedCreditMemoId exist, meaning a payment from a creditMemo was voided
+        if (result?.affectedCreditMemoId) {
+          tags.push(
+            { type: "CreditMemos", id: "LIST" },
+            { type: "CreditMemo", id: result.affectedCreditMemoId }
+          );
+        }
+
         // If success we will have affectedAccountId as part of response from the backend
         if (result?.affectedAccountId) {
           tags.push(

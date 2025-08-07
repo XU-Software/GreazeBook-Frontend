@@ -37,14 +37,13 @@ const CreditMemoPaymentModal = ({
   open,
   onClose,
   creditMemos = [],
-  onSubmit,
   accountsReceivableId = "",
 }) => {
   const dispatch = useAppDispatch();
 
   const [paymentInfo, setPaymentInfo] = useState({
     amount: "",
-    method: "CreditMemo",
+    method: "Credit Memo",
     reference: "",
     note: "",
     creditMemoId: "",
@@ -56,7 +55,7 @@ const CreditMemoPaymentModal = ({
     setSelectedMemo(memo);
     setPaymentInfo({
       amount: "",
-      method: "CreditMemo",
+      method: "Credit Memo",
       reference: "",
       note: "",
       creditMemoId: memo.creditMemoId,
@@ -72,7 +71,7 @@ const CreditMemoPaymentModal = ({
       setSelectedMemo(null);
       setPaymentInfo({
         amount: "",
-        method: "CreditMemo",
+        method: "Credit Memo",
         reference: "",
         note: "",
         creditMemoId: "",
@@ -114,7 +113,7 @@ const CreditMemoPaymentModal = ({
       setSelectedMemo(null);
       setPaymentInfo({
         amount: "",
-        method: "CreditMemo",
+        method: "Credit Memo",
         reference: "",
         note: "",
         creditMemoId: "",
