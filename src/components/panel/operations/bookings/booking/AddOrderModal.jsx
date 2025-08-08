@@ -15,6 +15,8 @@ import { useGetProductsQuery } from "@/state/services/productsApi";
 import { useAddPendingOrdersMutation } from "@/state/services/bookingsApi";
 import { useAppDispatch } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
+import QuantityTextField from "@/components/Utils/QuantityTextField";
+import CurrencyTextField from "@/components/Utils/CurrencyTextField";
 
 export default function AddOrderModal({
   open = false,
@@ -85,7 +87,7 @@ export default function AddOrderModal({
                 option?.productId === value?.productId
               }
             />
-
+            {/* 
             <TextField
               label="Quantity"
               name="quantity"
@@ -94,8 +96,18 @@ export default function AddOrderModal({
               onChange={handleChange}
               fullWidth
               required
+            /> */}
+
+            <QuantityTextField
+              name="quantity"
+              value={form.quantity}
+              onChange={handleChange}
+              label="Quantity"
+              required
+              fullWidth
             />
 
+            {/* 
             <TextField
               label="Price"
               name="price"
@@ -104,6 +116,15 @@ export default function AddOrderModal({
               onChange={handleChange}
               fullWidth
               required
+            /> */}
+
+            <CurrencyTextField
+              name="price"
+              value={form.price}
+              onChange={handleChange}
+              label="Price"
+              required
+              fullWidth
             />
           </Box>
         </DialogContent>

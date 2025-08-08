@@ -25,6 +25,10 @@ import { formatDate } from "@/utils/dateFormatter";
 import { Chip, Tooltip, Typography } from "@mui/material";
 import { WarningAmber, Error, CheckCircle, Add } from "@mui/icons-material";
 import { usePathname } from "next/navigation";
+import {
+  formatToThousandsWithDecimals,
+  formatToThousands,
+} from "@/utils/quantityFormatter";
 
 const columns = [
   {
@@ -118,11 +122,13 @@ const columnsGuide = [
     field: "uom",
     headerName: "UOM",
     type: "number",
+    isQuantity: true,
   },
   {
     field: "totalStocks",
     headerName: "Total Stocks",
     type: "number",
+    isQuantity: true,
   },
 ];
 
@@ -263,8 +269,8 @@ const ProductsPage = () => {
         materialCode: prod.materialCode,
         productName: prod.productName,
         productFamily: prod.productFamily,
-        uom: prod.uom,
-        totalStocks: prod.totalStocks,
+        uom: formatToThousandsWithDecimals(prod.uom),
+        totalStocks: formatToThousands(prod.totalStocks),
         createdAt: formattedDate,
       });
 
@@ -272,8 +278,8 @@ const ProductsPage = () => {
         "Material Code": prod.materialCode,
         "Product Name": prod.productName,
         "Product Family": prod.productFamily,
-        "UOM (L)": prod.uom,
-        "Total Stocks": prod.totalStocks,
+        "UOM (L)": formatToThousandsWithDecimals(prod.uom),
+        "Total Stocks": formatToThousands(prod.totalStocks),
         "Created At": formattedDate,
       });
     });
@@ -309,7 +315,9 @@ const ProductsPage = () => {
             <SearchBar setSearch={setSearch} setPage={setPage} />
             <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
           </div>
-          <Typography>Number of Products: {productsData?.total}</Typography>
+          <Typography>
+            Number of Products: {formatToThousands(productsData?.total)}
+          </Typography>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <AddRowButton
               columns={columnsGuide}

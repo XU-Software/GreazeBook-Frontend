@@ -22,6 +22,7 @@ import ExportExcel from "@/components/Utils/ExportExcel";
 import DeleteSelectedButton from "@/components/Utils/DeleteSelectedButton";
 import PaginationControls from "@/components/Utils/TablePagination";
 import { formatDate } from "@/utils/dateFormatter";
+import { formatToThousands } from "@/utils/quantityFormatter";
 import { usePathname } from "next/navigation";
 import { Add } from "@mui/icons-material";
 import { Typography } from "@mui/material";
@@ -284,7 +285,9 @@ const AccountsPage = () => {
             <SearchBar setSearch={setSearch} setPage={setPage} />
             <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
           </div>
-          <Typography>Number of Accounts: {accountsData?.total}</Typography>
+          <Typography>
+            Number of Accounts: {formatToThousands(accountsData?.total)}
+          </Typography>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <AddRowButton
               columns={columnsGuide}

@@ -20,6 +20,12 @@ import { useGetProductsQuery } from "@/state/services/productsApi";
 import SearchableSelect from "../../../Utils/SearchableSelect";
 import { Add, Delete } from "@mui/icons-material";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
+import {
+  formatToThousands,
+  formatToThousandsWithDecimals,
+} from "@/utils/quantityFormatter";
+import CurrencyTextField from "@/components/Utils/CurrencyTextField";
+import QuantityTextField from "@/components/Utils/QuantityTextField";
 
 const OrdersComponent = ({ ordersData = [], setOrdersData = () => {} }) => {
   const [tempOrder, setTempOrder] = useState({
@@ -84,7 +90,7 @@ const OrdersComponent = ({ ordersData = [], setOrdersData = () => {} }) => {
                 <strong>Product</strong>
               </TableCell>
               <TableCell>
-                <strong>UOM</strong>
+                <strong>UOM (L)</strong>
               </TableCell>
               <TableCell>
                 <strong>Quantity</strong>
@@ -118,15 +124,19 @@ const OrdersComponent = ({ ordersData = [], setOrdersData = () => {} }) => {
                 return (
                   <TableRow key={index}>
                     <TableCell>{order.product.productName}</TableCell>
-                    <TableCell>{order.product.uom}</TableCell>
-                    <TableCell>{order.quantity}</TableCell>
+                    <TableCell>
+                      {formatToThousandsWithDecimals(order.product.uom)}
+                    </TableCell>
+                    <TableCell>{formatToThousands(order.quantity)}</TableCell>
                     <TableCell>{formatToLocalCurrency(order.price)}</TableCell>
                     <TableCell align="right">
                       {order.quantity && order.price
                         ? formatToLocalCurrency(order.quantity * order.price)
                         : "-"}
                     </TableCell>
-                    <TableCell>{computeVolume(order)}</TableCell>
+                    <TableCell>
+                      {formatToThousandsWithDecimals(computeVolume(order))}
+                    </TableCell>
                     <TableCell align="center" sx={{ width: 60 }}>
                       <IconButton
                         color="error"
@@ -152,7 +162,9 @@ const OrdersComponent = ({ ordersData = [], setOrdersData = () => {} }) => {
                 </Typography>
               </TableCell>
               <TableCell>
-                <Typography fontWeight="bold">{totalVolume}</Typography>
+                <Typography fontWeight="bold">
+                  {formatToThousandsWithDecimals(totalVolume)}
+                </Typography>
               </TableCell>
             </TableRow>
           </TableFooter>
@@ -174,22 +186,38 @@ const OrdersComponent = ({ ordersData = [], setOrdersData = () => {} }) => {
           />
         </Grid>
         <Grid item size={{ xs: 6, sm: 2 }}>
-          <TextField
+          {/* <TextField
             label="Quantity"
             type="number"
             value={tempOrder.quantity}
             name="quantity"
             onChange={(e) => handleTempChange(e.target.name, e.target.value)}
             fullWidth
+          /> */}
+
+          <QuantityTextField
+            name="quantity"
+            value={tempOrder.quantity}
+            onChange={(e) => handleTempChange(e.target.name, e.target.value)}
+            label="Quantity"
+            fullWidth
           />
         </Grid>
         <Grid item size={{ xs: 6, sm: 2 }}>
-          <TextField
+          {/* <TextField
             label="Price"
             type="number"
             value={tempOrder.price}
             name="price"
             onChange={(e) => handleTempChange(e.target.name, e.target.value)}
+            fullWidth
+          /> */}
+
+          <CurrencyTextField
+            name="price"
+            value={tempOrder.price}
+            onChange={(e) => handleTempChange(e.target.name, e.target.value)}
+            label="Price"
             fullWidth
           />
         </Grid>

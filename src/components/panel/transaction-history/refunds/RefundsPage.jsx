@@ -13,6 +13,7 @@ import ExportExcel from "@/components/Utils/ExportExcel";
 import PaginationControls from "@/components/Utils/TablePagination";
 import { formatDateWithTime } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
+import { formatToThousands } from "@/utils/quantityFormatter";
 import { usePathname } from "next/navigation";
 import ColoredLink from "@/components/Utils/ColoredLink";
 import { Typography } from "@mui/material";
@@ -201,7 +202,9 @@ const RefundsPage = () => {
             <SearchBar setSearch={setSearch} setPage={setPage} />
             <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
           </div>
-          <Typography>Number of Refunded: {refundsData?.total}</Typography>
+          <Typography>
+            Number of Refunded: {formatToThousands(refundsData?.total)}
+          </Typography>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <ExportExcel
               exportData={exportData}

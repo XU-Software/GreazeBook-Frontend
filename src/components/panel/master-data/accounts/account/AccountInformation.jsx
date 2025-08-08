@@ -176,7 +176,12 @@ const AccountInformation = ({
             descriptionColor="error"
             startIcon={<Add />}
             columns={[
-              { field: "amount", headerName: "Amount", type: "number" },
+              {
+                field: "amount",
+                headerName: "Amount",
+                type: "number",
+                isCurrency: true,
+              },
               { field: "dueDate", headerName: "Due Date", type: "date" },
               { field: "note", headerName: "Note", type: "text" },
             ]}

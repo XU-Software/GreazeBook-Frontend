@@ -17,6 +17,7 @@ import {
   Stack,
 } from "@mui/material";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
+import CurrencyTextField from "@/components/Utils/CurrencyTextField";
 
 const style = {
   position: "absolute",
@@ -192,13 +193,21 @@ const CreditMemoPaymentModal = ({
                 )}
               </Typography>
               <Stack spacing={2}>
-                <TextField
+                {/* <TextField
                   label="Amount"
                   type="number"
                   inputProps={{ min: 0, step: 0.01 }}
                   name="amount"
                   value={paymentInfo.amount}
                   onChange={handleChange}
+                  fullWidth
+                /> */}
+                <CurrencyTextField
+                  name="amount"
+                  value={paymentInfo.amount}
+                  onChange={handleChange}
+                  label="Amount"
+                  required
                   fullWidth
                 />
                 <TextField

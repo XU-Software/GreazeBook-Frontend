@@ -12,6 +12,10 @@ import SortToggle from "@/components/Utils/SortToggle";
 import ExportExcel from "@/components/Utils/ExportExcel";
 import PaginationControls from "@/components/Utils/TablePagination";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
+import {
+  formatToThousands,
+  formatToThousandsWithDecimals,
+} from "@/utils/quantityFormatter";
 import { usePathname } from "next/navigation";
 import ColoredLink from "@/components/Utils/ColoredLink";
 import { Chip, Typography } from "@mui/material";
@@ -152,11 +156,13 @@ const SalesPage = () => {
         bookingId: sale.accountsReceivable.invoice.booking.bookingId,
         productName: sale.order.product.productName,
         productId: sale.order.product.productId,
-        uom: sale.order.product.uom,
-        quantity: sale.order.quantity,
+        uom: formatToThousandsWithDecimals(sale.order.product.uom),
+        quantity: formatToThousands(sale.order.quantity),
         price: formatToLocalCurrency(sale.order.price),
         subtotal: formatToLocalCurrency(sale.order.quantity * sale.order.price),
-        volume: sale.order.quantity * sale.order.product.uom,
+        volume: formatToThousandsWithDecimals(
+          sale.order.quantity * sale.order.product.uom
+        ),
         status: sale.actionType,
       });
 
@@ -164,11 +170,13 @@ const SalesPage = () => {
         "Invoice Number": sale.accountsReceivable.invoice.salesInvoiceNumber,
         "Booked By": sale.accountsReceivable.invoice.booking.customerName,
         Product: sale.order.product.productName,
-        "UOM (L)": sale.order.product.uom,
-        Quantity: sale.order.quantity,
+        "UOM (L)": formatToThousandsWithDecimals(sale.order.product.uom),
+        Quantity: formatToThousands(sale.order.quantity),
         "Unit Price": formatToLocalCurrency(sale.order.price),
         Subtotal: formatToLocalCurrency(sale.order.quantity * sale.order.price),
-        Volume: sale.order.quantity * sale.order.product.uom,
+        Volume: formatToThousandsWithDecimals(
+          sale.order.quantity * sale.order.product.uom
+        ),
         Status: sale.actionType,
       });
     });
@@ -202,7 +210,9 @@ const SalesPage = () => {
             <SearchBar setSearch={setSearch} setPage={setPage} />
             <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
           </div>
-          <Typography>Number of Sales: {salesData?.total}</Typography>
+          <Typography>
+            Number of Sales: {formatToThousands(salesData?.total)}
+          </Typography>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <ExportExcel
               exportData={exportData}

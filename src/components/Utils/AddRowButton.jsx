@@ -9,8 +9,9 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { Add } from "@mui/icons-material";
 import { useState } from "react";
+import CurrencyTextField from "./CurrencyTextField"; // import your existing component
+import QuantityTextField from "./QuantityTextField";
 
 export default function AddRowButton({
   buttonLabel = "Add",
@@ -67,22 +68,58 @@ export default function AddRowButton({
                 {description}
               </Typography>
             )}
-            {columns.map((col) => (
-              <TextField
-                key={col.field}
-                label={col.headerName}
-                fullWidth
-                margin="dense"
-                variant="outlined"
-                value={form[col.field] || ""}
-                onChange={(e) => handleChange(col.field, e.target.value)}
-                type={col.type || "text"}
-                required
-                slotProps={
-                  col.type === "date" ? { inputLabel: { shrink: true } } : {}
-                }
-              />
-            ))}
+            {columns.map((col) => {
+              const value = form[col.field] ?? "";
+
+              if (col.isCurrency) {
+                return (
+                  <CurrencyTextField
+                    key={col.field}
+                    label={col.headerName}
+                    value={value}
+                    name={col.field}
+                    onChange={(e) => handleChange(col.field, e.target.value)}
+                    fullWidth
+                    margin="dense"
+                    required
+                  />
+                );
+              }
+
+              // Quantity Field with thousand separator
+
+              if (col.isQuantity) {
+                return (
+                  <QuantityTextField
+                    key={col.field}
+                    label={col.headerName}
+                    value={value}
+                    name={col.field}
+                    onChange={(e) => handleChange(col.field, e.target.value)}
+                    fullWidth
+                    margin="dense"
+                    required
+                  />
+                );
+              }
+
+              return (
+                <TextField
+                  key={col.field}
+                  label={col.headerName}
+                  fullWidth
+                  margin="dense"
+                  variant="outlined"
+                  value={form[col.field] || ""}
+                  onChange={(e) => handleChange(col.field, e.target.value)}
+                  type={col.type || "text"}
+                  required
+                  slotProps={
+                    col.type === "date" ? { inputLabel: { shrink: true } } : {}
+                  }
+                />
+              );
+            })}
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose} color="inherit" loading={isLoading}>

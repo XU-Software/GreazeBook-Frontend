@@ -13,6 +13,7 @@ import ExportExcel from "@/components/Utils/ExportExcel";
 import PaginationControls from "@/components/Utils/TablePagination";
 import { formatDateWithTime } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
+import { formatToThousands } from "@/utils/quantityFormatter";
 import { usePathname } from "next/navigation";
 import ColoredLink from "@/components/Utils/ColoredLink";
 import { Chip, Typography } from "@mui/material";
@@ -208,7 +209,7 @@ const CreditMemosPage = () => {
             <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
           </div>
           <Typography>
-            Number of Credit Memos: {creditMemosData?.total}
+            Number of Credit Memos: {formatToThousands(creditMemosData?.total)}
           </Typography>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <ExportExcel

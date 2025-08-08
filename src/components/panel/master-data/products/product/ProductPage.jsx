@@ -14,6 +14,7 @@ import ProductInformation from "./ProductInformation";
 import Table from "@/components/Utils/DataTable";
 import PaginationControls from "@/components/Utils/TablePagination";
 import { formatDateWithTime } from "@/utils/dateFormatter";
+import { formatToThousands } from "@/utils/quantityFormatter";
 
 const columns = [
   {
@@ -100,7 +101,7 @@ const ProductDetailsPage = () => {
       rows.push({
         id: sh.stockHistoryId,
         changeType: sh.changeType,
-        quantity: sh.quantity,
+        quantity: formatToThousands(sh.quantity),
         reason: sh.reason,
         createdAt: formatDateWithTime(sh.createdAt),
         operatedBy: `${sh.createdBy.name} | ${sh.createdBy.email}`,
@@ -108,7 +109,7 @@ const ProductDetailsPage = () => {
 
       exportData.push({
         "Change Type": sh.changeType,
-        Quantity: sh.quantity,
+        Quantity: formatToThousands(sh.quantity),
         Reason: sh.reason,
         "Operated At": formatDateWithTime(sh.createdAt),
         "Operated By": `${sh.createdBy.name} | ${sh.createdBy.email}`,

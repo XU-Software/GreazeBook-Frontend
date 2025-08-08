@@ -8,6 +8,8 @@ import OrdersComponent from "./OrdersComponent";
 import { useAppDispatch } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
 import { useSubmitBookingMutation } from "@/state/services/bookingsApi";
+import { formatToThousands } from "@/utils/quantityFormatter";
+import QuantityTextField from "@/components/Utils/QuantityTextField";
 
 export default function BookingFormPage() {
   const dispatch = useAppDispatch();
@@ -150,7 +152,9 @@ export default function BookingFormPage() {
             </p>
             <p>
               Term:{" "}
-              <span className="font-semibold">{bookingInformation.term}</span>
+              <span className="font-semibold">
+                {formatToThousands(bookingInformation.term)}
+              </span>
             </p>
             <p>
               Freebies/Remarks/Concern:{" "}
@@ -225,7 +229,17 @@ export default function BookingFormPage() {
               />
             </Grid>
             <Grid item size={{ xs: 12, sm: 6 }}>
-              <TextField
+              <QuantityTextField
+                name="term"
+                value={bookingInformation.term}
+                onChange={(e) =>
+                  handleChangeBookingInformation(e.target.name, e.target.value)
+                }
+                label="Term (days)"
+                required
+                fullWidth
+              />
+              {/* <TextField
                 label="Term (days)"
                 type="number"
                 fullWidth
@@ -235,7 +249,7 @@ export default function BookingFormPage() {
                   handleChangeBookingInformation(e.target.name, e.target.value)
                 }
                 required
-              />
+              /> */}
             </Grid>
             <Grid item size={{ xs: 12, md: 6 }}>
               <TextField

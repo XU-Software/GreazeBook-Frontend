@@ -12,6 +12,10 @@ import SortToggle from "@/components/Utils/SortToggle";
 import ExportExcel from "@/components/Utils/ExportExcel";
 import PaginationControls from "@/components/Utils/TablePagination";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
+import {
+  formatToThousands,
+  formatToThousandsWithDecimals,
+} from "@/utils/quantityFormatter";
 import { usePathname } from "next/navigation";
 import ColoredLink from "@/components/Utils/ColoredLink";
 import { Chip, Typography } from "@mui/material";
@@ -165,11 +169,13 @@ const OrdersPage = () => {
           : order.sale.accountsReceivable.invoice.booking.bookingId,
         productName: order.product.productName,
         productId: order.product.productId,
-        uom: order.product.uom,
-        quantity: order.quantity,
+        uom: formatToThousandsWithDecimals(order.product.uom),
+        quantity: formatToThousands(order.quantity),
         price: formatToLocalCurrency(order.price),
         subtotal: formatToLocalCurrency(order.quantity * order.price),
-        volume: order.quantity * order.product.uom,
+        volume: formatToThousandsWithDecimals(
+          order.quantity * order.product.uom
+        ),
         status:
           order.booking && order.booking.status === "Pending"
             ? order.booking.status
@@ -184,11 +190,13 @@ const OrdersPage = () => {
           ? order.booking.customerName
           : order.sale.accountsReceivable.invoice.booking.customerName,
         Product: order.product.productName,
-        "UOM (L)": order.product.uom,
-        Quantity: order.quantity,
+        "UOM (L)": formatToThousandsWithDecimals(order.product.uom),
+        Quantity: formatToThousands(order.quantity),
         "Unit Price": formatToLocalCurrency(order.price),
         Subtotal: formatToLocalCurrency(order.quantity * order.price),
-        Volume: order.quantity * order.product.uom,
+        Volume: formatToThousandsWithDecimals(
+          order.quantity * order.product.uom
+        ),
         Status:
           order.booking && order.booking.status === "Pending"
             ? order.booking.status
@@ -227,7 +235,9 @@ const OrdersPage = () => {
             <SearchBar setSearch={setSearch} setPage={setPage} />
             <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
           </div>
-          <Typography>Number of Orders: {ordersData?.total}</Typography>
+          <Typography>
+            Number of Orders: {formatToThousands(ordersData?.total)}
+          </Typography>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <ExportExcel
               exportData={exportData}

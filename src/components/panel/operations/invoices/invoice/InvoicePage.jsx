@@ -23,6 +23,10 @@ import {
 import { EastOutlined } from "@mui/icons-material";
 import { formatDateWithTime, formatDate } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
+import {
+  formatToThousands,
+  formatToThousandsWithDecimals,
+} from "@/utils/quantityFormatter";
 
 const InvoicePage = () => {
   const params = useParams();
@@ -104,53 +108,49 @@ const InvoicePage = () => {
               <Typography variant="body2" color="text.secondary">
                 Customer Name
               </Typography>
-              <Typography>{booking.customerName || "-"}</Typography>
+              <Typography>{booking.customerName}</Typography>
             </Grid>
 
             <Grid item>
               <Typography variant="body2" color="text.secondary">
                 Order Date
               </Typography>
-              <Typography>
-                {booking.orderDate ? formatDate(booking.orderDate) : "-"}
-              </Typography>
+              <Typography>{formatDate(booking.orderDate)}</Typography>
             </Grid>
 
             <Grid item>
               <Typography variant="body2" color="text.secondary">
                 Delivery Date
               </Typography>
-              <Typography>
-                {booking.deliveryDate ? formatDate(booking.deliveryDate) : "-"}
-              </Typography>
+              <Typography>{formatDate(booking.deliveryDate)}</Typography>
             </Grid>
 
             <Grid item>
               <Typography variant="body2" color="text.secondary">
                 Term
               </Typography>
-              <Typography>{booking.term ? booking.term : "-"}</Typography>
+              <Typography>{formatToThousands(booking.term)}</Typography>
             </Grid>
 
             <Grid item>
               <Typography variant="body2" color="text.secondary">
                 Account Name
               </Typography>
-              <Typography>{booking.account.accountName || "-"}</Typography>
+              <Typography>{booking.account.accountName}</Typography>
             </Grid>
 
             <Grid item>
               <Typography variant="body2" color="text.secondary">
                 DSP
               </Typography>
-              <Typography>{booking.account.dsp || "-"}</Typography>
+              <Typography>{booking.account.dsp}</Typography>
             </Grid>
 
             <Grid item>
               <Typography variant="body2" color="text.secondary">
                 Location
               </Typography>
-              <Typography>{booking.account.location || "-"}</Typography>
+              <Typography>{booking.account.location}</Typography>
             </Grid>
           </Grid>
 
@@ -175,7 +175,9 @@ const InvoicePage = () => {
                 {booking.orders.map((order) => (
                   <TableRow key={order.orderId}>
                     <TableCell>{order.product.productName}</TableCell>
-                    <TableCell align="right">{order.quantity}</TableCell>
+                    <TableCell align="right">
+                      {formatToThousands(order.quantity)}
+                    </TableCell>
                     <TableCell align="right">
                       {formatToLocalCurrency(order.price)}
                     </TableCell>

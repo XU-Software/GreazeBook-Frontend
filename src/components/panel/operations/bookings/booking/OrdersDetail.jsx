@@ -20,6 +20,7 @@ import {
 import { Edit, Check, Close, Delete } from "@mui/icons-material";
 import EditableCell from "@/components/Utils/EditableCell";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
+import { formatToThousandsWithDecimals } from "@/utils/quantityFormatter";
 import AddOrderModal from "./AddOrderModal";
 
 const OrdersDetail = ({
@@ -137,7 +138,7 @@ const OrdersDetail = ({
               <TableRow>
                 <TableCell>#</TableCell>
                 <TableCell>Product</TableCell>
-                <TableCell>UOM</TableCell>
+                <TableCell>UOM (L)</TableCell>
                 <TableCell>Quantity</TableCell>
                 <TableCell>Unit Price</TableCell>
                 <TableCell>Subtotal</TableCell>
@@ -163,14 +164,20 @@ const OrdersDetail = ({
                 return (
                   <TableRow key={order.orderId}>
                     <TableCell>{index + 1}</TableCell>
+
                     <TableCell>{order.product.productName}</TableCell>
-                    <TableCell>{order.product.uom}</TableCell>
+
+                    <TableCell>
+                      {formatToThousandsWithDecimals(order.product.uom)}
+                    </TableCell>
+
                     <EditableCell
                       value={orderEdit?.quantity ?? order.quantity}
                       editing={editOrders}
                       type="number"
                       convertToCurrency={false}
                       name="quantity"
+                      isQuantity={true}
                       onChange={(e) => {
                         const updated = new Map(ordersFormData);
                         updated.set(order.orderId, {
@@ -180,12 +187,14 @@ const OrdersDetail = ({
                         setOrdersFormData(updated);
                       }}
                     />
+
                     <EditableCell
                       value={orderEdit?.price ?? order.price}
                       editing={editOrders}
                       type="number"
                       convertToCurrency={true}
                       name="price"
+                      isCurrency={true}
                       onChange={(e) => {
                         const updated = new Map(ordersFormData);
                         updated.set(order.orderId, {
@@ -198,7 +207,9 @@ const OrdersDetail = ({
                     <TableCell>
                       {formatToLocalCurrency(quantity * price)}
                     </TableCell>
-                    <TableCell>{volume}</TableCell>
+                    <TableCell>
+                      {formatToThousandsWithDecimals(volume)}
+                    </TableCell>
                     {bookingData.status === "Pending" && (
                       <TableCell align="center" sx={{ width: 120 }}>
                         <Box
@@ -245,16 +256,18 @@ const OrdersDetail = ({
                 </TableCell>
                 <TableCell>
                   <strong>
-                    {bookingData.orders
-                      .filter((order) => !ordersToDelete.has(order.orderId))
-                      .reduce((sum, order) => {
-                        const edit = ordersFormData.get(order.orderId);
-                        const quantity = Number(
-                          edit?.quantity ?? order.quantity
-                        );
-                        const uom = Number(order.product.uom);
-                        return sum + quantity * uom;
-                      }, 0)}
+                    {formatToThousandsWithDecimals(
+                      bookingData.orders
+                        .filter((order) => !ordersToDelete.has(order.orderId))
+                        .reduce((sum, order) => {
+                          const edit = ordersFormData.get(order.orderId);
+                          const quantity = Number(
+                            edit?.quantity ?? order.quantity
+                          );
+                          const uom = Number(order.product.uom);
+                          return sum + quantity * uom;
+                        }, 0)
+                    )}
                   </strong>
                 </TableCell>
               </TableRow>

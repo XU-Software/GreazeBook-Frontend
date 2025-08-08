@@ -20,8 +20,14 @@ import DashboardBarChart from "./DashboardBarChart";
 import DynamicBreadcrumbs from "@/components/Utils/DynamicBreadcrumbs";
 import DateRangePicker from "@/components/Utils/DateRangePicker";
 import EditableField from "@/components/Utils/EditableField";
-import { formatDate } from "@/utils/dateFormatter";
 import dayjs from "dayjs";
+import { formatDate } from "@/utils/dateFormatter";
+import {
+  formatToThousandsWithDecimals,
+  formatToThousands,
+} from "@/utils/quantityFormatter";
+import { formatToLocalCurrency } from "@/utils/currencyFormatter";
+import { formatToPercentage } from "@/utils/percentageFormatter";
 
 const DashboardPage = () => {
   const dispatch = useAppDispatch();
@@ -213,6 +219,8 @@ const DashboardPage = () => {
                       type="number"
                       value={currentOplan}
                       name={dsp}
+                      isQuantity={true}
+                      // isFloat={true}
                       onChange={(e) =>
                         handleOplanChange(e.target.name, e.target.value)
                       }
@@ -226,8 +234,10 @@ const DashboardPage = () => {
             data={dashboardState.data?.sales?.rows || []}
             summary={dashboardState.data?.sales?.summary}
             formatters={{
-              pesoValue: (v) => `₱${v.toLocaleString()}`,
-              attainment: (v) => `${v.toFixed(2)}%`,
+              salesToTrade: (v) => formatToThousandsWithDecimals(v),
+              attainment: (v) => formatToPercentage(v),
+              pesoValue: (v) => formatToLocalCurrency(v),
+              oplan: (v) => formatToThousands(v),
             }}
           />
         </Grid>
@@ -276,7 +286,9 @@ const DashboardPage = () => {
             data={dashboardState.data?.penetration?.rows || []}
             summary={dashboardState.data?.penetration?.summary}
             formatters={{
-              attainment: (v) => `${v.toFixed(2)}%`,
+              activeAccounts: (v) => formatToThousands(v),
+              totalAccounts: (v) => formatToThousands(v),
+              attainment: (v) => formatToPercentage(v),
             }}
           />
         </Grid>
@@ -327,9 +339,9 @@ const DashboardPage = () => {
             data={dashboardState.data?.collection?.rows || []}
             summary={dashboardState.data?.collection?.summary}
             formatters={{
-              totalAR: (v) => `₱${v.toLocaleString()}`,
-              totalOverdue: (v) => `₱${v.toLocaleString()}`,
-              overdueToTARRatio: (v) => `${v.toFixed(2)}%`,
+              totalOverdue: (v) => formatToLocalCurrency(v),
+              totalAR: (v) => formatToLocalCurrency(v),
+              overdueToTARRatio: (v) => formatToPercentage(v),
             }}
           />
         </Grid>
@@ -378,6 +390,10 @@ const DashboardPage = () => {
             ]}
             data={dashboardState.data?.penetrationByTradeType?.rows || []}
             summary={dashboardState.data?.penetrationByTradeType?.summary}
+            formatters={{
+              activeAccounts: (v) => formatToThousands(v),
+              totalVolume: (v) => formatToThousandsWithDecimals(v),
+            }}
           />
         </Grid>
         <Grid item size={{ xs: 12, md: 6, lg: 6 }}>

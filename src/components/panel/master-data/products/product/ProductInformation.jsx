@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import { Check, Close, Edit, Add, Remove } from "@mui/icons-material";
 import { formatDateWithTime } from "@/utils/dateFormatter";
+import { formatToThousands } from "@/utils/quantityFormatter";
 import AddRowButton from "@/components/Utils/AddRowButton";
 import EditableField from "@/components/Utils/EditableField";
 
@@ -195,6 +196,7 @@ const ProductInformation = ({ productInfoData, productId = "" }) => {
               field: "quantity",
               headerName: "Quantity of stocks to add",
               type: "number",
+              isQuantity: true,
             },
             { field: "reason", headerName: "Adjustment Reason", type: "text" },
           ]}
@@ -212,6 +214,7 @@ const ProductInformation = ({ productInfoData, productId = "" }) => {
               field: "quantity",
               headerName: "Quantity of stocks to remove",
               type: "number",
+              isQuantity: true,
             },
             { field: "reason", headerName: "Adjustment Reason", type: "text" },
           ]}
@@ -292,6 +295,8 @@ const ProductInformation = ({ productInfoData, productId = "" }) => {
             editing={editProduct}
             type="number"
             name="uom"
+            isQuantity={true}
+            isFloat={true}
             onChange={(e) =>
               setProductFormData((prev) => ({
                 ...prev,
@@ -303,7 +308,7 @@ const ProductInformation = ({ productInfoData, productId = "" }) => {
 
         <Grid item xs={12} sm={6} md={3}>
           <Typography variant="subtitle2">Total Stocks</Typography>
-          <Typography>{totalStocks}</Typography>
+          <Typography>{formatToThousands(totalStocks)}</Typography>
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
