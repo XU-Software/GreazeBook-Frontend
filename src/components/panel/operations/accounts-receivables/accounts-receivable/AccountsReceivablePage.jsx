@@ -66,7 +66,7 @@ const getFulfillmentChip = (actionType) => {
       return (
         <Chip
           icon={<CheckCircle />}
-          label="Fulfilled"
+          label="Invoiced"
           color="success"
           size="small"
         />
@@ -79,7 +79,7 @@ const getFulfillmentChip = (actionType) => {
       return (
         <Chip
           icon={<ChangeCircle />}
-          label="Changed Product"
+          label="ChangedProduct"
           color="info"
           size="small"
         />

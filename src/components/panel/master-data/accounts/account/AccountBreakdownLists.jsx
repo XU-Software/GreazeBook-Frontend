@@ -161,23 +161,23 @@ const salesColumns = [
     render: (value) => {
       if (value === "ChangedProduct") {
         return (
-          <Tooltip title="Order Changed">
-            <Chip label="Changed Product" color="info" size="small" />
+          <Tooltip title="Changed Product">
+            <Chip label="ChangedProduct" color="info" size="small" />
           </Tooltip>
         );
       }
 
       if (value === "Cancelled") {
         return (
-          <Tooltip title="Order Cancelled">
+          <Tooltip title="Cancelled">
             <Chip label="Cancelled" color="error" size="small" />
           </Tooltip>
         );
       }
 
       return (
-        <Tooltip title="Order Fulfilled">
-          <Chip label="Fulfilled" color="success" size="small" />
+        <Tooltip title="Invoiced">
+          <Chip label="Invoiced" color="success" size="small" />
         </Tooltip>
       );
     },

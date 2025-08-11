@@ -85,11 +85,11 @@ const columns = [
     render: (value, row) => {
       switch (value) {
         case "Fulfilled":
-          return <Chip label="Fulfilled" color="success" size="small" />;
+          return <Chip label="Invoiced" color="success" size="small" />;
         case "Cancelled":
           return <Chip label="Cancelled" color="error" size="small" />;
         case "ChangedProduct":
-          return <Chip label="Changed Product" color="info" size="small" />;
+          return <Chip label="ChangedProduct" color="info" size="small" />;
 
         default:
           return <Chip label={actionType} size="small" />;
