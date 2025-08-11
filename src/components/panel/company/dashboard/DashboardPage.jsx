@@ -91,7 +91,7 @@ const DashboardPage = () => {
   const dateRange = dashboardState.lastParams
     ? [
         dayjs(dashboardState.lastParams.startDate).startOf("day").toISOString(),
-        dayjs(dashboardState.lastParams.endDate).startOf("day").toISOString(),
+        dayjs(dashboardState.lastParams.endDate).endOf("day").toISOString(),
       ]
     : ["", ""];
 
