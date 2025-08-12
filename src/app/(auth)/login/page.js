@@ -1,16 +1,8 @@
 import React from "react";
-import LoginForm from "@/components/auth/login/LoginForm";
+import LoginPage from "@/components/auth/login/LoginPage";
 
-const Login = () => {
-  return (
-    <div className="container mx-auto min-h-screen flex items-center">
-      <main className="w-full flex items-center justify-center flex-col md:flex-row p-5 md:p-0">
-        <LoginForm />
-        <div className="w-full md:w-[50%] bg-black min-h-20"></div>
-      </main>
-      <footer className=""></footer>
-    </div>
-  );
+const Page = () => {
+  return <LoginPage />;
 };
 
-export default Login;
+export default Page;
