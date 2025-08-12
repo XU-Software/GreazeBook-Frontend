@@ -249,7 +249,7 @@ const AccountsPage = () => {
         "Trade Type": acc.tradeType,
         Location: acc.location,
         DSP: acc.dsp,
-        "Contact Info": acc.contactInformation,
+        "Contact Information": acc.contactInformation,
         "Created At": formattedDate,
       });
     });
