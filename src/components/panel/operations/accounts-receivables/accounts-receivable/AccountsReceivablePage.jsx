@@ -451,7 +451,7 @@ const AccountsReceivablePage = () => {
         </Paper>
         {/* Customer Details */}
         <Paper sx={{ p: 2, mb: 3 }} elevation={2}>
-          <Typography variant="h6">Customer Details</Typography>
+          <Typography variant="h6">Account Details</Typography>
           <Grid container columnSpacing={4} rowSpacing={1} mt={1}>
             <Grid item xs={12} sm={6} md={4}>
               <Typography variant="body2" color="text.secondary">

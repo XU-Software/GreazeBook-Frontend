@@ -3,30 +3,29 @@
 import React, { useState } from "react";
 import {
   Box,
+  TextField,
+  Button,
+  Typography,
+  CircularProgress,
   FormControl,
   InputLabel,
   OutlinedInput,
   InputAdornment,
   IconButton,
-  TextField,
-  Button,
-  Typography,
-  CircularProgress,
-  Stack,
 } from "@mui/material";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import GoogleIcon from "@mui/icons-material/Google";
-import Link from "next/link";
 import axios from "@/lib/axios";
 import { useRouter } from "next/navigation";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
-const LoginPage = () => {
+const RegisterCompanyPage = () => {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
+    companyName: "",
     email: "",
     password: "",
+    name: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -37,7 +36,7 @@ const LoginPage = () => {
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { value, name } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -45,16 +44,12 @@ const LoginPage = () => {
     e.preventDefault();
     setLoading(true);
     setError("");
-    try {
-      const response = await axios.post("/auth/signin", formData);
 
+    try {
+      const response = await axios.post("/company/register", formData);
       const data = response.data;
 
       if (data.success) {
-        setFormData({
-          email: "",
-          password: "",
-        });
         router.push("/company/dashboard");
       }
     } catch (error) {
@@ -63,9 +58,6 @@ const LoginPage = () => {
       setLoading(false);
     }
   };
-
-  const handleGoogleSignin = () =>
-    (window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/google`);
 
   return (
     <div className="min-h-screen flex justify-center items-center px-2">
@@ -81,7 +73,7 @@ const LoginPage = () => {
           overflow: "hidden",
         }}
       >
-        {/* Left illustration / accent panel */}
+        {/* Left accent panel */}
         <Box
           sx={{
             flex: 1,
@@ -96,13 +88,18 @@ const LoginPage = () => {
           }}
         >
           <Typography variant="h4" fontWeight="bold" mb={2}>
-            Welcome Back!
+            Register Your Company
+          </Typography>
+          <Typography mb={2}>
+            Create your business account to manage your company and get started
+            quickly.
           </Typography>
           <Typography>
-            Sign in to manage your account, access your dashboard, and stay
-            productive.
+            After the registration, you can onboard your members by sending an
+            email invitation from our system and together you can manage your
+            business
           </Typography>
-          {/* Optional: add an SVG illustration or image here */}
+          {/* Optional: add illustration here */}
         </Box>
 
         {/* Form area */}
@@ -116,9 +113,11 @@ const LoginPage = () => {
             flexDirection: "column",
             gap: 3,
           }}
+          noValidate
+          autoComplete="off"
         >
           <Typography variant="h5" fontWeight="600" textAlign="center">
-            Sign In
+            Sign Up Your Business
           </Typography>
           <Typography
             variant="body2"
@@ -128,25 +127,23 @@ const LoginPage = () => {
           >
             Please enter your details to continue
           </Typography>
-
-          {error && (
-            <Box
-              sx={{
-                bgcolor: "error.light",
-                color: "error.contrastText",
-                p: 1.5,
-                borderRadius: 1,
-                fontSize: 14,
-                textAlign: "center",
-              }}
-              role="alert"
-            >
-              {error}
-            </Box>
-          )}
-
+          <Typography>Company Detail</Typography>
           <TextField
-            label="Email"
+            label="Company Name"
+            variant="outlined"
+            type="text"
+            name="companyName"
+            value={formData.companyName}
+            onChange={handleChange}
+            required
+            fullWidth
+            size="small"
+            autoFocus
+          />
+          <Typography>Owner/Admin Details</Typography>
+          <TextField
+            label="Your Email"
+            variant="outlined"
             type="email"
             name="email"
             value={formData.email}
@@ -154,9 +151,7 @@ const LoginPage = () => {
             required
             fullWidth
             size="small"
-            autoFocus
           />
-
           <FormControl variant="outlined" size="small" fullWidth required>
             <InputLabel htmlFor="outlined-adornment-password">
               Password
@@ -184,14 +179,33 @@ const LoginPage = () => {
             />
           </FormControl>
 
-          <Box textAlign="right">
-            <Link
-              href="/forgot-password"
-              className="text-sm text-blue-600 hover:underline"
+          <TextField
+            label="Your Name"
+            variant="outlined"
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            fullWidth
+            size="small"
+          />
+
+          {error && (
+            <Box
+              sx={{
+                bgcolor: "error.light",
+                color: "error.contrastText",
+                p: 1.5,
+                borderRadius: 1,
+                fontSize: 14,
+                textAlign: "center",
+              }}
+              role="alert"
             >
-              Forgot password?
-            </Link>
-          </Box>
+              {error}
+            </Box>
+          )}
 
           <Button
             variant="contained"
@@ -202,50 +216,18 @@ const LoginPage = () => {
             {loading ? (
               <CircularProgress size={24} color="inherit" />
             ) : (
-              "Sign In"
+              "Register"
             )}
           </Button>
 
-          <Typography
-            variant="body2"
-            textAlign="center"
-            sx={{ color: "text.secondary", mt: 1 }}
-          >
-            OR
-          </Typography>
-          <Stack>
-            <Typography className="text-center px-4" variant="body4">
-              Your email must be registered in our system first before you can
-              use it for signing in
-            </Typography>
-            <Button
-              variant="outlined"
-              onClick={handleGoogleSignin}
-              startIcon={<GoogleIcon color="primary" />}
-              sx={{
-                textTransform: "none",
-                py: 1.5,
-                fontWeight: "bold",
-                borderColor: "grey.400",
-                color: "grey.700",
-                "&:hover": {
-                  borderColor: "grey.600",
-                  backgroundColor: "grey.100",
-                },
-              }}
-            >
-              Continue with Google
-            </Button>
-          </Stack>
-
           <Typography variant="body2" textAlign="center" mt={2}>
-            Don’t have an account? Receive an invitation from your company, or{" "}
-            <Link
-              href="/register-company"
+            Already have an account?{" "}
+            <a
+              href="/login"
               className="text-blue-600 hover:underline font-semibold"
             >
-              Register your business
-            </Link>
+              Sign in here
+            </a>
           </Typography>
         </Box>
       </Box>
@@ -253,4 +235,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterCompanyPage;

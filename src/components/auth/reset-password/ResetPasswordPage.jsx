@@ -8,64 +8,80 @@ import {
   OutlinedInput,
   InputAdornment,
   IconButton,
-  TextField,
   Button,
   Typography,
   CircularProgress,
-  Stack,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import GoogleIcon from "@mui/icons-material/Google";
-import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import axios from "@/lib/axios";
-import { useRouter } from "next/navigation";
 
-const LoginPage = () => {
+const ResetPasswordPage = ({ token = "" }) => {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
-    email: "",
     password: "",
+    confirmPassword: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  const [showPassword, setShowPassword] = useState(false);
-
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const [successMsg, setSuccessMsg] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setError("");
+    setSuccessMsg("");
   };
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleClickShowConfirmPassword = () =>
+    setShowConfirmPassword((show) => !show);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    if (!token) {
+      setError("Invalid or missing token.");
+      return;
+    }
+
     setLoading(true);
     setError("");
+    setSuccessMsg("");
+
     try {
-      const response = await axios.post("/auth/signin", formData);
+      const response = await axios.post("/auth/reset-password", {
+        token,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+      });
 
       const data = response.data;
 
       if (data.success) {
-        setFormData({
-          email: "",
-          password: "",
-        });
-        router.push("/company/dashboard");
+        setSuccessMsg("Password successfully reset! Redirecting to login...");
+        setTimeout(() => {
+          router.push("/login");
+        }, 3000);
+      } else {
+        setError("Failed to reset password. Please try again.");
       }
     } catch (error) {
-      setError(error.message);
+      setError(error.message || "An error occurred.");
     } finally {
       setLoading(false);
     }
   };
-
-  const handleGoogleSignin = () =>
-    (window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/google`);
 
   return (
     <div className="min-h-screen flex justify-center items-center px-2">
@@ -81,7 +97,7 @@ const LoginPage = () => {
           overflow: "hidden",
         }}
       >
-        {/* Left illustration / accent panel */}
+        {/* Left accent panel */}
         <Box
           sx={{
             flex: 1,
@@ -96,13 +112,11 @@ const LoginPage = () => {
           }}
         >
           <Typography variant="h4" fontWeight="bold" mb={2}>
-            Welcome Back!
+            Reset Your Password
           </Typography>
           <Typography>
-            Sign in to manage your account, access your dashboard, and stay
-            productive.
+            Enter a new password to regain access to your account.
           </Typography>
-          {/* Optional: add an SVG illustration or image here */}
         </Box>
 
         {/* Form area */}
@@ -116,17 +130,15 @@ const LoginPage = () => {
             flexDirection: "column",
             gap: 3,
           }}
+          noValidate
+          autoComplete="off"
         >
           <Typography variant="h5" fontWeight="600" textAlign="center">
-            Sign In
+            New Password
           </Typography>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            textAlign="center"
-            mb={1}
-          >
-            Please enter your details to continue
+
+          <Typography textAlign="center">
+            Please enter your new password details
           </Typography>
 
           {error && (
@@ -145,24 +157,26 @@ const LoginPage = () => {
             </Box>
           )}
 
-          <TextField
-            label="Email"
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            fullWidth
-            size="small"
-            autoFocus
-          />
+          {successMsg && (
+            <Box
+              sx={{
+                bgcolor: "success.light",
+                color: "success.contrastText",
+                p: 1.5,
+                borderRadius: 1,
+                fontSize: 14,
+                textAlign: "center",
+              }}
+              role="alert"
+            >
+              {successMsg}
+            </Box>
+          )}
 
           <FormControl variant="outlined" size="small" fullWidth required>
-            <InputLabel htmlFor="outlined-adornment-password">
-              Password
-            </InputLabel>
+            <InputLabel htmlFor="password">Password</InputLabel>
             <OutlinedInput
-              id="outlined-adornment-password"
+              id="password"
               name="password"
               type={showPassword ? "text" : "password"}
               value={formData.password}
@@ -181,17 +195,38 @@ const LoginPage = () => {
                 </InputAdornment>
               }
               label="Password"
+              autoFocus
             />
           </FormControl>
 
-          <Box textAlign="right">
-            <Link
-              href="/forgot-password"
-              className="text-sm text-blue-600 hover:underline"
-            >
-              Forgot password?
-            </Link>
-          </Box>
+          <FormControl variant="outlined" size="small" fullWidth required>
+            <InputLabel htmlFor="confirmPassword">Confirm Password</InputLabel>
+            <OutlinedInput
+              id="confirmPassword"
+              name="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label={
+                      showConfirmPassword ? "Hide password" : "Show password"
+                    }
+                    onClick={handleClickShowConfirmPassword}
+                    edge="end"
+                  >
+                    {showConfirmPassword ? (
+                      <VisibilityOffIcon />
+                    ) : (
+                      <VisibilityIcon />
+                    )}
+                  </IconButton>
+                </InputAdornment>
+              }
+              label="Confirm Password"
+            />
+          </FormControl>
 
           <Button
             variant="contained"
@@ -202,50 +237,18 @@ const LoginPage = () => {
             {loading ? (
               <CircularProgress size={24} color="inherit" />
             ) : (
-              "Sign In"
+              "Reset Password"
             )}
           </Button>
 
-          <Typography
-            variant="body2"
-            textAlign="center"
-            sx={{ color: "text.secondary", mt: 1 }}
-          >
-            OR
-          </Typography>
-          <Stack>
-            <Typography className="text-center px-4" variant="body4">
-              Your email must be registered in our system first before you can
-              use it for signing in
-            </Typography>
-            <Button
-              variant="outlined"
-              onClick={handleGoogleSignin}
-              startIcon={<GoogleIcon color="primary" />}
-              sx={{
-                textTransform: "none",
-                py: 1.5,
-                fontWeight: "bold",
-                borderColor: "grey.400",
-                color: "grey.700",
-                "&:hover": {
-                  borderColor: "grey.600",
-                  backgroundColor: "grey.100",
-                },
-              }}
-            >
-              Continue with Google
-            </Button>
-          </Stack>
-
           <Typography variant="body2" textAlign="center" mt={2}>
-            Don’t have an account? Receive an invitation from your company, or{" "}
-            <Link
-              href="/register-company"
+            Remember your password?{" "}
+            <a
+              href="/login"
               className="text-blue-600 hover:underline font-semibold"
             >
-              Register your business
-            </Link>
+              Sign In
+            </a>
           </Typography>
         </Box>
       </Box>
@@ -253,4 +256,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default ResetPasswordPage;
