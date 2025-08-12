@@ -6,7 +6,7 @@ import {
   useAddProductStockMutation,
   useRemoveProductStockMutation,
 } from "@/state/services/productsApi";
-import { useAppDispatch } from "@/app/redux";
+import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
 import {
   Paper,
@@ -37,6 +37,9 @@ const ProductInformation = ({ productInfoData, productId = "" }) => {
     createdAt,
     updatedAt,
   } = productInfoData.data;
+
+  const userData = useAppSelector((state) => state.global.userData);
+  const role = userData?.data?.role || "user";
 
   const [updateProductInfo, { isLoading: isUpdating }] =
     useUpdateProductInfoMutation();
@@ -148,79 +151,94 @@ const ProductInformation = ({ productInfoData, productId = "" }) => {
         }}
       >
         <Typography variant="h4">{productName}</Typography>
-        {editProduct ? (
-          <Stack direction="row" spacing={2}>
-            <Tooltip title="Save Changes">
+        {role === "admin" && (
+          <>
+            {" "}
+            {editProduct ? (
+              <Stack direction="row" spacing={2}>
+                <Tooltip title="Save Changes">
+                  <IconButton
+                    variant="contained"
+                    color="primary"
+                    onClick={() =>
+                      handleUpdateProduct(productId, productFormData)
+                    }
+                    loading={isUpdating}
+                    size="medium"
+                  >
+                    <Check fontSize="medium" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Cancel Editing">
+                  <IconButton
+                    variant="outlined"
+                    size="medium"
+                    color="secondary"
+                    onClick={() => {
+                      setProductFormData({});
+                      setEditProduct(false);
+                    }}
+                    loading={isUpdating}
+                  >
+                    <Close fontSize="medium" />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
+            ) : (
               <IconButton
-                variant="contained"
+                size="medium"
                 color="primary"
-                onClick={() => handleUpdateProduct(productId, productFormData)}
-                loading={isUpdating}
-                size="medium"
+                onClick={() => setEditProduct(true)}
               >
-                <Check fontSize="medium" />
+                <Edit fontSize="medium" />
               </IconButton>
-            </Tooltip>
-            <Tooltip title="Cancel Editing">
-              <IconButton
-                variant="outlined"
-                size="medium"
-                color="secondary"
-                onClick={() => {
-                  setProductFormData({});
-                  setEditProduct(false);
-                }}
-                loading={isUpdating}
-              >
-                <Close fontSize="medium" />
-              </IconButton>
-            </Tooltip>
-          </Stack>
-        ) : (
-          <IconButton
-            size="medium"
-            color="primary"
-            onClick={() => setEditProduct(true)}
-          >
-            <Edit fontSize="medium" />
-          </IconButton>
+            )}
+            <AddRowButton
+              buttonLabel="Stock"
+              title="Stock Adjustment (Add Stock)"
+              description="Adjust this product's stock and provide the adjustment reason."
+              descriptionColor="default"
+              startIcon={<Add />}
+              columns={[
+                {
+                  field: "quantity",
+                  headerName: "Quantity of stocks to add",
+                  type: "number",
+                  isQuantity: true,
+                },
+                {
+                  field: "reason",
+                  headerName: "Adjustment Reason",
+                  type: "text",
+                },
+              ]}
+              initialValues={{ quantity: "", reason: "" }}
+              onSubmit={handleWrapperAddStockFunction} // Pass wrapper
+            />
+            <AddRowButton
+              buttonLabel="Stock"
+              title="Stock Adjustment (Remove Stock)"
+              description="Adjust this product's stock and provide the adjustment reason."
+              descriptionColor="default"
+              startIcon={<Remove />}
+              columns={[
+                {
+                  field: "quantity",
+                  headerName: "Quantity of stocks to remove",
+                  type: "number",
+                  isQuantity: true,
+                },
+                {
+                  field: "reason",
+                  headerName: "Adjustment Reason",
+                  type: "text",
+                },
+              ]}
+              initialValues={{ quantity: "", reason: "" }}
+              onSubmit={handleWrapperRemoveStockFunction} // Pass wrapper
+            />
+          </>
         )}
-        <AddRowButton
-          buttonLabel="Stock"
-          title="Stock Adjustment (Add Stock)"
-          description="Adjust this product's stock and provide the adjustment reason."
-          descriptionColor="default"
-          startIcon={<Add />}
-          columns={[
-            {
-              field: "quantity",
-              headerName: "Quantity of stocks to add",
-              type: "number",
-              isQuantity: true,
-            },
-            { field: "reason", headerName: "Adjustment Reason", type: "text" },
-          ]}
-          initialValues={{ quantity: "", reason: "" }}
-          onSubmit={handleWrapperAddStockFunction} // Pass wrapper
-        />
-        <AddRowButton
-          buttonLabel="Stock"
-          title="Stock Adjustment (Remove Stock)"
-          description="Adjust this product's stock and provide the adjustment reason."
-          descriptionColor="default"
-          startIcon={<Remove />}
-          columns={[
-            {
-              field: "quantity",
-              headerName: "Quantity of stocks to remove",
-              type: "number",
-              isQuantity: true,
-            },
-            { field: "reason", headerName: "Adjustment Reason", type: "text" },
-          ]}
-          initialValues={{ quantity: "", reason: "" }}
-          onSubmit={handleWrapperRemoveStockFunction} // Pass wrapper
-        />
       </Stack>
 
       <Grid container columnSpacing={4} rowSpacing={1} mb={2}>
