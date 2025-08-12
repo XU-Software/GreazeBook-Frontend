@@ -60,7 +60,7 @@ const InvoiceNumberModal = ({ bookingData, bookingId = "" }) => {
     <>
       {bookingData.data.status === "Pending" && (
         <Button
-          variant="outlined"
+          variant="contained"
           color="primary"
           loading={isApprovingBooking}
           onClick={() => setToggleInvoiceNumberModal(true)}

@@ -90,14 +90,16 @@ const PaymentModal = ({ open, onClose, accountsReceivableId = "" }) => {
       >
         <DialogContent>
           <Box
-            sx={{ display: "flex", alignItems: "flex-start", gap: 1, mb: 2 }}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              mb: 2,
+            }}
           >
-            <InfoOutlined
-              sx={{ color: "text.secondary", mt: "2px", fontSize: 20 }}
-            />
+            <InfoOutlined sx={{ color: "text.secondary", fontSize: 20 }} />
             <Typography variant="body2" color="text.secondary">
               Please ensure all payment details are correct before proceeding.
-              Payments are final and cannot be edited or revoked once submitted.
             </Typography>
           </Box>
 

@@ -187,7 +187,26 @@ const BookingPage = () => {
   return (
     <div>
       <DynamicBreadcrumbs />
-      <Box p={4}>
+      <Box p={2}>
+        {/* Action Buttons */}
+        <Stack direction="row" spacing={2} mb={2}>
+          {role === "admin" && (
+            <InvoiceNumberModal
+              bookingData={bookingData}
+              bookingId={bookingId}
+            />
+          )}
+          {bookingData.data.status === "Pending" && (
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => setToggleDeleteModal(true)}
+            >
+              Delete
+            </Button>
+          )}
+        </Stack>
+
         {/* Booking Details */}
         <BookingDetails
           editBooking={editBooking}
@@ -214,25 +233,6 @@ const BookingPage = () => {
         />
         {/* Notes Section */}
         <NoteDetails bookingData={bookingData} bookingId={bookingId} />
-
-        {/* Bottom Action Buttons */}
-        <Stack direction="row" spacing={2}>
-          {role === "admin" && (
-            <InvoiceNumberModal
-              bookingData={bookingData}
-              bookingId={bookingId}
-            />
-          )}
-          {bookingData.data.status === "Pending" && (
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={() => setToggleDeleteModal(true)}
-            >
-              Delete
-            </Button>
-          )}
-        </Stack>
       </Box>
       <ConfirmationModal
         open={toggleDeleteModal}
