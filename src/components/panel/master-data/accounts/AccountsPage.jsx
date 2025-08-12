@@ -22,7 +22,7 @@ import ExportExcel from "@/components/Utils/ExportExcel";
 import DeleteSelectedButton from "@/components/Utils/DeleteSelectedButton";
 import PaginationControls from "@/components/Utils/TablePagination";
 import { formatDate } from "@/utils/dateFormatter";
-import { formatToThousands } from "@/utils/quantityFormatter";
+import { formatNumber } from "@/utils/quantityFormatter";
 import { usePathname } from "next/navigation";
 import { Add } from "@mui/icons-material";
 import { Typography } from "@mui/material";
@@ -286,7 +286,7 @@ const AccountsPage = () => {
             <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
           </div>
           <Typography>
-            Number of Accounts: {formatToThousands(accountsData?.total)}
+            Number of Accounts: {formatNumber(accountsData?.total)}
           </Typography>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <AddRowButton

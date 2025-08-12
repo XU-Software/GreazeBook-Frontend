@@ -19,7 +19,7 @@ import DeleteSelectedButton from "@/components/Utils/DeleteSelectedButton";
 import PaginationControls from "@/components/Utils/TablePagination";
 import { formatDate } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
-import { formatToThousands } from "@/utils/quantityFormatter";
+import { formatNumber } from "@/utils/quantityFormatter";
 import { Chip, Typography } from "@mui/material";
 import { usePathname } from "next/navigation";
 
@@ -179,7 +179,7 @@ const BookingsPage = () => {
         location: booking.account.location,
         dsp: booking.account.dsp,
         totalAmount: formatToLocalCurrency(booking.totalAmount),
-        term: formatToThousands(booking.term),
+        term: formatNumber(booking.term),
         freebiesRemarksConcern: booking.freebiesRemarksConcern,
         status: booking.status,
         createdAt: formatDate(booking.createdAt),
@@ -193,7 +193,7 @@ const BookingsPage = () => {
         Location: booking.account.location,
         DSP: booking.account.dsp,
         "Total Amount": formatToLocalCurrency(booking.totalAmount),
-        Term: formatToThousands(booking.term),
+        Term: formatNumber(booking.term),
         "Freebies/Remarks/Concern": booking.freebiesRemarksConcern,
         Status: booking.status,
         "Created At": formatDate(booking.createdAt),
@@ -232,7 +232,7 @@ const BookingsPage = () => {
             <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
           </div>
           <Typography>
-            Number of Bookings: {formatToThousands(bookingsData?.total)}
+            Number of Bookings: {formatNumber(bookingsData?.total)}
           </Typography>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <ExportExcel

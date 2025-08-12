@@ -22,10 +22,7 @@ import DateRangePicker from "@/components/Utils/DateRangePicker";
 import EditableField from "@/components/Utils/EditableField";
 import dayjs from "dayjs";
 import { formatDate } from "@/utils/dateFormatter";
-import {
-  formatToThousandsWithDecimals,
-  formatToThousands,
-} from "@/utils/quantityFormatter";
+import { formatNumber } from "@/utils/quantityFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 import { formatToPercentage } from "@/utils/percentageFormatter";
 
@@ -220,7 +217,6 @@ const DashboardPage = () => {
                       value={currentOplan}
                       name={dsp}
                       isQuantity={true}
-                      // isFloat={true}
                       onChange={(e) =>
                         handleOplanChange(e.target.name, e.target.value)
                       }
@@ -234,10 +230,10 @@ const DashboardPage = () => {
             data={dashboardState.data?.sales?.rows || []}
             summary={dashboardState.data?.sales?.summary}
             formatters={{
-              salesToTrade: (v) => formatToThousandsWithDecimals(v),
+              salesToTrade: (v) => formatNumber(v),
               attainment: (v) => formatToPercentage(v),
               pesoValue: (v) => formatToLocalCurrency(v),
-              oplan: (v) => formatToThousands(v),
+              oplan: (v) => formatNumber(v),
             }}
           />
         </Grid>
@@ -286,8 +282,8 @@ const DashboardPage = () => {
             data={dashboardState.data?.penetration?.rows || []}
             summary={dashboardState.data?.penetration?.summary}
             formatters={{
-              activeAccounts: (v) => formatToThousands(v),
-              totalAccounts: (v) => formatToThousands(v),
+              activeAccounts: (v) => formatNumber(v),
+              totalAccounts: (v) => formatNumber(v),
               attainment: (v) => formatToPercentage(v),
             }}
           />
@@ -391,8 +387,8 @@ const DashboardPage = () => {
             data={dashboardState.data?.penetrationByTradeType?.rows || []}
             summary={dashboardState.data?.penetrationByTradeType?.summary}
             formatters={{
-              activeAccounts: (v) => formatToThousands(v),
-              totalVolume: (v) => formatToThousandsWithDecimals(v),
+              activeAccounts: (v) => formatNumber(v),
+              totalVolume: (v) => formatNumber(v),
             }}
           />
         </Grid>

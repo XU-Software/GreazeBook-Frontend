@@ -8,7 +8,7 @@ import OrdersComponent from "./OrdersComponent";
 import { useAppDispatch } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
 import { useSubmitBookingMutation } from "@/state/services/bookingsApi";
-import { formatToThousands } from "@/utils/quantityFormatter";
+import { formatNumber } from "@/utils/quantityFormatter";
 import QuantityTextField from "@/components/Utils/QuantityTextField";
 
 export default function BookingFormPage() {
@@ -153,7 +153,7 @@ export default function BookingFormPage() {
             <p>
               Term:{" "}
               <span className="font-semibold">
-                {formatToThousands(bookingInformation.term)}
+                {formatNumber(bookingInformation.term)}
               </span>
             </p>
             <p>

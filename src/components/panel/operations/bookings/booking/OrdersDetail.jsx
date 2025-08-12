@@ -20,7 +20,7 @@ import {
 import { Edit, Check, Close, Delete } from "@mui/icons-material";
 import EditableCell from "@/components/Utils/EditableCell";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
-import { formatToThousandsWithDecimals } from "@/utils/quantityFormatter";
+import { formatNumber } from "@/utils/quantityFormatter";
 import AddOrderModal from "./AddOrderModal";
 
 const OrdersDetail = ({
@@ -167,9 +167,7 @@ const OrdersDetail = ({
 
                     <TableCell>{order.product.productName}</TableCell>
 
-                    <TableCell>
-                      {formatToThousandsWithDecimals(order.product.uom)}
-                    </TableCell>
+                    <TableCell>{formatNumber(order.product.uom)}</TableCell>
 
                     <EditableCell
                       value={orderEdit?.quantity ?? order.quantity}
@@ -207,9 +205,7 @@ const OrdersDetail = ({
                     <TableCell>
                       {formatToLocalCurrency(quantity * price)}
                     </TableCell>
-                    <TableCell>
-                      {formatToThousandsWithDecimals(volume)}
-                    </TableCell>
+                    <TableCell>{formatNumber(volume)}</TableCell>
                     {bookingData.status === "Pending" && (
                       <TableCell align="center" sx={{ width: 120 }}>
                         <Box
@@ -256,7 +252,7 @@ const OrdersDetail = ({
                 </TableCell>
                 <TableCell>
                   <strong>
-                    {formatToThousandsWithDecimals(
+                    {formatNumber(
                       bookingData.orders
                         .filter((order) => !ordersToDelete.has(order.orderId))
                         .reduce((sum, order) => {

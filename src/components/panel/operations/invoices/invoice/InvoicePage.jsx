@@ -23,10 +23,7 @@ import {
 import { EastOutlined } from "@mui/icons-material";
 import { formatDateWithTime, formatDate } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
-import {
-  formatToThousands,
-  formatToThousandsWithDecimals,
-} from "@/utils/quantityFormatter";
+import { formatNumber } from "@/utils/quantityFormatter";
 
 const InvoicePage = () => {
   const params = useParams();
@@ -129,7 +126,7 @@ const InvoicePage = () => {
               <Typography variant="body2" color="text.secondary">
                 Term
               </Typography>
-              <Typography>{formatToThousands(booking.term)}</Typography>
+              <Typography>{formatNumber(booking.term)}</Typography>
             </Grid>
 
             <Grid item>
@@ -176,7 +173,7 @@ const InvoicePage = () => {
                   <TableRow key={order.orderId}>
                     <TableCell>{order.product.productName}</TableCell>
                     <TableCell align="right">
-                      {formatToThousands(order.quantity)}
+                      {formatNumber(order.quantity)}
                     </TableCell>
                     <TableCell align="right">
                       {formatToLocalCurrency(order.price)}

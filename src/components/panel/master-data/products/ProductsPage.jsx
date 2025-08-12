@@ -25,10 +25,7 @@ import { formatDate } from "@/utils/dateFormatter";
 import { Chip, Tooltip, Typography } from "@mui/material";
 import { WarningAmber, Error, CheckCircle, Add } from "@mui/icons-material";
 import { usePathname } from "next/navigation";
-import {
-  formatToThousandsWithDecimals,
-  formatToThousands,
-} from "@/utils/quantityFormatter";
+import { formatNumber } from "@/utils/quantityFormatter";
 
 const columns = [
   {
@@ -269,8 +266,8 @@ const ProductsPage = () => {
         materialCode: prod.materialCode,
         productName: prod.productName,
         productFamily: prod.productFamily,
-        uom: formatToThousandsWithDecimals(prod.uom),
-        totalStocks: formatToThousands(prod.totalStocks),
+        uom: formatNumber(prod.uom),
+        totalStocks: formatNumber(prod.totalStocks),
         createdAt: formattedDate,
       });
 
@@ -278,8 +275,8 @@ const ProductsPage = () => {
         "Material Code": prod.materialCode,
         "Product Name": prod.productName,
         "Product Family": prod.productFamily,
-        "UOM (L)": formatToThousandsWithDecimals(prod.uom),
-        "Total Stocks": formatToThousands(prod.totalStocks),
+        "UOM (L)": formatNumber(prod.uom),
+        "Total Stocks": formatNumber(prod.totalStocks),
         "Created At": formattedDate,
       });
     });
@@ -316,7 +313,7 @@ const ProductsPage = () => {
             <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
           </div>
           <Typography>
-            Number of Products: {formatToThousands(productsData?.total)}
+            Number of Products: {formatNumber(productsData?.total)}
           </Typography>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <AddRowButton

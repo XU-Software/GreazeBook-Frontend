@@ -8,6 +8,7 @@ import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";
 import { formatDate, formatDateWithTime } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
+import { formatNumber } from "@/utils/quantityFormatter";
 import AccountBreakdownSection from "./AccountBreakdownSection";
 import ColoredLink from "@/components/Utils/ColoredLink";
 
@@ -454,7 +455,7 @@ const AccountBreakdownLists = ({
             salesInvoiceNumber: sale.salesInvoiceNumber,
             accountsReceivableId: sale.accountsReceivableId,
             productName: sale.order.product.productName,
-            quantity: sale.order.quantity,
+            quantity: formatNumber(sale.order.quantity),
             price: formatToLocalCurrency(sale.order.price),
             actionType: sale.actionType,
           })) || []),

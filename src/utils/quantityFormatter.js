@@ -1,10 +1,9 @@
 import numeral from "numeral";
 
-// Format float or integer to thousands with commas (e.g., 12345 -> 12,345)
-const formatToThousands = (value) => numeral(value).format("0,0");
+// Universal format for quantity
+const formatNumber = (value) => {
+  if (value == null || isNaN(value)) return ""; // safeguard
+  return numeral(value).format(value % 1 === 0 ? "0,0" : "0,0.00");
+};
 
-// Format float or integer to thousands with commas and decimal
-const formatToThousandsWithDecimals = (value) =>
-  numeral(value).format("0,0.00");
-
-export { formatToThousands, formatToThousandsWithDecimals };
+export { formatNumber };

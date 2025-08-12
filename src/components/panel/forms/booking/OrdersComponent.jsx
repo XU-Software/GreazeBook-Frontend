@@ -20,10 +20,7 @@ import { useGetProductsQuery } from "@/state/services/productsApi";
 import SearchableSelect from "../../../Utils/SearchableSelect";
 import { Add, Delete } from "@mui/icons-material";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
-import {
-  formatToThousands,
-  formatToThousandsWithDecimals,
-} from "@/utils/quantityFormatter";
+import { formatNumber } from "@/utils/quantityFormatter";
 import CurrencyTextField from "@/components/Utils/CurrencyTextField";
 import QuantityTextField from "@/components/Utils/QuantityTextField";
 
@@ -124,19 +121,15 @@ const OrdersComponent = ({ ordersData = [], setOrdersData = () => {} }) => {
                 return (
                   <TableRow key={index}>
                     <TableCell>{order.product.productName}</TableCell>
-                    <TableCell>
-                      {formatToThousandsWithDecimals(order.product.uom)}
-                    </TableCell>
-                    <TableCell>{formatToThousands(order.quantity)}</TableCell>
+                    <TableCell>{formatNumber(order.product.uom)}</TableCell>
+                    <TableCell>{formatNumber(order.quantity)}</TableCell>
                     <TableCell>{formatToLocalCurrency(order.price)}</TableCell>
                     <TableCell align="right">
                       {order.quantity && order.price
                         ? formatToLocalCurrency(order.quantity * order.price)
                         : "-"}
                     </TableCell>
-                    <TableCell>
-                      {formatToThousandsWithDecimals(computeVolume(order))}
-                    </TableCell>
+                    <TableCell>{formatNumber(computeVolume(order))}</TableCell>
                     <TableCell align="center" sx={{ width: 60 }}>
                       <IconButton
                         color="error"
@@ -163,7 +156,7 @@ const OrdersComponent = ({ ordersData = [], setOrdersData = () => {} }) => {
               </TableCell>
               <TableCell>
                 <Typography fontWeight="bold">
-                  {formatToThousandsWithDecimals(totalVolume)}
+                  {formatNumber(totalVolume)}
                 </Typography>
               </TableCell>
             </TableRow>

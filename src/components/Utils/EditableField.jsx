@@ -2,10 +2,7 @@
 
 import { TextField, Typography } from "@mui/material";
 import { formatToLongDate } from "@/utils/dateFormatter";
-import {
-  formatToThousands,
-  formatToThousandsWithDecimals,
-} from "@/utils/quantityFormatter";
+import { formatNumber } from "@/utils/quantityFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 import CurrencyTextField from "./CurrencyTextField";
 import QuantityTextField from "./QuantityTextField";
@@ -19,7 +16,6 @@ const EditableField = ({
   type = "text",
   isCurrency = false,
   isQuantity = false,
-  isFloat = false, // NEW PROP
 }) => {
   if (editing) {
     if (isCurrency) {
@@ -72,9 +68,7 @@ const EditableField = ({
           : isCurrency
           ? formatToLocalCurrency(value)
           : isQuantity
-          ? isFloat
-            ? formatToThousandsWithDecimals(value)
-            : formatToThousands(value)
+          ? formatNumber(value)
           : value}
       </Typography>
     </>

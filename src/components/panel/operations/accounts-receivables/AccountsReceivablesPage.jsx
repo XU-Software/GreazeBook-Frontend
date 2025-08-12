@@ -13,7 +13,7 @@ import ExportExcel from "@/components/Utils/ExportExcel";
 import PaginationControls from "@/components/Utils/TablePagination";
 import { formatDate } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
-import { formatToThousands } from "@/utils/quantityFormatter";
+import { formatNumber } from "@/utils/quantityFormatter";
 import { usePathname } from "next/navigation";
 import { Chip, Tooltip, Stack, Typography, Box } from "@mui/material";
 
@@ -222,7 +222,7 @@ const AccountsReceivablesPage = () => {
         createdAt: formatDate(ar.createdAt),
         term:
           ar.invoice?.booking?.term !== undefined
-            ? formatToThousands(ar.invoice.booking.term)
+            ? formatNumber(ar.invoice.booking.term)
             : "-",
         dueDate: formatDate(ar.dueDate),
         totalSalesAmount: formatToLocalCurrency(ar.totalSalesAmount),
@@ -246,7 +246,7 @@ const AccountsReceivablesPage = () => {
         "Invoice Date": formatDate(ar.createdAt),
         Term:
           ar.invoice?.booking?.term !== undefined
-            ? formatToThousands(ar.invoice.booking.term)
+            ? formatNumber(ar.invoice.booking.term)
             : "-",
         "Due Date": formatDate(ar.dueDate),
         "Total Sales": formatToLocalCurrency(ar.totalSalesAmount),
@@ -297,7 +297,7 @@ const AccountsReceivablesPage = () => {
           </div>
           <Typography>
             Number of Accounts Receivables:{" "}
-            {formatToThousands(accountsReceivablesData?.total)}
+            {formatNumber(accountsReceivablesData?.total)}
           </Typography>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <ExportExcel

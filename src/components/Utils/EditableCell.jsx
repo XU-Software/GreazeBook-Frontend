@@ -2,10 +2,7 @@
 
 import { TextField, TableCell } from "@mui/material";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
-import {
-  formatToThousands,
-  formatToThousandsWithDecimals,
-} from "@/utils/quantityFormatter";
+import { formatNumber } from "@/utils/quantityFormatter";
 import CurrencyTextField from "./CurrencyTextField";
 import QuantityTextField from "./QuantityTextField";
 import { formatToLongDate } from "@/utils/dateFormatter";
@@ -19,7 +16,6 @@ const EditableCell = ({
   type = "text",
   isCurrency = false,
   isQuantity = false,
-  isFloat = false,
 }) => {
   if (editing) {
     if (isCurrency) {
@@ -76,9 +72,7 @@ const EditableCell = ({
   } else if (isCurrency) {
     displayValue = formatToLocalCurrency(value);
   } else if (isQuantity) {
-    displayValue = isFloat
-      ? formatToThousandsWithDecimals(value)
-      : formatToThousands(value);
+    displayValue = formatNumber(value);
   }
 
   // return (

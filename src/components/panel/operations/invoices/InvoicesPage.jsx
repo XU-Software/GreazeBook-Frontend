@@ -13,7 +13,7 @@ import ExportExcel from "@/components/Utils/ExportExcel";
 import PaginationControls from "@/components/Utils/TablePagination";
 import { formatDate } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
-import { formatToThousands } from "@/utils/quantityFormatter";
+import { formatNumber } from "@/utils/quantityFormatter";
 import { usePathname } from "next/navigation";
 import { Typography } from "@mui/material";
 
@@ -117,7 +117,7 @@ const InvoicesPage = () => {
         location: invoice.booking.account.location,
         dsp: invoice.booking.account.dsp,
         totalAmount: formatToLocalCurrency(invoice.totalAmount),
-        term: formatToThousands(invoice.booking.term),
+        term: formatNumber(invoice.booking.term),
         createdAt: formatDate(invoice.createdAt),
       });
 
@@ -128,7 +128,7 @@ const InvoicesPage = () => {
         Location: invoice.booking.account.location,
         DSP: invoice.booking.account.dsp,
         "Total Amount": formatToLocalCurrency(invoice.totalAmount),
-        Term: formatToThousands(invoice.booking.term),
+        Term: formatNumber(invoice.booking.term),
         "Created At": formatDate(invoice.createdAt),
       });
     });
@@ -165,7 +165,7 @@ const InvoicesPage = () => {
             <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
           </div>
           <Typography>
-            Number of Invoices: {formatToThousands(invoicesData?.total)}
+            Number of Invoices: {formatNumber(invoicesData?.total)}
           </Typography>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <ExportExcel
