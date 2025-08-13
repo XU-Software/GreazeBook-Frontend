@@ -2,11 +2,7 @@ import React from "react";
 import GoogleSuccess from "@/components/auth/google-success/GoogleSuccess";
 
 const GoogleSuccessPage = () => {
-  return (
-    <div>
-      <GoogleSuccess />
-    </div>
-  );
+  return <GoogleSuccess />;
 };
 
 export default GoogleSuccessPage;

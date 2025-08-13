@@ -22,6 +22,7 @@ import {
   Button,
   Stack,
   Tooltip,
+  TableFooter,
 } from "@mui/material";
 import {
   CheckCircle,
@@ -41,6 +42,7 @@ import ConfirmationModal from "@/components/Utils/ConfirmationModal";
 import CancelSaleModal from "./CancelSaleModal";
 import ChangeSaleModal from "./ChangeSaleModal";
 import ProcessOverpaymentModal from "./ProcessPendingExcessModal";
+import CreditMemoPaymentModal from "./CreditMemoPaymentModal";
 
 // Helper chips
 const getStatusChip = (status) => {
@@ -51,8 +53,10 @@ const getStatusChip = (status) => {
       return <Chip label="Partial" color="warning" size="small" />;
     case "Paid":
       return <Chip label="Paid" color="success" size="small" />;
+    case "Overdue":
+      return <Chip label="Overdue" color="error" size="small" />;
     default:
-      return <Chip label={status} size="small" />;
+      return <Chip label="Cancelled" color="error" size="small" />;
   }
 };
 
@@ -62,7 +66,7 @@ const getFulfillmentChip = (actionType) => {
       return (
         <Chip
           icon={<CheckCircle />}
-          label="Fulfilled"
+          label="Invoiced"
           color="success"
           size="small"
         />
@@ -75,7 +79,7 @@ const getFulfillmentChip = (actionType) => {
       return (
         <Chip
           icon={<ChangeCircle />}
-          label="Changed Product"
+          label="ChangedProduct"
           color="info"
           size="small"
         />
@@ -158,6 +162,10 @@ const AccountsReceivablePage = () => {
   const [toggleProcessOverpaymentModal, setToggleProcessOverpaymentModal] =
     useState(false);
   const [pendingExcessId, setPendingExcessId] = useState("");
+
+  // Toggling credit memo payment modal
+  const [toggleCreditMemoPaymentModal, setToggleCreditMemoPaymentModal] =
+    useState(false);
 
   const userData = useAppSelector((state) => state.global.userData);
   const role = userData?.data?.role || "user";
@@ -253,6 +261,7 @@ const AccountsReceivablePage = () => {
     sales,
     payments,
     totalSalesAmount,
+    totalVolume,
     totalPayments,
     activePendingExcess, //can be null
     refund, //can be null
@@ -291,15 +300,28 @@ const AccountsReceivablePage = () => {
                 </span>
               </Tooltip>
             ) : (
-              <Tooltip title="Make a payment">
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setTogglePaymentModal(true)}
-                >
-                  Record Payment
-                </Button>
-              </Tooltip>
+              <>
+                <Tooltip title="Make a payment">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setTogglePaymentModal(true)}
+                  >
+                    Record Payment
+                  </Button>
+                </Tooltip>
+                {account.creditMemos.length > 0 && (
+                  <Tooltip title="This account has credit memo available which can be used for payment">
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => setToggleCreditMemoPaymentModal(true)}
+                    >
+                      Credit Memo Available
+                    </Button>
+                  </Tooltip>
+                )}
+              </>
             )}
             {activePendingExcess && (
               <Button
@@ -421,13 +443,15 @@ const AccountsReceivablePage = () => {
               <Typography variant="body2" color="text.secondary">
                 Aging
               </Typography>
-              {status !== "Paid" ? getAgingChip(dueDate) : "-"}
+              {status !== "Paid" && status !== "Cancelled"
+                ? getAgingChip(dueDate)
+                : "-"}
             </Grid>
           </Grid>
         </Paper>
         {/* Customer Details */}
         <Paper sx={{ p: 2, mb: 3 }} elevation={2}>
-          <Typography variant="h6">Customer Details</Typography>
+          <Typography variant="h6">Account Details</Typography>
           <Grid container columnSpacing={4} rowSpacing={1} mt={1}>
             <Grid item xs={12} sm={6} md={4}>
               <Typography variant="body2" color="text.secondary">
@@ -486,9 +510,11 @@ const AccountsReceivablePage = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>Product</TableCell>
+                  <TableCell>UOM</TableCell>
                   <TableCell align="right">Quantity</TableCell>
                   <TableCell align="right">Unit Price</TableCell>
                   <TableCell align="right">Subtotal</TableCell>
+                  <TableCell align="right">Volume</TableCell>
                   <TableCell align="center">Action Type</TableCell>
                   <TableCell>Changed To</TableCell>
                   <TableCell>Reason</TableCell>
@@ -498,7 +524,7 @@ const AccountsReceivablePage = () => {
               <TableBody>
                 {type === "Opening" ? (
                   <TableRow>
-                    <TableCell colSpan={8} align="center">
+                    <TableCell colSpan={10} align="center">
                       <Typography variant="body2" color="textSecondary">
                         This is an Opening A/R and doesn't include system
                         generated sales
@@ -513,6 +539,7 @@ const AccountsReceivablePage = () => {
                     return (
                       <TableRow key={sale.saleId}>
                         <TableCell>{sale.order.product.productName}</TableCell>
+                        <TableCell>{sale.order.product.uom}</TableCell>
                         <TableCell align="right">
                           {sale.order.quantity}
                         </TableCell>
@@ -523,6 +550,9 @@ const AccountsReceivablePage = () => {
                           {formatToLocalCurrency(
                             sale.order.quantity * sale.order.price
                           )}
+                        </TableCell>
+                        <TableCell align="right">
+                          {sale.order.product.uom * sale.order.quantity}
                         </TableCell>
                         <TableCell align="center">
                           {getFulfillmentChip(sale.actionType)}
@@ -579,6 +609,21 @@ const AccountsReceivablePage = () => {
                   })
                 )}
               </TableBody>
+              <TableFooter>
+                <TableRow>
+                  <TableCell colSpan={4} align="right">
+                    <Typography fontWeight="bold">Total</Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography fontWeight="bold">
+                      {formatToLocalCurrency(totalSalesAmount)}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography fontWeight="bold">{totalVolume}</Typography>
+                  </TableCell>
+                </TableRow>
+              </TableFooter>
             </Table>
           </Box>
         </Paper>
@@ -661,6 +706,14 @@ const AccountsReceivablePage = () => {
           onClose={() => setTogglePaymentModal(false)}
           accountsReceivableId={accountsReceivableId}
         />
+
+        <CreditMemoPaymentModal
+          open={toggleCreditMemoPaymentModal}
+          onClose={() => setToggleCreditMemoPaymentModal(false)}
+          creditMemos={account.creditMemos}
+          accountsReceivableId={accountsReceivableId}
+        />
+
         <ConfirmationModal
           open={toggleVoidPaymentModal}
           onClose={handleCloseVoidModal}

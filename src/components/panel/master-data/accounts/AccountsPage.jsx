@@ -21,9 +21,11 @@ import ImportExcel from "@/components/Utils/ImportExcel";
 import ExportExcel from "@/components/Utils/ExportExcel";
 import DeleteSelectedButton from "@/components/Utils/DeleteSelectedButton";
 import PaginationControls from "@/components/Utils/TablePagination";
-import numeral from "numeral";
 import { formatDate } from "@/utils/dateFormatter";
+import { formatNumber } from "@/utils/quantityFormatter";
 import { usePathname } from "next/navigation";
+import { Add } from "@mui/icons-material";
+import { Typography } from "@mui/material";
 
 const columns = [
   {
@@ -247,7 +249,7 @@ const AccountsPage = () => {
         "Trade Type": acc.tradeType,
         Location: acc.location,
         DSP: acc.dsp,
-        "Contact Info": acc.contactInformation,
+        "Contact Information": acc.contactInformation,
         "Created At": formattedDate,
       });
     });
@@ -283,6 +285,9 @@ const AccountsPage = () => {
             <SearchBar setSearch={setSearch} setPage={setPage} />
             <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
           </div>
+          <Typography>
+            Number of Accounts: {formatNumber(accountsData?.total)}
+          </Typography>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <AddRowButton
               columns={columnsGuide}
@@ -298,6 +303,7 @@ const AccountsPage = () => {
               onSubmit={handleAddSingleAccount}
               title="Add New Account"
               buttonLabel="Account"
+              startIcon={<Add />}
             />
             <ImportExcel
               handleImportExcel={handleImportAccountsExcel}

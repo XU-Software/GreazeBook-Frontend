@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
 import PublicNavbar from "@/components/layout/public/PublicNavbar";
@@ -24,8 +24,10 @@ export default function PublicLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <PublicNavbar />
-        {children}
+        <header>
+          <PublicNavbar />
+        </header>
+        <main> {children}</main>
       </body>
     </html>
   );

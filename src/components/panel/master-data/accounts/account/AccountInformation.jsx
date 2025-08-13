@@ -5,8 +5,6 @@ import {
   useSetOpeningARMutation,
   useUpdateAccountInfoMutation,
 } from "@/state/services/accountsApi";
-import LoadingSpinner from "@/components/Utils/LoadingSpinner";
-import ErrorMessage from "@/components/Utils/ErrorMessage";
 import DateRangePicker from "@/components/Utils/DateRangePicker";
 import {
   Paper,
@@ -14,13 +12,12 @@ import {
   Grid,
   Box,
   Stack,
-  Button,
   Tooltip,
   IconButton,
 } from "@mui/material";
-import { Edit, Close, Check } from "@mui/icons-material";
+import { Edit, Close, Check, Add } from "@mui/icons-material";
 import { formatDateWithTime } from "@/utils/dateFormatter";
-import { useAppDispatch } from "@/app/redux";
+import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
 import AddRowButton from "@/components/Utils/AddRowButton";
 import EditableField from "@/components/Utils/EditableField";
@@ -47,6 +44,9 @@ const AccountInformation = ({
     contactInformation,
     createdAt,
   } = accountInfoData.data;
+
+  const userData = useAppSelector((state) => state.global.userData);
+  const role = userData?.data?.role || "user";
 
   //Function for handling opening A/R
   const [setOpeningAR, { isLoading: isSettingOpeningAR }] =
@@ -133,61 +133,76 @@ const AccountInformation = ({
           }}
         >
           <Typography variant="h4">{accountName}</Typography>
-          {editAccount ? (
-            <Stack direction="row" spacing={2}>
-              <Tooltip title="Save Changes">
+          {role === "admin" && (
+            <>
+              {editAccount ? (
+                <Stack direction="row" spacing={2}>
+                  <Tooltip title="Save Changes">
+                    <IconButton
+                      variant="contained"
+                      color="primary"
+                      onClick={() =>
+                        handleUpdateAccount(accountId, accountFormData)
+                      }
+                      loading={isUpdating}
+                      size="medium"
+                    >
+                      <Check fontSize="medium" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Cancel Editing">
+                    <IconButton
+                      variant="outlined"
+                      size="medium"
+                      color="secondary"
+                      onClick={() => {
+                        setAccountFormData({});
+                        setEditAccount(false);
+                      }}
+                      loading={isUpdating}
+                    >
+                      <Close fontSize="medium" />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
+              ) : (
                 <IconButton
-                  variant="contained"
+                  size="medium"
                   color="primary"
-                  onClick={() =>
-                    handleUpdateAccount(accountId, accountFormData)
-                  }
-                  loading={isUpdating}
-                  size="medium"
+                  onClick={() => setEditAccount(true)}
                 >
-                  <Check fontSize="medium" />
+                  <Edit fontSize="medium" />
                 </IconButton>
-              </Tooltip>
-              <Tooltip title="Cancel Editing">
-                <IconButton
-                  variant="outlined"
-                  size="medium"
-                  color="secondary"
-                  onClick={() => {
-                    setAccountFormData({});
-                    setEditAccount(false);
-                  }}
-                  loading={isUpdating}
-                >
-                  <Close fontSize="medium" />
-                </IconButton>
-              </Tooltip>
-            </Stack>
-          ) : (
-            <IconButton
-              size="medium"
-              color="primary"
-              onClick={() => setEditAccount(true)}
-            >
-              <Edit fontSize="medium" />
-            </IconButton>
+              )}
+              <AddRowButton
+                buttonLabel="Opening A/R"
+                title="Set Opening A/R"
+                description="⚠️ Important: Once the Opening A/R is set, it cannot be modified or revoked. Please proceed only when the details are finalized and fully validated."
+                descriptionColor="error"
+                startIcon={<Add />}
+                columns={[
+                  {
+                    field: "amount",
+                    headerName: "Amount",
+                    type: "number",
+                    isCurrency: true,
+                  },
+                  { field: "dueDate", headerName: "Due Date", type: "date" },
+                  { field: "note", headerName: "Note", type: "text" },
+                ]}
+                initialValues={{ amount: "", dueDate: "", note: "" }}
+                onSubmit={handleWrapperFunction} // Pass wrapper
+              />
+            </>
           )}
-          <AddRowButton
-            buttonLabel="Opening A/R"
-            title="Set Opening A/R"
-            description="⚠️ Important: Once the Opening A/R is set, it cannot be modified or revoked. Please proceed only when the details are finalized and fully validated."
-            descriptionColor="error"
-            columns={[
-              { field: "amount", headerName: "Amount", type: "number" },
-              { field: "dueDate", headerName: "Due Date", type: "date" },
-              { field: "note", headerName: "Note", type: "text" },
-            ]}
-            initialValues={{ amount: "", dueDate: "", note: "" }}
-            onSubmit={handleWrapperFunction} // Pass wrapper
-          />
         </Stack>
 
-        <DateRangePicker onFilter={onFilter} onClear={onClear} />
+        <DateRangePicker
+          onFilter={onFilter}
+          onClear={onClear}
+          filterButtonText="Filter By Invoice Date"
+          clearButtonText="Clear"
+        />
       </Box>
 
       <Grid container columnSpacing={4} rowSpacing={1} mb={2}>

@@ -168,6 +168,7 @@ const BookingDetails = ({
               editing={editBooking}
               type="number"
               name="term"
+              isQuantity={true}
               onChange={(e) =>
                 setBookingFormData((prev) => ({
                   ...prev,

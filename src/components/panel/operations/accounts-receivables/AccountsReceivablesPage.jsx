@@ -13,13 +13,9 @@ import ExportExcel from "@/components/Utils/ExportExcel";
 import PaginationControls from "@/components/Utils/TablePagination";
 import { formatDate } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
+import { formatNumber } from "@/utils/quantityFormatter";
 import { usePathname } from "next/navigation";
 import { Chip, Tooltip, Stack, Typography, Box } from "@mui/material";
-import {
-  HourglassEmpty,
-  HourglassBottom,
-  CheckCircle,
-} from "@mui/icons-material";
 
 const columns = [
   {
@@ -121,8 +117,16 @@ const columns = [
         );
       }
 
+      if (value === "Overdue") {
+        return (
+          <Tooltip title="Payment overdue">
+            <Chip label={value} color="error" size="small" />
+          </Tooltip>
+        );
+      }
+
       return (
-        <Tooltip title="Payment overdue">
+        <Tooltip title="A/R Cancelled">
           <Chip label={value} color="error" size="small" />
         </Tooltip>
       );
@@ -216,7 +220,10 @@ const AccountsReceivablesPage = () => {
         id: ar.accountsReceivableId,
         salesInvoiceNumber: ar.invoice?.salesInvoiceNumber || "Opening A/R",
         createdAt: formatDate(ar.createdAt),
-        term: ar.invoice?.booking?.term || "-",
+        term:
+          ar.invoice?.booking?.term !== undefined
+            ? formatNumber(ar.invoice.booking.term)
+            : "-",
         dueDate: formatDate(ar.dueDate),
         totalSalesAmount: formatToLocalCurrency(ar.totalSalesAmount),
         totalPayments: formatToLocalCurrency(ar.totalPayments),
@@ -237,7 +244,10 @@ const AccountsReceivablesPage = () => {
           ar.pendingExcessAmount
         ),
         "Invoice Date": formatDate(ar.createdAt),
-        Term: ar.invoice?.booking?.term || "-",
+        Term:
+          ar.invoice?.booking?.term !== undefined
+            ? formatNumber(ar.invoice.booking.term)
+            : "-",
         "Due Date": formatDate(ar.dueDate),
         "Total Sales": formatToLocalCurrency(ar.totalSalesAmount),
         "Total Payments": formatToLocalCurrency(ar.totalPayments),
@@ -285,6 +295,10 @@ const AccountsReceivablesPage = () => {
             <SearchBar setSearch={setSearch} setPage={setPage} />
             <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
           </div>
+          <Typography>
+            Number of Accounts Receivables:{" "}
+            {formatNumber(accountsReceivablesData?.total)}
+          </Typography>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <ExportExcel
               exportData={exportData}

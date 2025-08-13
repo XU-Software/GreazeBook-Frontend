@@ -22,9 +22,10 @@ import ExportExcel from "@/components/Utils/ExportExcel";
 import DeleteSelectedButton from "@/components/Utils/DeleteSelectedButton";
 import PaginationControls from "@/components/Utils/TablePagination";
 import { formatDate } from "@/utils/dateFormatter";
-import { Chip, Tooltip } from "@mui/material";
-import { WarningAmber, Error, CheckCircle } from "@mui/icons-material";
+import { Chip, Tooltip, Typography } from "@mui/material";
+import { WarningAmber, Error, CheckCircle, Add } from "@mui/icons-material";
 import { usePathname } from "next/navigation";
+import { formatNumber } from "@/utils/quantityFormatter";
 
 const columns = [
   {
@@ -40,7 +41,7 @@ const columns = [
   },
   {
     field: "uom",
-    headerName: "UOM",
+    headerName: "UOM (L)",
     minWidth: 150,
   },
   {
@@ -98,7 +99,7 @@ const rowGuide = {
   materialCode: "MC-12345",
   productName: "Product1",
   productFamily: "Product Family1",
-  uom: "123",
+  uom: "123 or 1 or 1.5 (In Liters)",
   totalStocks: "123 or 0",
 };
 
@@ -117,12 +118,14 @@ const columnsGuide = [
   {
     field: "uom",
     headerName: "UOM",
-    type: "text",
+    type: "number",
+    isQuantity: true,
   },
   {
     field: "totalStocks",
     headerName: "Total Stocks",
     type: "number",
+    isQuantity: true,
   },
 ];
 
@@ -263,8 +266,8 @@ const ProductsPage = () => {
         materialCode: prod.materialCode,
         productName: prod.productName,
         productFamily: prod.productFamily,
-        uom: prod.uom,
-        totalStocks: prod.totalStocks,
+        uom: formatNumber(prod.uom),
+        totalStocks: formatNumber(prod.totalStocks),
         createdAt: formattedDate,
       });
 
@@ -272,8 +275,8 @@ const ProductsPage = () => {
         "Material Code": prod.materialCode,
         "Product Name": prod.productName,
         "Product Family": prod.productFamily,
-        UOM: prod.uom,
-        "Total Stocks": prod.totalStocks,
+        "UOM (L)": formatNumber(prod.uom),
+        "Total Stocks": formatNumber(prod.totalStocks),
         "Created At": formattedDate,
       });
     });
@@ -309,6 +312,9 @@ const ProductsPage = () => {
             <SearchBar setSearch={setSearch} setPage={setPage} />
             <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
           </div>
+          <Typography>
+            Number of Products: {formatNumber(productsData?.total)}
+          </Typography>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <AddRowButton
               columns={columnsGuide}
@@ -323,6 +329,7 @@ const ProductsPage = () => {
               onSubmit={handleAddSingleProduct}
               title="Add New Product"
               buttonLabel="Product"
+              startIcon={<Add />}
             />
             <ImportExcel
               handleImportExcel={handleImportProductsExcel}

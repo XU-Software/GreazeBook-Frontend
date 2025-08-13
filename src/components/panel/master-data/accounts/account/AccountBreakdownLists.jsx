@@ -8,7 +8,9 @@ import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";
 import { formatDate, formatDateWithTime } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
+import { formatNumber } from "@/utils/quantityFormatter";
 import AccountBreakdownSection from "./AccountBreakdownSection";
+import ColoredLink from "@/components/Utils/ColoredLink";
 
 //AR column fields
 const accountsReceivablesColumns = [
@@ -106,8 +108,16 @@ const accountsReceivablesColumns = [
         );
       }
 
+      if (value === "Overdue") {
+        return (
+          <Tooltip title="Payment overdue">
+            <Chip label={value} color="error" size="small" />
+          </Tooltip>
+        );
+      }
+
       return (
-        <Tooltip title="Payment overdue">
+        <Tooltip title="A/R Cancelled">
           <Chip label={value} color="error" size="small" />
         </Tooltip>
       );
@@ -118,6 +128,19 @@ const accountsReceivablesColumns = [
 
 //Sales columns
 const salesColumns = [
+  {
+    field: "salesInvoiceNumber",
+    headerName: "Invoice Number",
+    render: (value, row) => {
+      return (
+        <ColoredLink
+          href={`/operations/accounts-receivables/${row.accountsReceivableId}`}
+          linkText={value}
+        />
+      );
+    },
+    minWidth: 150,
+  },
   {
     field: "productName",
     headerName: "Product",
@@ -139,23 +162,23 @@ const salesColumns = [
     render: (value) => {
       if (value === "ChangedProduct") {
         return (
-          <Tooltip title="Order Changed">
-            <Chip label="Changed Product" color="info" size="small" />
+          <Tooltip title="Changed Product">
+            <Chip label="ChangedProduct" color="info" size="small" />
           </Tooltip>
         );
       }
 
       if (value === "Cancelled") {
         return (
-          <Tooltip title="Order Cancelled">
+          <Tooltip title="Cancelled">
             <Chip label="Cancelled" color="error" size="small" />
           </Tooltip>
         );
       }
 
       return (
-        <Tooltip title="Order Fulfilled">
-          <Chip label="Fulfilled" color="success" size="small" />
+        <Tooltip title="Invoiced">
+          <Chip label="Invoiced" color="success" size="small" />
         </Tooltip>
       );
     },
@@ -165,6 +188,19 @@ const salesColumns = [
 
 //Payments columns
 const paymentsColumns = [
+  {
+    field: "salesInvoiceNumber",
+    headerName: "Invoice Number",
+    render: (value, row) => {
+      return (
+        <ColoredLink
+          href={`/operations/accounts-receivables/${row.accountsReceivableId}`}
+          linkText={value}
+        />
+      );
+    },
+    minWidth: 150,
+  },
   {
     field: "createdAt",
     headerName: "Date Processed",
@@ -222,6 +258,19 @@ const paymentsColumns = [
 //CreditMemo columns
 const creditMemoColumns = [
   {
+    field: "salesInvoiceNumber",
+    headerName: "Processed From",
+    render: (value, row) => {
+      return (
+        <ColoredLink
+          href={`/operations/accounts-receivables/${row.accountsReceivableId}`}
+          linkText={value}
+        />
+      );
+    },
+    minWidth: 150,
+  },
+  {
     field: "createdAt",
     headerName: "Date Issued",
     minWidth: 150,
@@ -272,6 +321,19 @@ const creditMemoColumns = [
 
 //Refunds columns
 const refundsColumns = [
+  {
+    field: "salesInvoiceNumber",
+    headerName: "Invoice Number",
+    render: (value, row) => {
+      return (
+        <ColoredLink
+          href={`/operations/accounts-receivables/${row.accountsReceivableId}`}
+          linkText={value}
+        />
+      );
+    },
+    minWidth: 150,
+  },
   {
     field: "createdAt",
     headerName: "Date Issued",
@@ -390,8 +452,10 @@ const AccountBreakdownLists = ({
           ...prev.sales,
           ...(accountDetailsData.sales.map((sale) => ({
             id: sale.saleId,
+            salesInvoiceNumber: sale.salesInvoiceNumber,
+            accountsReceivableId: sale.accountsReceivableId,
             productName: sale.order.product.productName,
-            quantity: sale.order.quantity,
+            quantity: formatNumber(sale.order.quantity),
             price: formatToLocalCurrency(sale.order.price),
             actionType: sale.actionType,
           })) || []),
@@ -400,6 +464,10 @@ const AccountBreakdownLists = ({
           ...prev.payments,
           ...(accountDetailsData.payments.map((p) => ({
             id: p.paymentId,
+            salesInvoiceNumber: p.salesInvoiceNumber
+              ? p.salesInvoiceNumber
+              : "Opening A/R",
+            accountsReceivableId: p.accountsReceivableId,
             createdAt: formatDateWithTime(p.createdAt),
             createdBy: p.createdBy.email,
             amount: formatToLocalCurrency(p.amount),
@@ -414,6 +482,10 @@ const AccountBreakdownLists = ({
           ...prev.creditMemos,
           ...(accountDetailsData.creditMemos.map((cm) => ({
             id: cm.creditMemoId,
+            salesInvoiceNumber: cm.salesInvoiceNumber
+              ? cm.salesInvoiceNumber
+              : "Opening A/R",
+            accountsReceivableId: cm.accountsReceivableId,
             createdAt: formatDateWithTime(cm.createdAt),
             createdBy: cm.createdBy.email,
             amount: formatToLocalCurrency(cm.amount),
@@ -428,6 +500,10 @@ const AccountBreakdownLists = ({
           ...prev.refunds,
           ...(accountDetailsData.refunds.map((refund) => ({
             id: refund.refundId,
+            salesInvoiceNumber: refund.salesInvoiceNumber
+              ? refund.salesInvoiceNumber
+              : "Opening A/R",
+            accountsReceivableId: refund.accountsReceivableId,
             createdAt: formatDateWithTime(refund.createdAt),
             createdBy: refund.createdBy.email,
             amount: formatToLocalCurrency(refund.amount),
@@ -481,6 +557,11 @@ const AccountBreakdownLists = ({
           { label: "Partial", count: arStatusCounts.partial, color: "warning" },
           { label: "Paid", count: arStatusCounts.paid, color: "success" },
           { label: "Overdue", count: arStatusCounts.overdue, color: "error" },
+          {
+            label: "Cancelled A/R",
+            count: arStatusCounts.cancelled,
+            color: "error",
+          },
         ]}
         rows={accumulatedData.accountsReceivables}
         columns={accountsReceivablesColumns}

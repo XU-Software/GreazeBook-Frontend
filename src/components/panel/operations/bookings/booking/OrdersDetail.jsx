@@ -20,7 +20,7 @@ import {
 import { Edit, Check, Close, Delete } from "@mui/icons-material";
 import EditableCell from "@/components/Utils/EditableCell";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
-import AddRowButton from "@/components/Utils/AddRowButton";
+import { formatNumber } from "@/utils/quantityFormatter";
 import AddOrderModal from "./AddOrderModal";
 
 const OrdersDetail = ({
@@ -138,9 +138,11 @@ const OrdersDetail = ({
               <TableRow>
                 <TableCell>#</TableCell>
                 <TableCell>Product</TableCell>
+                <TableCell>UOM (L)</TableCell>
                 <TableCell>Quantity</TableCell>
                 <TableCell>Unit Price</TableCell>
                 <TableCell>Subtotal</TableCell>
+                <TableCell>Volume</TableCell>
                 {bookingData.status === "Pending" && (
                   <TableCell align="center" sx={{ width: 120 }}>
                     Actions
@@ -154,17 +156,26 @@ const OrdersDetail = ({
                 if (ordersToDelete.has(order.orderId)) return null;
 
                 const orderEdit = ordersFormData.get(order.orderId) || {};
+                const quantity = Number(orderEdit?.quantity ?? order.quantity);
+                const price = Number(orderEdit?.price ?? order.price);
+                const uom = Number(order.product.uom);
+                const volume = quantity * uom;
 
                 return (
                   <TableRow key={order.orderId}>
                     <TableCell>{index + 1}</TableCell>
+
                     <TableCell>{order.product.productName}</TableCell>
+
+                    <TableCell>{formatNumber(order.product.uom)}</TableCell>
+
                     <EditableCell
                       value={orderEdit?.quantity ?? order.quantity}
                       editing={editOrders}
                       type="number"
                       convertToCurrency={false}
                       name="quantity"
+                      isQuantity={true}
                       onChange={(e) => {
                         const updated = new Map(ordersFormData);
                         updated.set(order.orderId, {
@@ -174,12 +185,14 @@ const OrdersDetail = ({
                         setOrdersFormData(updated);
                       }}
                     />
+
                     <EditableCell
                       value={orderEdit?.price ?? order.price}
                       editing={editOrders}
                       type="number"
                       convertToCurrency={true}
                       name="price"
+                      isCurrency={true}
                       onChange={(e) => {
                         const updated = new Map(ordersFormData);
                         updated.set(order.orderId, {
@@ -190,11 +203,9 @@ const OrdersDetail = ({
                       }}
                     />
                     <TableCell>
-                      {formatToLocalCurrency(
-                        (orderEdit?.quantity ?? order.quantity) *
-                          (orderEdit?.price ?? order.price)
-                      )}
+                      {formatToLocalCurrency(quantity * price)}
                     </TableCell>
+                    <TableCell>{formatNumber(volume)}</TableCell>
                     {bookingData.status === "Pending" && (
                       <TableCell align="center" sx={{ width: 120 }}>
                         <Box
@@ -227,10 +238,10 @@ const OrdersDetail = ({
                 );
               })}
               <TableRow>
-                <TableCell colSpan={4} align="right">
-                  <strong>Total Amount:</strong>
+                <TableCell colSpan={5} align="right">
+                  <strong>Total</strong>
                 </TableCell>
-                <TableCell colSpan={2}>
+                <TableCell>
                   {editOrders ? (
                     <strong>{formatToLocalCurrency(liveTotalAmount)}</strong>
                   ) : (
@@ -238,6 +249,22 @@ const OrdersDetail = ({
                       {formatToLocalCurrency(bookingData.totalAmount)}
                     </strong>
                   )}
+                </TableCell>
+                <TableCell>
+                  <strong>
+                    {formatNumber(
+                      bookingData.orders
+                        .filter((order) => !ordersToDelete.has(order.orderId))
+                        .reduce((sum, order) => {
+                          const edit = ordersFormData.get(order.orderId);
+                          const quantity = Number(
+                            edit?.quantity ?? order.quantity
+                          );
+                          const uom = Number(order.product.uom);
+                          return sum + quantity * uom;
+                        }, 0)
+                    )}
+                  </strong>
                 </TableCell>
               </TableRow>
             </TableBody>

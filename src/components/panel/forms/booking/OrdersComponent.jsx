@@ -20,6 +20,9 @@ import { useGetProductsQuery } from "@/state/services/productsApi";
 import SearchableSelect from "../../../Utils/SearchableSelect";
 import { Add, Delete } from "@mui/icons-material";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
+import { formatNumber } from "@/utils/quantityFormatter";
+import CurrencyTextField from "@/components/Utils/CurrencyTextField";
+import QuantityTextField from "@/components/Utils/QuantityTextField";
 
 const OrdersComponent = ({ ordersData = [], setOrdersData = () => {} }) => {
   const [tempOrder, setTempOrder] = useState({
@@ -51,6 +54,22 @@ const OrdersComponent = ({ ordersData = [], setOrdersData = () => {} }) => {
     setOrdersData((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const computeVolume = (order) => {
+    const uom = parseFloat(order.product?.uom || 0);
+    const quantity = parseFloat(order.quantity || 0);
+    return uom * quantity;
+  };
+
+  const totalAmount = ordersData.reduce((total, order) => {
+    const subtotal = order.quantity * order.price;
+    return total + (isNaN(subtotal) ? 0 : subtotal);
+  }, 0);
+
+  const totalVolume = ordersData.reduce((total, order) => {
+    const volume = order.quantity * (order.product?.uom || 0);
+    return total + (isNaN(volume) ? 0 : volume);
+  }, 0);
+
   return (
     <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
       <Typography variant="h6" mb={2} fontWeight={500}>
@@ -68,6 +87,9 @@ const OrdersComponent = ({ ordersData = [], setOrdersData = () => {} }) => {
                 <strong>Product</strong>
               </TableCell>
               <TableCell>
+                <strong>UOM (L)</strong>
+              </TableCell>
+              <TableCell>
                 <strong>Quantity</strong>
               </TableCell>
               <TableCell>
@@ -77,6 +99,9 @@ const OrdersComponent = ({ ordersData = [], setOrdersData = () => {} }) => {
                 <strong>Subtotal</strong>
               </TableCell>
               <TableCell>
+                <strong>Volume</strong>
+              </TableCell>
+              <TableCell>
                 <strong>Actions</strong>
               </TableCell>
             </TableRow>
@@ -84,7 +109,7 @@ const OrdersComponent = ({ ordersData = [], setOrdersData = () => {} }) => {
           <TableBody>
             {ordersData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} align="center">
+                <TableCell colSpan={7} align="center">
                   <Typography variant="body2" color="textSecondary">
                     No orders added yet. Use the form below to add your first
                     order.
@@ -96,13 +121,15 @@ const OrdersComponent = ({ ordersData = [], setOrdersData = () => {} }) => {
                 return (
                   <TableRow key={index}>
                     <TableCell>{order.product.productName}</TableCell>
-                    <TableCell>{order.quantity}</TableCell>
+                    <TableCell>{formatNumber(order.product.uom)}</TableCell>
+                    <TableCell>{formatNumber(order.quantity)}</TableCell>
                     <TableCell>{formatToLocalCurrency(order.price)}</TableCell>
                     <TableCell align="right">
                       {order.quantity && order.price
                         ? formatToLocalCurrency(order.quantity * order.price)
                         : "-"}
                     </TableCell>
+                    <TableCell>{formatNumber(computeVolume(order))}</TableCell>
                     <TableCell align="center" sx={{ width: 60 }}>
                       <IconButton
                         color="error"
@@ -119,17 +146,17 @@ const OrdersComponent = ({ ordersData = [], setOrdersData = () => {} }) => {
           </TableBody>
           <TableFooter>
             <TableRow>
-              <TableCell colSpan={3} align="right">
+              <TableCell colSpan={4} align="right">
                 <Typography fontWeight="bold">Total</Typography>
               </TableCell>
               <TableCell align="right">
                 <Typography fontWeight="bold">
-                  {formatToLocalCurrency(
-                    ordersData.reduce((total, order) => {
-                      const subtotal = order.quantity * order.price;
-                      return total + (isNaN(subtotal) ? 0 : subtotal);
-                    }, 0)
-                  )}
+                  {formatToLocalCurrency(totalAmount)}
+                </Typography>
+              </TableCell>
+              <TableCell>
+                <Typography fontWeight="bold">
+                  {formatNumber(totalVolume)}
                 </Typography>
               </TableCell>
             </TableRow>
@@ -152,22 +179,38 @@ const OrdersComponent = ({ ordersData = [], setOrdersData = () => {} }) => {
           />
         </Grid>
         <Grid item size={{ xs: 6, sm: 2 }}>
-          <TextField
+          {/* <TextField
             label="Quantity"
             type="number"
             value={tempOrder.quantity}
             name="quantity"
             onChange={(e) => handleTempChange(e.target.name, e.target.value)}
             fullWidth
+          /> */}
+
+          <QuantityTextField
+            name="quantity"
+            value={tempOrder.quantity}
+            onChange={(e) => handleTempChange(e.target.name, e.target.value)}
+            label="Quantity"
+            fullWidth
           />
         </Grid>
         <Grid item size={{ xs: 6, sm: 2 }}>
-          <TextField
+          {/* <TextField
             label="Price"
             type="number"
             value={tempOrder.price}
             name="price"
             onChange={(e) => handleTempChange(e.target.name, e.target.value)}
+            fullWidth
+          /> */}
+
+          <CurrencyTextField
+            name="price"
+            value={tempOrder.price}
+            onChange={(e) => handleTempChange(e.target.name, e.target.value)}
+            label="Price"
             fullWidth
           />
         </Grid>
