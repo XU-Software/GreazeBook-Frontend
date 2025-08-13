@@ -23,6 +23,12 @@ export const productsApi = api.injectEndpoints({
             ]
           : [{ type: "Products", id: "LIST" }],
     }),
+    getProductsToRestock: build.query({
+      query: () => ({
+        url: `/product/restock-count`,
+      }),
+      providesTags: [{ type: "ProductsToRestock", id: "LIST" }],
+    }),
     deleteProducts: build.mutation({
       query: (products) => ({
         url: `/product/delete-products`,
@@ -34,6 +40,7 @@ export const productsApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, error, products) => [
         { type: "Products", id: "LIST" },
+        { type: "ProductsToRestock", id: "LIST" },
         ...products.map((productId) => ({ type: "Product", id: productId })),
       ],
     }),
@@ -46,7 +53,10 @@ export const productsApi = api.injectEndpoints({
           "Content-Type": "application/json",
         },
       }),
-      invalidatesTags: [{ type: "Products", id: "LIST" }],
+      invalidatesTags: [
+        { type: "Products", id: "LIST" },
+        { type: "ProductsToRestock", id: "LIST" },
+      ],
     }),
     importProductsExcel: build.mutation({
       query: (file) => {
@@ -59,7 +69,10 @@ export const productsApi = api.injectEndpoints({
           body: formData,
         };
       },
-      invalidatesTags: [{ type: "Products", id: "LIST" }],
+      invalidatesTags: [
+        { type: "Products", id: "LIST" },
+        { type: "ProductsToRestock", id: "LIST" },
+      ],
     }),
     getProductInformation: build.query({
       query: (productId) => ({
@@ -108,6 +121,7 @@ export const productsApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, error, arg) => [
         { type: "Products", id: "LIST" },
+        { type: "ProductsToRestock", id: "LIST" },
         { type: "Product", id: arg.productId },
         { type: "StockHistoryList", id: arg.productId },
       ],
@@ -123,6 +137,7 @@ export const productsApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, error, arg) => [
         { type: "Products", id: "LIST" },
+        { type: "ProductsToRestock", id: "LIST" },
         { type: "Product", id: arg.productId },
         { type: "StockHistoryList", id: arg.productId },
       ],
@@ -132,6 +147,7 @@ export const productsApi = api.injectEndpoints({
 
 export const {
   useGetProductsQuery,
+  useGetProductsToRestockQuery,
   useDeleteProductsMutation,
   useAddSingleProductMutation,
   useImportProductsExcelMutation,

@@ -147,6 +147,7 @@ export const bookingsApi = api.injectEndpoints({
         { type: "Sales", id: "LIST" },
         { type: "AccountsReceivables", id: "LIST" },
         { type: "Products", id: "LIST" },
+        { type: "ProductsToRestock", id: "LIST" },
         ...(result?.affectedProductIds?.length
           ? result.affectedProductIds.map((productId) => ({
               type: "Product",

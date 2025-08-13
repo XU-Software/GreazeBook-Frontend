@@ -3,15 +3,30 @@
 import Link from "next/link";
 import clsx from "clsx";
 import { usePathname } from "next/navigation";
+import { useGetProductsToRestockQuery } from "@/state/services/productsApi";
 import { useAppSelector } from "@/app/redux";
 import { navigationPageList } from "@/data/navigationData";
 import React from "react";
+import { Tooltip, IconButton, Badge } from "@mui/material";
 
 export default function Sidebar() {
   const pathname = usePathname();
 
   const userData = useAppSelector((state) => state.global.userData);
   const role = userData?.data?.role || "user";
+
+  const {
+    data: productsToRestockData,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useGetProductsToRestockQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+  });
+
+  const productsToRestock = productsToRestockData?.data ?? 0;
 
   // Get only the first two non-empty segments
   const baseSegments = pathname.split("/").filter(Boolean).slice(0, 2);
@@ -80,10 +95,31 @@ export default function Sidebar() {
                       : "hover:bg-gray-100"
                   )}
                 >
-                  <Icon
-                    className="shrink-0 transition-all duration-300"
-                    sx={{ fontSize: 24 }}
-                  />
+                  {isSidebarCollapsed &&
+                  item.title === "Products" &&
+                  productsToRestock > 0 ? (
+                    <Tooltip
+                      title={`${productsToRestock} products need replenishment`}
+                      sx={{ ml: "auto" }}
+                    >
+                      <Badge
+                        badgeContent={productsToRestock}
+                        color="error"
+                        max={99}
+                      >
+                        <Icon
+                          className="shrink-0 transition-all duration-300"
+                          sx={{ fontSize: 24 }}
+                        />
+                      </Badge>
+                    </Tooltip>
+                  ) : (
+                    <Icon
+                      className="shrink-0 transition-all duration-300"
+                      sx={{ fontSize: 24 }}
+                    />
+                  )}
+
                   <span
                     className={clsx(
                       "whitespace-nowrap",
@@ -97,6 +133,25 @@ export default function Sidebar() {
                   >
                     {item.title}
                   </span>
+                  {!isSidebarCollapsed &&
+                    item.title === "Products" &&
+                    productsToRestock > 0 && (
+                      <Tooltip
+                        title={`${productsToRestock} products need replenishment`}
+                        sx={{ ml: "auto" }}
+                      >
+                        <IconButton
+                          aria-label="Products to restock"
+                          size="large"
+                        >
+                          <Badge
+                            badgeContent={productsToRestock}
+                            color="error"
+                            max={99}
+                          ></Badge>
+                        </IconButton>
+                      </Tooltip>
+                    )}
                 </Link>
               );
             })}

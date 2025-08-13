@@ -315,6 +315,13 @@ const ProductsPage = () => {
           <Typography>
             Number of Products: {formatNumber(productsData?.total)}
           </Typography>
+          {productsData?.productsToRestock > 0 && (
+            <Typography>
+              Products to Replenish:{" "}
+              {formatNumber(productsData?.productsToRestock)}
+            </Typography>
+          )}
+
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <AddRowButton
               columns={columnsGuide}
