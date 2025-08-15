@@ -173,9 +173,11 @@ export const accountsReceivablesApi = api.injectEndpoints({
 
         // Products (We check if affectedProductId is not null, it can be null from backend response as it's totalStocks is either replenished or not)
         if (result?.affectedProductId) {
-          tags.push({ type: "Product", id: result.affectedProductId });
-          tags.push({ type: "Products", id: "LIST" });
-          tags.push({ type: "ProductsToRestock", id: "LIST" }); // Invalidate products list only if a product was affected
+          tags.push(
+            { type: "Product", id: result.affectedProductId },
+            { type: "Products", id: "LIST" },
+            { type: "ProductsToRestock", id: "LIST" }
+          ); // Invalidate products list only if a product was affected
         }
 
         // PendingExcesses (We check if pendingExcessIds is not empty, it can be empty because we invalidate all active pendingExcess every transaction and we only create new active pendingExcess if theres overpaid calculated)
@@ -223,7 +225,6 @@ export const accountsReceivablesApi = api.injectEndpoints({
           { type: "Orders", id: "LIST" },
           { type: "Products", id: "LIST" },
           { type: "ProductsToRestock", id: "LIST" },
-          // { type: "Product", id: arg.newSale.productId },
         ];
 
         // If success we will have affectedAccountId as part of response from the backend

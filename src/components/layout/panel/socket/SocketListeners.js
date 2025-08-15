@@ -199,6 +199,209 @@ export default function SocketListeners({ userData }) {
       dispatch(api.util.invalidateTags([{ type: "Bookings", id: "LIST" }]));
     });
 
+    {
+      /*Accounts Receivables Event Listeners*/
+    }
+    socket.on(
+      "ar_payment",
+      ({
+        accountsReceivableId,
+        affectedPendingExcessIds,
+        newPendingExcessCreated,
+        affectedAccountId,
+        usedCreditMemoId,
+      }) => {
+        // newPendingExcessCreated is a boolean
+        // usedCreditMemoId is either creditMemoId or null
+        dispatch(
+          api.util.invalidateTags([
+            { type: "AccountsReceivables", id: "LIST" },
+            { type: "AccountsReceivable", id: accountsReceivableId },
+            { type: "Payments", id: "LIST" },
+            ...(usedCreditMemoId && [
+              { type: "CreditMemos", id: "LIST" },
+              { type: "CreditMemo", id: usedCreditMemoId },
+            ]),
+            ...(affectedAccountId && [
+              { type: "AccountMetrics", id: affectedAccountId },
+              { type: "AccountDetails", id: affectedAccountId },
+            ]),
+            ...(Array.isArray(affectedPendingExcessIds) &&
+              affectedPendingExcessIds.length > 0 &&
+              affectedPendingExcessIds.map((pendingExcessId) => ({
+                type: "PendingExcess",
+                id: pendingExcessId,
+              }))),
+            (Array.isArray(affectedPendingExcessIds) &&
+              affectedPendingExcessIds.length > 0) ||
+              (newPendingExcessCreated && {
+                type: "PendingExcesses",
+                id: "LIST",
+              }),
+          ])
+        );
+      }
+    );
+    socket.on(
+      "ar_void_payment",
+      ({
+        accountsReceivableId,
+        paymentId,
+        affectedPendingExcessIds,
+        newPendingExcessCreated,
+        affectedAccountId,
+        affectedCreditMemoId,
+      }) => {
+        dispatch(
+          api.util.invalidateTags([
+            { type: "AccountsReceivables", id: "LIST" },
+            { type: "AccountsReceivable", id: accountsReceivableId },
+            { type: "Payments", id: "LIST" },
+            { type: "Payment", id: paymentId },
+            ...(affectedCreditMemoId && [
+              { type: "CreditMemos", id: "LIST" },
+              { type: "CreditMemo", id: affectedCreditMemoId },
+            ]),
+            ...(affectedAccountId && [
+              { type: "AccountMetrics", id: affectedAccountId },
+              { type: "AccountDetails", id: affectedAccountId },
+            ]),
+            ...(Array.isArray(affectedPendingExcessIds) &&
+              affectedPendingExcessIds.length > 0 &&
+              affectedPendingExcessIds.map((pendingExcessId) => ({
+                type: "PendingExcess",
+                id: pendingExcessId,
+              }))),
+            (Array.isArray(affectedPendingExcessIds) &&
+              affectedPendingExcessIds.length > 0) ||
+              (newPendingExcessCreated && {
+                type: "PendingExcesses",
+                id: "LIST",
+              }),
+          ])
+        );
+      }
+    );
+    socket.on(
+      "ar_cancel_sale",
+      ({
+        accountsReceivableId,
+        saleId,
+        affectedAccountId,
+        affectedProductId,
+        affectedPendingExcessIds,
+        newPendingExcessCreated,
+      }) => {
+        dispatch(
+          api.util.invalidateTags([
+            { type: "AccountsReceivables", id: "LIST" },
+            { type: "AccountsReceivable", id: accountsReceivableId },
+            { type: "Sales", id: "LIST" },
+            { type: "Sale", id: saleId },
+            ...(affectedAccountId && [
+              { type: "AccountMetrics", id: affectedAccountId },
+              { type: "AccountDetails", id: affectedAccountId },
+            ]),
+            ...(affectedProductId && [
+              { type: "Product", id: affectedProductId },
+              { type: "Products", id: "LIST" },
+              { type: "ProductsToRestock", id: "LIST" },
+            ]),
+            ...(Array.isArray(affectedPendingExcessIds) &&
+              affectedPendingExcessIds.length > 0 &&
+              affectedPendingExcessIds.map((pendingExcessId) => ({
+                type: "PendingExcess",
+                id: pendingExcessId,
+              }))),
+            (Array.isArray(affectedPendingExcessIds) &&
+              affectedPendingExcessIds.length > 0) ||
+              (newPendingExcessCreated && {
+                type: "PendingExcesses",
+                id: "LIST",
+              }),
+          ])
+        );
+      }
+    );
+    socket.on(
+      "ar_change_sale",
+      ({
+        accountsReceivableId,
+        saleId,
+        affectedAccountId,
+        affectedProductIds,
+        affectedPendingExcessIds,
+        newPendingExcessCreated,
+      }) => {
+        dispatch(
+          api.util.invalidateTags([
+            { type: "AccountsReceivables", id: "LIST" },
+            { type: "AccountsReceivable", id: accountsReceivableId },
+            { type: "Sales", id: "LIST" },
+            { type: "Sale", id: saleId },
+            { type: "Orders", id: "LIST" },
+            { type: "Products", id: "LIST" },
+            { type: "ProductsToRestock", id: "LIST" },
+            ...(affectedAccountId && [
+              { type: "AccountMetrics", id: affectedAccountId },
+              { type: "AccountDetails", id: affectedAccountId },
+            ]),
+            ...Array.from(new Set(affectedProductIds || []))
+              .filter(Boolean)
+              .map((productId) => ({ type: "Product", id: productId })),
+            ...(Array.isArray(affectedPendingExcessIds) &&
+              affectedPendingExcessIds.length > 0 &&
+              affectedPendingExcessIds.map((pendingExcessId) => ({
+                type: "PendingExcess",
+                id: pendingExcessId,
+              }))),
+            (Array.isArray(affectedPendingExcessIds) &&
+              affectedPendingExcessIds.length > 0) ||
+              (newPendingExcessCreated && {
+                type: "PendingExcesses",
+                id: "LIST",
+              }),
+          ])
+        );
+      }
+    );
+    socket.on(
+      "pending_excess_to_refund",
+      ({ accountsReceivableId, pendingExcessId, affectedAccountId }) => {
+        dispatch(
+          api.util.invalidateTags([
+            { type: "AccountsReceivables", id: "LIST" },
+            { type: "AccountsReceivable", id: accountsReceivableId },
+            { type: "PendingExcesses", id: "LIST" },
+            { type: "PendingExcess", id: pendingExcessId },
+            { type: "Refunds", id: "LIST" },
+            ...(affectedAccountId && [
+              { type: "AccountMetrics", id: affectedAccountId },
+              { type: "AccountDetails", id: affectedAccountId },
+            ]),
+          ])
+        );
+      }
+    );
+    socket.on(
+      "pending_excess_to_credit_memo",
+      ({ accountsReceivableId, pendingExcessId, affectedAccountId }) => {
+        dispatch(
+          api.util.invalidateTags([
+            { type: "AccountsReceivables", id: "LIST" },
+            { type: "AccountsReceivable", id: accountsReceivableId },
+            { type: "PendingExcesses", id: "LIST" },
+            { type: "PendingExcess", id: pendingExcessId },
+            { type: "CreditMemos", id: "LIST" },
+            ...(affectedAccountId && [
+              { type: "AccountMetrics", id: affectedAccountId },
+              { type: "AccountDetails", id: affectedAccountId },
+            ]),
+          ])
+        );
+      }
+    );
+
     return () => {
       //Accounts
       socket.off("account_added");
@@ -224,6 +427,14 @@ export default function SocketListeners({ userData }) {
       socket.off("booking_note_added");
       socket.off("booking_approved");
       socket.off("booking_deleted");
+
+      //Accounts Receivables
+      socket.off("ar_payment");
+      socket.off("ar_void_payment");
+      socket.off("ar_cancel_sale");
+      socket.off("ar_change_sale");
+      socket.off("pending_excess_to_refund");
+      socket.off("pending_excess_to_credit_memo");
     };
   }, [dispatch, userId]);
 
