@@ -14,6 +14,8 @@ import { setHideSnackbar } from "@/state/snackbarSlice";
 import { useGetUserQuery } from "@/state/services/userApi";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import SocketInitializer from "./socket/SocketInitializer";
+import SocketListeners from "./socket/SocketListeners";
 
 const PageWrapper = ({ children }) => {
   const isSidebarCollapsed = useAppSelector(
@@ -69,6 +71,12 @@ const PanelBootstrap = ({ children }) => {
 
   return (
     <>
+      {isSuccess && userDataResponse && (
+        <>
+          <SocketInitializer userData={userDataResponse.data} />
+          <SocketListeners userData={userDataResponse.data} />
+        </>
+      )}
       <Navbar />
       <Sidebar />
       <PageWrapper>{children}</PageWrapper>
