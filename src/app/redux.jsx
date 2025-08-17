@@ -5,6 +5,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, Provider } from "react-redux";
 import globalReducer from "@/state";
 import snackbarReducer from "@/state/snackbarSlice";
+import productsReducer from "@/state/productsSlice";
 import dashboardReducer from "@/state/dashboardSlice";
 import { api } from "@/state/api";
 import { setupListeners } from "@reduxjs/toolkit/query";
@@ -45,6 +46,7 @@ const rootReducer = combineReducers({
   global: globalReducer,
   snackbar: snackbarReducer,
   dashboard: dashboardReducer,
+  products: productsReducer,
   [api.reducerPath]: api.reducer,
 });
 

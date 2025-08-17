@@ -6,6 +6,7 @@ import { Sort, ArrowUpward, ArrowDownward } from "@mui/icons-material";
 export default function SortToggle({
   sortOrder = "desc",
   setSortOrder = () => {},
+  title = "Sort by date",
 }) {
   const toggleSort = () => {
     setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
@@ -13,7 +14,7 @@ export default function SortToggle({
 
   return (
     <Tooltip
-      title={`Sort by date ${sortOrder === "asc" ? "descending" : "ascending"}`}
+      title={`${title} ${sortOrder === "asc" ? "descending" : "ascending"}`}
     >
       <IconButton onClick={toggleSort} size="medium">
         <Box display="flex" alignItems="center">
