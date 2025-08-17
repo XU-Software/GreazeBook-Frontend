@@ -10,9 +10,11 @@ import Table from "@/components/Utils/DataTable";
 import SearchBar from "@/components/Utils/SearchBar";
 import SortToggle from "@/components/Utils/SortToggle";
 import ExportExcel from "@/components/Utils/ExportExcel";
+import DateRangePicker from "@/components/Utils/DateRangePicker";
 import PaginationControls from "@/components/Utils/TablePagination";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 import { formatNumber } from "@/utils/quantityFormatter";
+import { formatDate } from "@/utils/dateFormatter";
 import { usePathname } from "next/navigation";
 import ColoredLink from "@/components/Utils/ColoredLink";
 import { Chip, Typography } from "@mui/material";
@@ -30,8 +32,13 @@ const columns = [
     minWidth: 150,
   },
   {
-    field: "bookedBy",
-    headerName: "Booked By",
+    field: "invoiceDate",
+    headerName: "Invoice Date",
+    minWidth: 150,
+  },
+  {
+    field: "customerName",
+    headerName: "Outlet Name",
     render: (value, row) => (
       <ColoredLink
         href={`/operations/bookings/${row.bookingId}`}
@@ -105,14 +112,19 @@ const SalesPage = () => {
   const [sortOrder, setSortOrder] = useState("desc");
   const [search, setSearch] = useState("");
 
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
   const queryArgs = useMemo(
     () => ({
       page,
       limit,
       sortOrder,
       search,
+      startDate,
+      endDate,
     }),
-    [page, limit, sortOrder, search]
+    [page, limit, sortOrder, search, startDate, endDate]
   );
 
   const {
@@ -125,6 +137,17 @@ const SalesPage = () => {
     refetchOnMountOrArgChange: true,
     refetchOnFocus: true,
   });
+
+  const handleFilterDateRange = (startDate, endDate) => {
+    if (!startDate || !endDate) return;
+    setStartDate(startDate);
+    setEndDate(endDate);
+  };
+
+  const handleClearInput = () => {
+    setStartDate("");
+    setEndDate("");
+  };
 
   // Handler for only page change
   const handlePageChange = async (event, newPage) => {
@@ -148,8 +171,9 @@ const SalesPage = () => {
       rows.push({
         id: sale.saleId,
         salesInvoiceNumber: sale.accountsReceivable.invoice.salesInvoiceNumber,
+        invoiceDate: formatDate(sale.accountsReceivable.invoice.createdAt),
         accountsReceivableId: sale.accountsReceivableId,
-        bookedBy: sale.accountsReceivable.invoice.booking.customerName,
+        customerName: sale.accountsReceivable.invoice.booking.customerName,
         bookingId: sale.accountsReceivable.invoice.booking.bookingId,
         productName: sale.order.product.productName,
         productId: sale.order.product.productId,
@@ -163,7 +187,8 @@ const SalesPage = () => {
 
       exportData.push({
         "Invoice Number": sale.accountsReceivable.invoice.salesInvoiceNumber,
-        "Booked By": sale.accountsReceivable.invoice.booking.customerName,
+        "Invoice Date": formatDate(sale.accountsReceivable.invoice.createdAt),
+        "Outlet Name": sale.accountsReceivable.invoice.booking.customerName,
         Product: sale.order.product.productName,
         "UOM (L)": formatNumber(sale.order.product.uom),
         Quantity: formatNumber(sale.order.quantity),
@@ -206,6 +231,16 @@ const SalesPage = () => {
           <Typography>
             Number of Sales: {formatNumber(salesData?.total)}
           </Typography>
+          <Typography>
+            Total Volume: {formatNumber(salesData?.totalVolume)}
+          </Typography>
+
+          <DateRangePicker
+            onFilter={handleFilterDateRange}
+            onClear={handleClearInput}
+            filterButtonText="Filter By Invoice Date"
+            clearButtonText="Clear"
+          />
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <ExportExcel
               exportData={exportData}

@@ -34,8 +34,8 @@ const columns = [
     minWidth: 150,
   },
   {
-    field: "bookedBy",
-    headerName: "Booked By",
+    field: "customerName",
+    headerName: "Outlet Name",
     render: (value, row) => (
       <ColoredLink
         href={`/operations/bookings/${row.bookingId}`}
@@ -158,7 +158,7 @@ const OrdersPage = () => {
         accountsReceivableId: order.sale
           ? order.sale.accountsReceivable.accountsReceivableId
           : null,
-        bookedBy: order.booking
+        customerName: order.booking
           ? order.booking.customerName
           : order.sale.accountsReceivable.invoice.booking.customerName,
         bookingId: order.booking
@@ -181,7 +181,7 @@ const OrdersPage = () => {
         "Invoice Number": order.sale
           ? order.sale.accountsReceivable.invoice.salesInvoiceNumber
           : "-",
-        "Booked By": order.booking
+        "Outlet Name": order.booking
           ? order.booking.customerName
           : order.sale.accountsReceivable.invoice.booking.customerName,
         Product: order.product.productName,
