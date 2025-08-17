@@ -20,6 +20,16 @@ const columns = [
   {
     field: "changeType",
     headerName: "Change Type",
+    render: (value) => {
+      switch (value) {
+        case "IN":
+          return "SELL IN";
+        case "OUT":
+          return "SELL OUT";
+        case "ADJUSTMENT":
+          return "RETURN";
+      }
+    },
     minWidth: 150,
   },
   { field: "quantity", headerName: "Quantity", minWidth: 150 },
