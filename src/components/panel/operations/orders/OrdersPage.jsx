@@ -58,11 +58,13 @@ const columns = [
   {
     field: "uom",
     headerName: "UOM (L)",
+    render: (value) => formatNumber(value),
     minWidth: 150,
   },
   {
     field: "quantity",
     headerName: "Quantity",
+    render: (value) => formatNumber(value),
     minWidth: 150,
   },
   {
@@ -78,6 +80,7 @@ const columns = [
   {
     field: "volume",
     headerName: "Volume",
+    render: (value) => formatNumber(value),
     minWidth: 150,
   },
   {
@@ -166,11 +169,11 @@ const OrdersPage = () => {
           : order.sale.accountsReceivable.invoice.booking.bookingId,
         productName: order.product.productName,
         productId: order.product.productId,
-        uom: formatNumber(order.product.uom),
-        quantity: formatNumber(order.quantity),
+        uom: order.product.uom,
+        quantity: order.quantity,
         price: formatToLocalCurrency(order.price),
         subtotal: formatToLocalCurrency(order.quantity * order.price),
-        volume: formatNumber(order.quantity * order.product.uom),
+        volume: order.quantity * order.product.uom,
         status:
           order.booking && order.booking.status === "Pending"
             ? order.booking.status

@@ -63,6 +63,8 @@ const columns = [
   {
     field: "term",
     headerName: "Term",
+    render: (value) =>
+      typeof value === "number" ? formatNumber(value) : value,
     minWidth: 150,
   },
   {
@@ -220,10 +222,7 @@ const AccountsReceivablesPage = () => {
         id: ar.accountsReceivableId,
         salesInvoiceNumber: ar.invoice?.salesInvoiceNumber || "Opening A/R",
         createdAt: formatDate(ar.createdAt),
-        term:
-          ar.invoice?.booking?.term !== undefined
-            ? formatNumber(ar.invoice.booking.term)
-            : "-",
+        term: ar.invoice?.booking?.term ?? "-",
         dueDate: formatDate(ar.dueDate),
         totalSalesAmount: formatToLocalCurrency(ar.totalSalesAmount),
         totalPayments: formatToLocalCurrency(ar.totalPayments),
@@ -245,8 +244,8 @@ const AccountsReceivablesPage = () => {
         ),
         "Invoice Date": formatDate(ar.createdAt),
         Term:
-          ar.invoice?.booking?.term !== undefined
-            ? formatNumber(ar.invoice.booking.term)
+          typeof ar.invoice?.booking?.term === "number"
+            ? formatNumber(ar.invoice?.booking?.term)
             : "-",
         "Due Date": formatDate(ar.dueDate),
         "Total Sales": formatToLocalCurrency(ar.totalSalesAmount),

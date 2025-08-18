@@ -149,6 +149,7 @@ const salesColumns = [
   {
     field: "quantity",
     headerName: "Quantity",
+    render: (value) => formatNumber(value),
     minWidth: 150,
   },
   {
@@ -455,7 +456,7 @@ const AccountBreakdownLists = ({
             salesInvoiceNumber: sale.salesInvoiceNumber,
             accountsReceivableId: sale.accountsReceivableId,
             productName: sale.order.product.productName,
-            quantity: formatNumber(sale.order.quantity),
+            quantity: sale.order.quantity,
             price: formatToLocalCurrency(sale.order.price),
             actionType: sale.actionType,
           })) || []),

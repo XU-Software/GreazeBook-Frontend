@@ -1,9 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import { useCompanySalesVolumeQuery } from "@/state/services/companyApi";
-import { useAppDispatch } from "@/app/redux";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";
 import Table from "@/components/Utils/DataTable";
@@ -14,7 +12,6 @@ import PaginationControls from "@/components/Utils/TablePagination";
 import ColoredLink from "@/components/Utils/ColoredLink";
 import YearPicker from "./YearDatePicker";
 import { formatNumber } from "@/utils/quantityFormatter";
-import { usePathname } from "next/navigation";
 import { Typography } from "@mui/material";
 
 const columns = [

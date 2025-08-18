@@ -32,7 +32,12 @@ const columns = [
     },
     minWidth: 150,
   },
-  { field: "quantity", headerName: "Quantity", minWidth: 150 },
+  {
+    field: "quantity",
+    headerName: "Quantity",
+    render: (value) => formatNumber(value),
+    minWidth: 150,
+  },
   {
     field: "reason",
     headerName: "Reason",
@@ -111,7 +116,7 @@ const ProductDetailsPage = () => {
       rows.push({
         id: sh.stockHistoryId,
         changeType: sh.changeType,
-        quantity: formatNumber(sh.quantity),
+        quantity: sh.quantity,
         reason: sh.reason,
         createdAt: formatDateWithTime(sh.createdAt),
         operatedBy: `${sh.createdBy.name} | ${sh.createdBy.email}`,

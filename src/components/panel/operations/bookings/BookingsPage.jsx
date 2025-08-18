@@ -63,6 +63,7 @@ const columns = [
   {
     field: "term",
     headerName: "Term",
+    render: (value) => formatNumber(value),
     minWidth: 150,
   },
   {
@@ -179,7 +180,7 @@ const BookingsPage = () => {
         location: booking.account.location,
         dsp: booking.account.dsp,
         totalAmount: formatToLocalCurrency(booking.totalAmount),
-        term: formatNumber(booking.term),
+        term: booking.term,
         freebiesRemarksConcern: booking.freebiesRemarksConcern,
         status: booking.status,
         createdAt: formatDate(booking.createdAt),

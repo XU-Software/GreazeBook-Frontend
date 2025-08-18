@@ -61,11 +61,13 @@ const columns = [
   {
     field: "uom",
     headerName: "UOM (L)",
+    render: (value) => formatNumber(value),
     minWidth: 150,
   },
   {
     field: "quantity",
     headerName: "Quantity",
+    render: (value) => formatNumber(value),
     minWidth: 150,
   },
   {
@@ -81,6 +83,7 @@ const columns = [
   {
     field: "volume",
     headerName: "Volume",
+    render: (value) => formatNumber(value),
     minWidth: 150,
   },
   {
@@ -177,11 +180,11 @@ const SalesPage = () => {
         bookingId: sale.accountsReceivable.invoice.booking.bookingId,
         productName: sale.order.product.productName,
         productId: sale.order.product.productId,
-        uom: formatNumber(sale.order.product.uom),
-        quantity: formatNumber(sale.order.quantity),
+        uom: sale.order.product.uom,
+        quantity: sale.order.quantity,
         price: formatToLocalCurrency(sale.order.price),
         subtotal: formatToLocalCurrency(sale.order.quantity * sale.order.price),
-        volume: formatNumber(sale.order.quantity * sale.order.product.uom),
+        volume: sale.order.quantity * sale.order.product.uom,
         status: sale.actionType,
       });
 
