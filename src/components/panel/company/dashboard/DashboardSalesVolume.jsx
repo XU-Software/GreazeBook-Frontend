@@ -12,6 +12,7 @@ import SortToggle from "@/components/Utils/SortToggle";
 import ExportExcel from "@/components/Utils/ExportExcel";
 import PaginationControls from "@/components/Utils/TablePagination";
 import ColoredLink from "@/components/Utils/ColoredLink";
+import YearPicker from "./YearDatePicker";
 import { formatNumber } from "@/utils/quantityFormatter";
 import { usePathname } from "next/navigation";
 import { Typography } from "@mui/material";
@@ -113,50 +114,22 @@ const columns = [
   },
 ];
 
-// Example data for preview of importing excel file inputs guide
-const rowGuide = {
-  customerNumber: "CN-12345",
-  accountName: "John Doe",
-  tradeType: "Trade type",
-  location: "Philippines",
-  dsp: "DSP 1",
-  contactInformation: "Email or Phone number",
-};
-
-const columnsGuide = [
-  {
-    field: "customerNumber",
-    headerName: "Customer Number",
-    type: "text",
-  },
-  { field: "accountName", headerName: "Account Name", type: "text" },
-  {
-    field: "tradeType",
-    headerName: "Trade Type",
-    type: "text",
-  },
-  {
-    field: "location",
-    headerName: "Location",
-    type: "text",
-  },
-  {
-    field: "dsp",
-    headerName: "DSP",
-    type: "text",
-  },
-  {
-    field: "contactInformation",
-    headerName: "Contact Information",
-    type: "text",
-  },
+const monthNames = [
+  "january",
+  "february",
+  "march",
+  "april",
+  "may",
+  "june",
+  "july",
+  "august",
+  "september",
+  "october",
+  "november",
+  "december",
 ];
 
 const DashboardSalesVolume = () => {
-  const pathName = usePathname();
-  const router = useRouter();
-  const dispatch = useAppDispatch();
-
   const [year, setYear] = useState(new Date().getFullYear());
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(50);
@@ -197,6 +170,9 @@ const DashboardSalesVolume = () => {
     setLimit(newLimit);
   };
 
+  // Handler for selecting year
+  const handleYearChange = (year) => setYear(year);
+
   const { rows, exportData } = useMemo(() => {
     const rows = [];
     const exportData = [];
@@ -204,41 +180,30 @@ const DashboardSalesVolume = () => {
     if (!salesVolumeData) return { rows, exportData };
 
     salesVolumeData?.data.forEach((acc) => {
+      const monthData = {};
+
+      monthNames.forEach((month, idx) => {
+        monthData[month] = acc.monthlyVolumes[idx];
+      });
+
       rows.push({
         id: acc.accountId,
         accountId: acc.accountId,
         accountName: acc.accountName,
         dsp: acc.dsp,
-        january: acc.monthlyVolumes[0],
-        february: acc.monthlyVolumes[1],
-        march: acc.monthlyVolumes[2],
-        april: acc.monthlyVolumes[3],
-        may: acc.monthlyVolumes[4],
-        june: acc.monthlyVolumes[5],
-        july: acc.monthlyVolumes[6],
-        august: acc.monthlyVolumes[7],
-        september: acc.monthlyVolumes[8],
-        october: acc.monthlyVolumes[9],
-        november: acc.monthlyVolumes[10],
-        december: acc.monthlyVolumes[11],
+        ...monthData,
         totalVolume: acc.rowTotal,
       });
 
       exportData.push({
         "Account Name": acc.accountName,
         DSP: acc.dsp,
-        January: formatNumber(acc.monthlyVolumes[0]),
-        February: formatNumber(acc.monthlyVolumes[1]),
-        March: formatNumber(acc.monthlyVolumes[2]),
-        April: formatNumber(acc.monthlyVolumes[3]),
-        May: formatNumber(acc.monthlyVolumes[4]),
-        June: formatNumber(acc.monthlyVolumes[5]),
-        July: formatNumber(acc.monthlyVolumes[6]),
-        August: formatNumber(acc.monthlyVolumes[7]),
-        September: formatNumber(acc.monthlyVolumes[8]),
-        October: formatNumber(acc.monthlyVolumes[9]),
-        November: formatNumber(acc.monthlyVolumes[10]),
-        December: formatNumber(acc.monthlyVolumes[11]),
+        ...monthNames.reduce((obj, month, idx) => {
+          obj[month[0].toUpperCase() + month.slice(1)] = formatNumber(
+            acc.monthlyVolumes[idx]
+          );
+          return obj;
+        }, {}),
         "Total Volume": formatNumber(acc.rowTotal),
       });
     });
@@ -278,9 +243,13 @@ const DashboardSalesVolume = () => {
           <Typography>
             Number of Accounts: {formatNumber(salesVolumeData?.total)}
           </Typography>
+
           <Typography>
             Grand Total Volume: {formatNumber(salesVolumeData?.grandTotal)}
           </Typography>
+
+          <YearPicker selectedYear={year} onChange={handleYearChange} />
+
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <ExportExcel
               exportData={exportData}
