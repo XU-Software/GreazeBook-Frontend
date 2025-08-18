@@ -94,10 +94,8 @@ const DashboardPage = () => {
 
   return (
     <Box sx={{ p: 2, mx: "auto" }}>
-      <DynamicBreadcrumbs />
-
       <Typography variant="h4" gutterBottom>
-        Dashboard
+        Overview
       </Typography>
 
       <Box

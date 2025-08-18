@@ -167,7 +167,9 @@ export const accountsReceivablesApi = api.injectEndpoints({
         if (result?.affectedAccountId) {
           tags.push(
             { type: "AccountMetrics", id: result.affectedAccountId },
-            { type: "AccountDetails", id: result.affectedAccountId }
+            { type: "AccountDetails", id: result.affectedAccountId },
+            { type: "CompanySalesVolume", id: "LIST" },
+            { type: "CompanySalesVolume", id: result.affectedAccountId }
           );
         }
 
@@ -231,7 +233,9 @@ export const accountsReceivablesApi = api.injectEndpoints({
         if (result?.affectedAccountId) {
           tags.push(
             { type: "AccountMetrics", id: result.affectedAccountId },
-            { type: "AccountDetails", id: result.affectedAccountId }
+            { type: "AccountDetails", id: result.affectedAccountId },
+            { type: "CompanySalesVolume", id: "LIST" },
+            { type: "CompanySalesVolume", id: result.affectedAccountId }
           );
         }
 
