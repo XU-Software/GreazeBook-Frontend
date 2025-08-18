@@ -412,12 +412,21 @@ const AccountBreakdownLists = ({
     isError,
     error,
     refetch,
+    dataUpdatedAt, // timestamp when query data was last updated
   } = useGetAccountBreakdownListsQuery(queryArgs, {
     refetchOnMountOrArgChange: true,
     refetchOnFocus: true,
   });
 
-  // Reset accumulated data when accountId, startDate, endDate, or search changes
+  // Watches time stamp of invalidation, whenever an invalidation happens time stamp changes and we run this useEffect and reset the query to page 1 therefore fetching fresh data
+  useEffect(() => {
+    // Whenever RTK query re-fetches due to invalidation, reset to page 1
+    if (!isFetching && page !== 1) {
+      setPage(1);
+    }
+  }, [dataUpdatedAt]);
+
+  // Reset accumulated data when accountId, startDate, endDate, or search changes (user input driven)
   useEffect(() => {
     setAccumulatedData({
       accountsReceivables: [],
@@ -429,17 +438,104 @@ const AccountBreakdownLists = ({
     setPage(1); // Reset pagination
   }, [accountId, startDate, endDate, search]);
 
-  // Accumulate data for infinite scroll
+  // // Accumulate data for infinite scroll
+  // useEffect(() => {
+  //   if (accountDetailsData) {
+  //     setAccumulatedData((prev) => ({
+  //       accountsReceivables: [
+  //         ...prev.accountsReceivables,
+  //         ...(accountDetailsData.accountsReceivables.map((ar) => ({
+  //           id: ar.accountsReceivableId,
+  //           salesInvoiceNumber: ar.salesInvoiceNumber
+  //             ? ar.salesInvoiceNumber
+  //             : "Opening A/R",
+  //           createdAt: formatDate(ar.createdAt),
+  //           dueDate: formatDate(ar.dueDate),
+  //           totalSales: formatToLocalCurrency(ar.totalSales),
+  //           totalPayments: formatToLocalCurrency(ar.totalPayments),
+  //           balance: formatToLocalCurrency(ar.balance),
+  //           status: ar.status,
+  //           hasActivePendingExcess: ar.hasActivePendingExcess,
+  //         })) || []),
+  //       ],
+  //       sales: [
+  //         ...prev.sales,
+  //         ...(accountDetailsData.sales.map((sale) => ({
+  //           id: sale.saleId,
+  //           salesInvoiceNumber: sale.salesInvoiceNumber,
+  //           accountsReceivableId: sale.accountsReceivableId,
+  //           productName: sale.order.product.productName,
+  //           quantity: sale.order.quantity,
+  //           price: formatToLocalCurrency(sale.order.price),
+  //           actionType: sale.actionType,
+  //         })) || []),
+  //       ],
+  //       payments: [
+  //         ...prev.payments,
+  //         ...(accountDetailsData.payments.map((p) => ({
+  //           id: p.paymentId,
+  //           salesInvoiceNumber: p.salesInvoiceNumber
+  //             ? p.salesInvoiceNumber
+  //             : "Opening A/R",
+  //           accountsReceivableId: p.accountsReceivableId,
+  //           createdAt: formatDateWithTime(p.createdAt),
+  //           createdBy: p.createdBy.email,
+  //           amount: formatToLocalCurrency(p.amount),
+  //           method: p.method,
+  //           reference: p.reference ? p.reference : "-",
+  //           note: p.note ? p.note : "-",
+  //           isVoid: p.isVoid,
+  //           voidBy: p.voidBy ? p.voidBy.email : "-",
+  //         })) || []),
+  //       ],
+  //       creditMemos: [
+  //         ...prev.creditMemos,
+  //         ...(accountDetailsData.creditMemos.map((cm) => ({
+  //           id: cm.creditMemoId,
+  //           salesInvoiceNumber: cm.salesInvoiceNumber
+  //             ? cm.salesInvoiceNumber
+  //             : "Opening A/R",
+  //           accountsReceivableId: cm.accountsReceivableId,
+  //           createdAt: formatDateWithTime(cm.createdAt),
+  //           createdBy: cm.createdBy.email,
+  //           amount: formatToLocalCurrency(cm.amount),
+  //           usedAmount: formatToLocalCurrency(cm.usedAmount),
+  //           isFullyUsed: cm.isFullyUsed,
+  //           reason: cm.reason,
+  //           note: cm.note ? cm.note : "-",
+  //           updatedAt: formatDateWithTime(cm.updatedAt),
+  //         })) || []),
+  //       ],
+  //       refunds: [
+  //         ...prev.refunds,
+  //         ...(accountDetailsData.refunds.map((refund) => ({
+  //           id: refund.refundId,
+  //           salesInvoiceNumber: refund.salesInvoiceNumber
+  //             ? refund.salesInvoiceNumber
+  //             : "Opening A/R",
+  //           accountsReceivableId: refund.accountsReceivableId,
+  //           createdAt: formatDateWithTime(refund.createdAt),
+  //           createdBy: refund.createdBy.email,
+  //           amount: formatToLocalCurrency(refund.amount),
+  //           method: refund.method,
+  //           reason: refund.reason,
+  //           reference: refund.reference ? refund.reference : "-",
+  //           note: refund.note ? refund.note : "-",
+  //         })) || []),
+  //       ],
+  //     }));
+  //   }
+  // }, [accountDetailsData]);
+
   useEffect(() => {
-    if (accountDetailsData) {
-      setAccumulatedData((prev) => ({
-        accountsReceivables: [
-          ...prev.accountsReceivables,
-          ...(accountDetailsData.accountsReceivables.map((ar) => ({
+    if (!accountDetailsData) return;
+
+    setAccumulatedData((prev) => {
+      const newData = {
+        accountsReceivables: accountDetailsData.accountsReceivables.map(
+          (ar) => ({
             id: ar.accountsReceivableId,
-            salesInvoiceNumber: ar.salesInvoiceNumber
-              ? ar.salesInvoiceNumber
-              : "Opening A/R",
+            salesInvoiceNumber: ar.salesInvoiceNumber || "Opening A/R",
             createdAt: formatDate(ar.createdAt),
             dueDate: formatDate(ar.dueDate),
             totalSales: formatToLocalCurrency(ar.totalSales),
@@ -447,76 +543,81 @@ const AccountBreakdownLists = ({
             balance: formatToLocalCurrency(ar.balance),
             status: ar.status,
             hasActivePendingExcess: ar.hasActivePendingExcess,
-          })) || []),
-        ],
-        sales: [
-          ...prev.sales,
-          ...(accountDetailsData.sales.map((sale) => ({
-            id: sale.saleId,
-            salesInvoiceNumber: sale.salesInvoiceNumber,
-            accountsReceivableId: sale.accountsReceivableId,
-            productName: sale.order.product.productName,
-            quantity: sale.order.quantity,
-            price: formatToLocalCurrency(sale.order.price),
-            actionType: sale.actionType,
-          })) || []),
-        ],
-        payments: [
-          ...prev.payments,
-          ...(accountDetailsData.payments.map((p) => ({
-            id: p.paymentId,
-            salesInvoiceNumber: p.salesInvoiceNumber
-              ? p.salesInvoiceNumber
-              : "Opening A/R",
-            accountsReceivableId: p.accountsReceivableId,
-            createdAt: formatDateWithTime(p.createdAt),
-            createdBy: p.createdBy.email,
-            amount: formatToLocalCurrency(p.amount),
-            method: p.method,
-            reference: p.reference ? p.reference : "-",
-            note: p.note ? p.note : "-",
-            isVoid: p.isVoid,
-            voidBy: p.voidBy ? p.voidBy.email : "-",
-          })) || []),
-        ],
-        creditMemos: [
-          ...prev.creditMemos,
-          ...(accountDetailsData.creditMemos.map((cm) => ({
-            id: cm.creditMemoId,
-            salesInvoiceNumber: cm.salesInvoiceNumber
-              ? cm.salesInvoiceNumber
-              : "Opening A/R",
-            accountsReceivableId: cm.accountsReceivableId,
-            createdAt: formatDateWithTime(cm.createdAt),
-            createdBy: cm.createdBy.email,
-            amount: formatToLocalCurrency(cm.amount),
-            usedAmount: formatToLocalCurrency(cm.usedAmount),
-            isFullyUsed: cm.isFullyUsed,
-            reason: cm.reason,
-            note: cm.note ? cm.note : "-",
-            updatedAt: formatDateWithTime(cm.updatedAt),
-          })) || []),
-        ],
-        refunds: [
-          ...prev.refunds,
-          ...(accountDetailsData.refunds.map((refund) => ({
-            id: refund.refundId,
-            salesInvoiceNumber: refund.salesInvoiceNumber
-              ? refund.salesInvoiceNumber
-              : "Opening A/R",
-            accountsReceivableId: refund.accountsReceivableId,
-            createdAt: formatDateWithTime(refund.createdAt),
-            createdBy: refund.createdBy.email,
-            amount: formatToLocalCurrency(refund.amount),
-            method: refund.method,
-            reason: refund.reason,
-            reference: refund.reference ? refund.reference : "-",
-            note: refund.note ? refund.note : "-",
-          })) || []),
-        ],
-      }));
-    }
-  }, [accountDetailsData]);
+          })
+        ),
+        sales: accountDetailsData.sales.map((sale) => ({
+          id: sale.saleId,
+          salesInvoiceNumber: sale.salesInvoiceNumber,
+          accountsReceivableId: sale.accountsReceivableId,
+          productName: sale.order.product.productName,
+          quantity: sale.order.quantity,
+          price: formatToLocalCurrency(sale.order.price),
+          actionType: sale.actionType,
+        })),
+        payments: accountDetailsData.payments.map((p) => ({
+          id: p.paymentId,
+          salesInvoiceNumber: p.salesInvoiceNumber || "Opening A/R",
+          accountsReceivableId: p.accountsReceivableId,
+          createdAt: formatDateWithTime(p.createdAt),
+          createdBy: p.createdBy.email,
+          amount: formatToLocalCurrency(p.amount),
+          method: p.method,
+          reference: p.reference || "-",
+          note: p.note || "-",
+          isVoid: p.isVoid,
+          voidBy: p.voidBy ? p.voidBy.email : "-",
+        })),
+        creditMemos: accountDetailsData.creditMemos.map((cm) => ({
+          id: cm.creditMemoId,
+          salesInvoiceNumber: cm.salesInvoiceNumber || "Opening A/R",
+          accountsReceivableId: cm.accountsReceivableId,
+          createdAt: formatDateWithTime(cm.createdAt),
+          createdBy: cm.createdBy.email,
+          amount: formatToLocalCurrency(cm.amount),
+          usedAmount: formatToLocalCurrency(cm.usedAmount),
+          isFullyUsed: cm.isFullyUsed,
+          reason: cm.reason,
+          note: cm.note || "-",
+          updatedAt: formatDateWithTime(cm.updatedAt),
+        })),
+        refunds: accountDetailsData.refunds.map((refund) => ({
+          id: refund.refundId,
+          salesInvoiceNumber: refund.salesInvoiceNumber || "Opening A/R",
+          accountsReceivableId: refund.accountsReceivableId,
+          createdAt: formatDateWithTime(refund.createdAt),
+          createdBy: refund.createdBy.email,
+          amount: formatToLocalCurrency(refund.amount),
+          method: refund.method,
+          reason: refund.reason,
+          reference: refund.reference || "-",
+          note: refund.note || "-",
+        })),
+      };
+
+      // If we’re fetching the *first page* (after invalidation or filter change),
+      // we REPLACE the accumulated data instead of appending
+      if (page === 1) {
+        return newData;
+      }
+
+      // Otherwise, append for infinite scroll
+      const mergeUnique = (prevArr, newArr) => {
+        const seen = new Set(prevArr.map((item) => item.id));
+        return [...prevArr, ...newArr.filter((item) => !seen.has(item.id))];
+      };
+
+      return {
+        accountsReceivables: mergeUnique(
+          prev.accountsReceivables,
+          newData.accountsReceivables
+        ),
+        sales: mergeUnique(prev.sales, newData.sales),
+        payments: mergeUnique(prev.payments, newData.payments),
+        creditMemos: mergeUnique(prev.creditMemos, newData.creditMemos),
+        refunds: mergeUnique(prev.refunds, newData.refunds),
+      };
+    });
+  }, [accountDetailsData, page]);
 
   const handleFetchNext = () => {
     if (
