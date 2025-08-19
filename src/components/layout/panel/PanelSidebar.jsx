@@ -100,7 +100,6 @@ export default function Sidebar() {
                   productsToRestock > 0 ? (
                     <Tooltip
                       title={`${productsToRestock} product/s need replenishment`}
-                      sx={{ ml: "auto" }}
                     >
                       <Badge
                         badgeContent={productsToRestock}
