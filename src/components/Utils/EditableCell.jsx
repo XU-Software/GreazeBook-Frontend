@@ -75,13 +75,6 @@ const EditableCell = ({
     displayValue = formatNumber(value);
   }
 
-  // return (
-  //   <TableCell>
-  //     {type === "number" && convertToCurrency === true
-  //       ? formatToLocalCurrency(value) || ""
-  //       : value || ""}
-  //   </TableCell>
-  // );
   return <TableCell>{displayValue || ""}</TableCell>;
 };
 

@@ -34,8 +34,8 @@ const columns = [
     minWidth: 150,
   },
   {
-    field: "bookedBy",
-    headerName: "Booked By",
+    field: "customerName",
+    headerName: "Outlet Name",
     render: (value, row) => (
       <ColoredLink
         href={`/operations/bookings/${row.bookingId}`}
@@ -58,11 +58,13 @@ const columns = [
   {
     field: "uom",
     headerName: "UOM (L)",
+    render: (value) => formatNumber(value),
     minWidth: 150,
   },
   {
     field: "quantity",
     headerName: "Quantity",
+    render: (value) => formatNumber(value),
     minWidth: 150,
   },
   {
@@ -78,6 +80,7 @@ const columns = [
   {
     field: "volume",
     headerName: "Volume",
+    render: (value) => formatNumber(value),
     minWidth: 150,
   },
   {
@@ -158,7 +161,7 @@ const OrdersPage = () => {
         accountsReceivableId: order.sale
           ? order.sale.accountsReceivable.accountsReceivableId
           : null,
-        bookedBy: order.booking
+        customerName: order.booking
           ? order.booking.customerName
           : order.sale.accountsReceivable.invoice.booking.customerName,
         bookingId: order.booking
@@ -166,11 +169,11 @@ const OrdersPage = () => {
           : order.sale.accountsReceivable.invoice.booking.bookingId,
         productName: order.product.productName,
         productId: order.product.productId,
-        uom: formatNumber(order.product.uom),
-        quantity: formatNumber(order.quantity),
+        uom: order.product.uom,
+        quantity: order.quantity,
         price: formatToLocalCurrency(order.price),
         subtotal: formatToLocalCurrency(order.quantity * order.price),
-        volume: formatNumber(order.quantity * order.product.uom),
+        volume: order.quantity * order.product.uom,
         status:
           order.booking && order.booking.status === "Pending"
             ? order.booking.status
@@ -181,7 +184,7 @@ const OrdersPage = () => {
         "Invoice Number": order.sale
           ? order.sale.accountsReceivable.invoice.salesInvoiceNumber
           : "-",
-        "Booked By": order.booking
+        "Outlet Name": order.booking
           ? order.booking.customerName
           : order.sale.accountsReceivable.invoice.booking.customerName,
         Product: order.product.productName,

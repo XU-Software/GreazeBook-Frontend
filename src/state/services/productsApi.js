@@ -108,6 +108,7 @@ export const productsApi = api.injectEndpoints({
       invalidatesTags: (result, error, arg) => [
         { type: "Products", id: "LIST" },
         { type: "Product", id: arg.productId },
+        { type: "CompanySalesVolume", id: "LIST" },
       ],
     }),
     addProductStock: build.mutation({

@@ -51,6 +51,7 @@ const columns = [
   {
     field: "term",
     headerName: "Term",
+    render: (value) => formatNumber(value),
     minWidth: 150,
   },
   {
@@ -117,7 +118,7 @@ const InvoicesPage = () => {
         location: invoice.booking.account.location,
         dsp: invoice.booking.account.dsp,
         totalAmount: formatToLocalCurrency(invoice.totalAmount),
-        term: formatNumber(invoice.booking.term),
+        term: invoice.booking.term,
         createdAt: formatDate(invoice.createdAt),
       });
 

@@ -36,9 +36,6 @@ const MemoizedTableRow = React.memo(
         ))}
       </TableRow>
     );
-  },
-  (prevProps, nextProps) => {
-    return prevProps.isSelected === nextProps.isSelected;
   }
 );
 

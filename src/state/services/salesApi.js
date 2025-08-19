@@ -3,13 +3,22 @@ import { api } from "../api";
 const salesApi = api.injectEndpoints({
   endpoints: (build) => ({
     getSales: build.query({
-      query: ({ page = 1, limit = 10, search = "", sortOrder = "desc" }) => ({
+      query: ({
+        page = 1,
+        limit = 10,
+        search = "",
+        sortOrder = "desc",
+        startDate,
+        endDate,
+      }) => ({
         url: `/sales/all`,
         params: {
           page,
           limit,
           search,
           sortOrder,
+          startDate,
+          endDate,
         },
       }),
       providesTags: (result, error, arg) =>

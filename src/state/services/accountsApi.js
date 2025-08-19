@@ -34,7 +34,13 @@ export const accountsApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, error, arg) => [
         { type: "Accounts", id: "LIST" },
-        ...arg.map((accountId) => ({ type: "Account", id: accountId })),
+        { type: "CompanySalesVolume", id: "LIST" },
+        ...arg.map(
+          (accountId) => (
+            { type: "Account", id: accountId },
+            { type: "CompanySalesVolume", id: accountId }
+          )
+        ),
       ],
     }),
     addSingleAccount: build.mutation({
@@ -46,7 +52,10 @@ export const accountsApi = api.injectEndpoints({
           "Content-Type": "application/json",
         },
       }),
-      invalidatesTags: [{ type: "Accounts", id: "LIST" }],
+      invalidatesTags: [
+        { type: "Accounts", id: "LIST" },
+        { type: "CompanySalesVolume", id: "LIST" },
+      ],
     }),
     importAccountsExcel: build.mutation({
       query: (file) => {
@@ -59,7 +68,10 @@ export const accountsApi = api.injectEndpoints({
           body: formData,
         };
       },
-      invalidatesTags: [{ type: "Accounts", id: "LIST" }],
+      invalidatesTags: [
+        { type: "Accounts", id: "LIST" },
+        { type: "CompanySalesVolume", id: "LIST" },
+      ],
     }),
     getAccountInformation: build.query({
       query: (accountId) => ({
@@ -120,6 +132,8 @@ export const accountsApi = api.injectEndpoints({
       invalidatesTags: (result, error, arg) => [
         { type: "Accounts", id: "LIST" },
         { type: "Account", id: arg.accountId },
+        { type: "CompanySalesVolume", id: "LIST" },
+        { type: "CompanySalesVolume", id: arg.accountId },
       ],
     }),
   }),

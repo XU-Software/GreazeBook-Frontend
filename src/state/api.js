@@ -13,6 +13,7 @@ export const api = createApi({
     "CompanyUsers",
     "CompanyUser",
     "CompanyDashboard",
+    "CompanySalesVolume",
     "Accounts",
     "Account",
     "AccountMetrics",

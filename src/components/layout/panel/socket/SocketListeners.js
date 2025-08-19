@@ -18,19 +18,35 @@ export default function SocketListeners({ userData }) {
       /* Accounts Event Listeners*/
     }
     socket.on("account_added", () => {
-      dispatch(api.util.invalidateTags([{ type: "Accounts", id: "LIST" }]));
+      dispatch(
+        api.util.invalidateTags([
+          { type: "Accounts", id: "LIST" },
+          { type: "CompanySalesVolume", id: "LIST" },
+        ])
+      );
     });
     socket.on("accounts_added", () => {
-      dispatch(api.util.invalidateTags([{ type: "Accounts", id: "LIST" }]));
+      dispatch(
+        api.util.invalidateTags([
+          { type: "Accounts", id: "LIST" },
+          { type: "CompanySalesVolume", id: "LIST" },
+        ])
+      );
     });
     socket.on("accounts_deleted", (affectedAccountIds) => {
       dispatch(
         api.util.invalidateTags([
           { type: "Accounts", id: "LIST" },
-          ...affectedAccountIds.map((accountId) => ({
-            type: "Account",
-            id: accountId,
-          })),
+          { type: "CompanySalesVolume", id: "LIST" },
+          ...affectedAccountIds.map(
+            (accountId) => (
+              {
+                type: "Account",
+                id: accountId,
+              },
+              { type: "CompanySalesVolume", id: accountId }
+            )
+          ),
         ])
       );
     });
@@ -55,6 +71,8 @@ export default function SocketListeners({ userData }) {
         api.util.invalidateTags([
           { type: "Accounts", id: "LIST" },
           { type: "Account", id: accountId },
+          { type: "CompanySalesVolume", id: "LIST" },
+          { type: "CompanySalesVolume", id: accountId },
         ])
       );
     });
@@ -95,6 +113,7 @@ export default function SocketListeners({ userData }) {
         api.util.invalidateTags([
           { type: "Products", id: "LIST" },
           { type: "Product", id: productId },
+          { type: "CompanySalesVolume", id: "LIST" },
         ])
       );
     });
@@ -176,25 +195,34 @@ export default function SocketListeners({ userData }) {
     socket.on("booking_note_added", (bookingId) => {
       dispatch(api.util.invalidateTags([{ type: "Booking", id: bookingId }]));
     });
-    socket.on("booking_approved", ({ bookingId, affectedProductIds }) => {
-      dispatch(
-        api.util.invalidateTags([
-          { type: "Bookings", id: "LIST" },
-          { type: "Booking", id: bookingId },
-          { type: "Invoices", id: "LIST" },
-          { type: "Sales", id: "LIST" },
-          { type: "AccountsReceivables", id: "LIST" },
-          { type: "Products", id: "LIST" },
-          { type: "ProductsToRestock", id: "LIST" },
-          ...(affectedProductIds?.length
-            ? affectedProductIds.map((productId) => ({
-                type: "Product",
-                id: productId,
-              }))
-            : []),
-        ])
-      );
-    });
+    socket.on(
+      "booking_approved",
+      ({ bookingId, affectedProductIds, affectedAccountId }) => {
+        dispatch(
+          api.util.invalidateTags([
+            { type: "Bookings", id: "LIST" },
+            { type: "Booking", id: bookingId },
+            { type: "Invoices", id: "LIST" },
+            { type: "Sales", id: "LIST" },
+            { type: "AccountsReceivables", id: "LIST" },
+            { type: "Products", id: "LIST" },
+            { type: "ProductsToRestock", id: "LIST" },
+            ...(affectedProductIds?.length
+              ? affectedProductIds.map((productId) => ({
+                  type: "Product",
+                  id: productId,
+                }))
+              : []),
+            ...(affectedAccountId && [
+              { type: "AccountMetrics", id: affectedAccountId },
+              { type: "AccountDetails", id: affectedAccountId },
+              { type: "CompanySalesVolume", id: "LIST" },
+              { type: "CompanySalesVolume", id: affectedAccountId },
+            ]),
+          ])
+        );
+      }
+    );
     socket.on("booking_deleted", () => {
       dispatch(api.util.invalidateTags([{ type: "Bookings", id: "LIST" }]));
     });
@@ -301,6 +329,8 @@ export default function SocketListeners({ userData }) {
             ...(affectedAccountId && [
               { type: "AccountMetrics", id: affectedAccountId },
               { type: "AccountDetails", id: affectedAccountId },
+              { type: "CompanySalesVolume", id: "LIST" },
+              { type: "CompanySalesVolume", id: affectedAccountId },
             ]),
             ...(affectedProductId && [
               { type: "Product", id: affectedProductId },
@@ -345,6 +375,8 @@ export default function SocketListeners({ userData }) {
             ...(affectedAccountId && [
               { type: "AccountMetrics", id: affectedAccountId },
               { type: "AccountDetails", id: affectedAccountId },
+              { type: "CompanySalesVolume", id: "LIST" },
+              { type: "CompanySalesVolume", id: affectedAccountId },
             ]),
             ...Array.from(new Set(affectedProductIds || []))
               .filter(Boolean)

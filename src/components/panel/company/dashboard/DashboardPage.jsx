@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { useLazyCompanyDashboardQuery } from "@/state/services/companyApi";
 import { setDashboardData, clearDashboardData } from "@/state/dashboardSlice";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
@@ -17,7 +17,6 @@ import {
 import { Check, Close, Edit } from "@mui/icons-material";
 import DashboardTable from "./DashboardTable";
 import DashboardBarChart from "./DashboardBarChart";
-import DynamicBreadcrumbs from "@/components/Utils/DynamicBreadcrumbs";
 import DateRangePicker from "@/components/Utils/DateRangePicker";
 import EditableField from "@/components/Utils/EditableField";
 import dayjs from "dayjs";
@@ -94,10 +93,8 @@ const DashboardPage = () => {
 
   return (
     <Box sx={{ p: 2, mx: "auto" }}>
-      <DynamicBreadcrumbs />
-
       <Typography variant="h4" gutterBottom>
-        Dashboard
+        Overview
       </Typography>
 
       <Box

@@ -42,18 +42,27 @@ const columns = [
   {
     field: "uom",
     headerName: "UOM (L)",
+    render: (value) => formatNumber(value),
     minWidth: 150,
   },
   {
     field: "totalStocks",
     headerName: "Total Stocks",
-    render: (value) => {
+    render: (value, row) => {
       if (value < 0) {
         return (
-          <Tooltip title="Backorder — stock needs replenishment">
+          <Tooltip
+            title={
+              row.restockThreshold === 0
+                ? `Stocks Threshold: (${formatNumber(
+                    row.restockThreshold
+                  )}), No data yet for average sales volume for the past 2 months`
+                : `Stocks Threshold: (${formatNumber(row.restockThreshold)})`
+            }
+          >
             <Chip
               icon={<Error sx={{ fontSize: 18 }} />}
-              label={`Backorder (${Math.abs(value)})`}
+              label={`Backorder (${formatNumber(value)})`}
               color="error"
               size="small"
             />
@@ -61,12 +70,14 @@ const columns = [
         );
       }
 
-      if (value < 20) {
+      if (row.isLowStock) {
         return (
-          <Tooltip title="Low physical stock">
+          <Tooltip
+            title={`Stocks Threshold: (${formatNumber(row.restockThreshold)})`}
+          >
             <Chip
               icon={<WarningAmber sx={{ fontSize: 18 }} />}
-              label={`Low Stock (${value})`}
+              label={`Low Stock (${formatNumber(value)})`}
               color="warning"
               size="small"
             />
@@ -75,16 +86,30 @@ const columns = [
       }
 
       return (
-        <Tooltip title="Sufficient stock available">
+        <Tooltip
+          title={
+            row.restockThreshold === 0
+              ? `Stocks Threshold: (${formatNumber(
+                  row.restockThreshold
+                )}), No data yet for average sales volume for the past 2 months`
+              : `Stocks Threshold: (${formatNumber(row.restockThreshold)})`
+          }
+        >
           <Chip
             icon={<CheckCircle sx={{ fontSize: 18 }} />}
-            label={`In Stock (${value})`}
+            label={`In Stock (${formatNumber(value)})`}
             color="success"
             size="small"
           />
         </Tooltip>
       );
     },
+    minWidth: 150,
+  },
+  {
+    field: "totalLiters",
+    headerName: "Total Liters",
+    render: (value) => formatNumber(value),
     minWidth: 150,
   },
   {
@@ -143,6 +168,10 @@ const ProductsPage = () => {
 
   const userData = useAppSelector((state) => state.global.userData);
   const role = userData?.data?.role || "user";
+
+  const productsToRestockCount = useAppSelector(
+    (state) => state.products.productsToRestockCount
+  );
 
   const queryArgs = useMemo(
     () => ({
@@ -261,13 +290,18 @@ const ProductsPage = () => {
     productsData?.data.forEach((prod) => {
       const formattedDate = formatDate(prod.createdAt);
 
+      const formattedTotalStocks = formatNumber(prod.totalStocks);
+
       rows.push({
         id: prod.productId,
         materialCode: prod.materialCode,
         productName: prod.productName,
         productFamily: prod.productFamily,
-        uom: formatNumber(prod.uom),
-        totalStocks: formatNumber(prod.totalStocks),
+        uom: prod.uom,
+        totalStocks: prod.totalStocks,
+        totalLiters: prod.totalLiters,
+        restockThreshold: prod.restockThreshold,
+        isLowStock: prod.isLowStock,
         createdAt: formattedDate,
       });
 
@@ -276,7 +310,13 @@ const ProductsPage = () => {
         "Product Name": prod.productName,
         "Product Family": prod.productFamily,
         "UOM (L)": formatNumber(prod.uom),
-        "Total Stocks": formatNumber(prod.totalStocks),
+        "Total Stocks":
+          prod.totalStocks < 0
+            ? `Backorder (${formattedTotalStocks})`
+            : prod.isLowStock
+            ? `Low Stock (${formattedTotalStocks})`
+            : `In Stock (${formattedTotalStocks})`,
+        "Total Liters": formatNumber(prod.totalLiters),
         "Created At": formattedDate,
       });
     });
@@ -310,17 +350,19 @@ const ProductsPage = () => {
         <div className="flex flex-col lg:flex-row items-center justify-between gap-2 ">
           <div className="w-full lg:w-auto flex justify-between items-center gap-4">
             <SearchBar setSearch={setSearch} setPage={setPage} />
-            <SortToggle sortOrder={sortOrder} setSortOrder={setSortOrder} />
+            <SortToggle
+              sortOrder={sortOrder}
+              setSortOrder={setSortOrder}
+              title="Sort by Total Stocks"
+            />
           </div>
           <Typography>
             Number of Products: {formatNumber(productsData?.total)}
           </Typography>
-          {productsData?.productsToRestock > 0 && (
-            <Typography>
-              Products to Replenish:{" "}
-              {formatNumber(productsData?.productsToRestock)}
-            </Typography>
-          )}
+
+          <Typography>
+            Products to Replenish: {formatNumber(productsToRestockCount ?? 0)}
+          </Typography>
 
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <AddRowButton

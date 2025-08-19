@@ -154,6 +154,12 @@ export const bookingsApi = api.injectEndpoints({
               id: productId,
             }))
           : []),
+        ...(result?.affectedAccountId && [
+          { type: "AccountMetrics", id: result.affectedAccountId },
+          { type: "AccountDetails", id: result.affectedAccountId },
+          { type: "CompanySalesVolume", id: "LIST" },
+          { type: "CompanySalesVolume", id: result.affectedAccountId },
+        ]),
       ],
     }),
     deletePendingBooking: build.mutation({

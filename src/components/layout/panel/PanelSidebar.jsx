@@ -99,8 +99,7 @@ export default function Sidebar() {
                   item.title === "Products" &&
                   productsToRestock > 0 ? (
                     <Tooltip
-                      title={`${productsToRestock} products need replenishment`}
-                      sx={{ ml: "auto" }}
+                      title={`${productsToRestock} product/s need replenishment`}
                     >
                       <Badge
                         badgeContent={productsToRestock}
@@ -137,7 +136,7 @@ export default function Sidebar() {
                     item.title === "Products" &&
                     productsToRestock > 0 && (
                       <Tooltip
-                        title={`${productsToRestock} products need replenishment`}
+                        title={`${productsToRestock} product/s need replenishment`}
                         sx={{ ml: "auto" }}
                       >
                         <IconButton
