@@ -147,6 +147,7 @@ const DashboardSalesVolume = () => {
   const {
     data: salesVolumeData,
     isLoading,
+    isFetching,
     isError,
     error,
     refetch,
@@ -208,7 +209,7 @@ const DashboardSalesVolume = () => {
     return { rows, exportData };
   }, [salesVolumeData]);
 
-  if (isLoading) {
+  if (isLoading || isFetching) {
     return (
       <div className="h-full flex items-center justify-center">
         <LoadingSpinner />

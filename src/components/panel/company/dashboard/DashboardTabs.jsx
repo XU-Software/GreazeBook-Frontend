@@ -22,26 +22,36 @@ export default function DashboardTabs() {
   };
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box
+      sx={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       {/* Tabs Header */}
       <Box sx={{ bgcolor: "white", borderColor: "divider" }}>
         <Tabs
           value={tabIndex}
           onChange={handleChange}
           aria-label="dashboard tabs"
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
           sx={{ borderBottom: 1, borderColor: "divider" }}
         >
           <Tab label="OVERVIEW" />
           <Tab label="MONTHLY SALES VOLUME" />
-          {/* <Tab label="Sales Volume" /> */}
         </Tabs>
       </Box>
 
       {/* Tab Panels */}
-      <Box>
+      <Box sx={{ flex: 1 }}>
+        {/* <div className="w-full h-screen bg-black"> */}
         {tabIndex === 0 && <OverviewTab />}
         {tabIndex === 1 && <SalesVolumeTab />}
-        {/* {tabIndex === 2 && <SalesVolumeTab />} */}
+        {/* </div> */}
       </Box>
     </Box>
   );
