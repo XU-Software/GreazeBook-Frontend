@@ -209,7 +209,7 @@ const DashboardSalesVolume = () => {
     return { rows, exportData };
   }, [salesVolumeData]);
 
-  if (isLoading || isFetching) {
+  if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center">
         <LoadingSpinner />
@@ -231,7 +231,8 @@ const DashboardSalesVolume = () => {
   }
 
   return (
-    <div className="min-h-full">
+    // <div className="min-h-full">
+    <div className="h-full flex flex-col">
       <div className="sticky top-18 z-10 bg-white py-2 px-4 shadow-sm">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-2 ">
           <div className="w-full lg:w-auto flex justify-between items-center gap-4">
@@ -257,14 +258,22 @@ const DashboardSalesVolume = () => {
           </div>
         </div>
       </div>
-      <Table rows={rows} columns={columns} enableSelection={false} />
-      <PaginationControls
-        handlePageChange={handlePageChange}
-        handleLimitChange={handleLimitChange}
-        page={salesVolumeData?.page}
-        limit={salesVolumeData?.limit}
-        total={salesVolumeData?.total}
-      />
+      {isFetching ? (
+        <div className="flex flex-1 items-center justify-center">
+          <LoadingSpinner />
+        </div>
+      ) : (
+        <>
+          <Table rows={rows} columns={columns} enableSelection={false} />
+          <PaginationControls
+            handlePageChange={handlePageChange}
+            handleLimitChange={handleLimitChange}
+            page={salesVolumeData?.page}
+            limit={salesVolumeData?.limit}
+            total={salesVolumeData?.total}
+          />
+        </>
+      )}
     </div>
   );
 };
