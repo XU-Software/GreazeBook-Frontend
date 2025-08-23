@@ -38,31 +38,31 @@ export default function SocketListeners({ userData }) {
         api.util.invalidateTags([
           { type: "Accounts", id: "LIST" },
           { type: "CompanySalesVolume", id: "LIST" },
-          ...affectedAccountIds.map(
-            (accountId) => (
-              {
-                type: "Account",
-                id: accountId,
-              },
-              { type: "CompanySalesVolume", id: accountId }
-            )
-          ),
+          ...(affectedAccountIds?.length
+            ? affectedAccountIds.map(
+                (accountId) => (
+                  {
+                    type: "Account",
+                    id: accountId,
+                  },
+                  { type: "CompanySalesVolume", id: accountId }
+                )
+              )
+            : []),
         ])
       );
     });
     socket.on("account_set_opening_ar", (accountId) => {
       dispatch(
         api.util.invalidateTags([
-          [
-            {
-              type: "Accounts",
-              id: "LIST",
-            },
-            { type: "Account", id: accountId },
-            { type: "AccountMetrics", id: accountId },
-            { type: "AccountDetails", id: accountId },
-            { type: "AccountsReceivables", id: "LIST" },
-          ],
+          {
+            type: "Accounts",
+            id: "LIST",
+          },
+          { type: "Account", id: accountId },
+          { type: "AccountMetrics", id: accountId },
+          { type: "AccountDetails", id: accountId },
+          { type: "AccountsReceivables", id: "LIST" },
         ])
       );
     });
@@ -101,10 +101,12 @@ export default function SocketListeners({ userData }) {
         api.util.invalidateTags([
           { type: "Products", id: "LIST" },
           { type: "ProductsToRestock", id: "LIST" },
-          ...affectedProductIds.map((productId) => ({
-            type: "Product",
-            id: productId,
-          })),
+          ...(affectedProductIds?.length
+            ? affectedProductIds.map((productId) => ({
+                type: "Product",
+                id: productId,
+              }))
+            : []),
         ])
       );
     });
@@ -155,10 +157,12 @@ export default function SocketListeners({ userData }) {
       dispatch(
         api.util.invalidateTags([
           { type: "Bookings", id: "LIST" },
-          ...affectedBookingIds.map((bookingId) => ({
-            type: "Booking",
-            id: bookingId,
-          })),
+          ...(affectedBookingIds?.length
+            ? affectedBookingIds.map((bookingId) => ({
+                type: "Booking",
+                id: bookingId,
+              }))
+            : []),
         ])
       );
     });
@@ -176,10 +180,12 @@ export default function SocketListeners({ userData }) {
           { type: "Bookings", id: "LIST" },
           { type: "Booking", id: bookingId },
           { type: "Orders", id: "LIST" },
-          ...affectedOrderIds.map((orderId) => ({
-            type: "Order",
-            id: orderId,
-          })),
+          ...(affectedOrderIds?.length
+            ? affectedOrderIds.map((orderId) => ({
+                type: "Order",
+                id: orderId,
+              }))
+            : []),
         ])
       );
     });
@@ -213,12 +219,14 @@ export default function SocketListeners({ userData }) {
                   id: productId,
                 }))
               : []),
-            ...(affectedAccountId && [
-              { type: "AccountMetrics", id: affectedAccountId },
-              { type: "AccountDetails", id: affectedAccountId },
-              { type: "CompanySalesVolume", id: "LIST" },
-              { type: "CompanySalesVolume", id: affectedAccountId },
-            ]),
+            ...(affectedAccountId
+              ? [
+                  { type: "AccountMetrics", id: affectedAccountId },
+                  { type: "AccountDetails", id: affectedAccountId },
+                  { type: "CompanySalesVolume", id: "LIST" },
+                  { type: "CompanySalesVolume", id: affectedAccountId },
+                ]
+              : []),
           ])
         );
       }
@@ -246,26 +254,35 @@ export default function SocketListeners({ userData }) {
             { type: "AccountsReceivables", id: "LIST" },
             { type: "AccountsReceivable", id: accountsReceivableId },
             { type: "Payments", id: "LIST" },
-            ...(usedCreditMemoId && [
-              { type: "CreditMemos", id: "LIST" },
-              { type: "CreditMemo", id: usedCreditMemoId },
-            ]),
-            ...(affectedAccountId && [
-              { type: "AccountMetrics", id: affectedAccountId },
-              { type: "AccountDetails", id: affectedAccountId },
-            ]),
+            ...(usedCreditMemoId
+              ? [
+                  { type: "CreditMemos", id: "LIST" },
+                  { type: "CreditMemo", id: usedCreditMemoId },
+                ]
+              : []),
+            ...(affectedAccountId
+              ? [
+                  { type: "AccountMetrics", id: affectedAccountId },
+                  { type: "AccountDetails", id: affectedAccountId },
+                ]
+              : []),
             ...(Array.isArray(affectedPendingExcessIds) &&
-              affectedPendingExcessIds.length > 0 &&
-              affectedPendingExcessIds.map((pendingExcessId) => ({
-                type: "PendingExcess",
-                id: pendingExcessId,
-              }))),
-            (Array.isArray(affectedPendingExcessIds) &&
+            affectedPendingExcessIds.length > 0
+              ? affectedPendingExcessIds.map((pendingExcessId) => ({
+                  type: "PendingExcess",
+                  id: pendingExcessId,
+                }))
+              : []),
+            ...((Array.isArray(affectedPendingExcessIds) &&
               affectedPendingExcessIds.length > 0) ||
-              (newPendingExcessCreated && {
-                type: "PendingExcesses",
-                id: "LIST",
-              }),
+            newPendingExcessCreated
+              ? [
+                  {
+                    type: "PendingExcesses",
+                    id: "LIST",
+                  },
+                ]
+              : []),
           ])
         );
       }
@@ -286,26 +303,35 @@ export default function SocketListeners({ userData }) {
             { type: "AccountsReceivable", id: accountsReceivableId },
             { type: "Payments", id: "LIST" },
             { type: "Payment", id: paymentId },
-            ...(affectedCreditMemoId && [
-              { type: "CreditMemos", id: "LIST" },
-              { type: "CreditMemo", id: affectedCreditMemoId },
-            ]),
-            ...(affectedAccountId && [
-              { type: "AccountMetrics", id: affectedAccountId },
-              { type: "AccountDetails", id: affectedAccountId },
-            ]),
+            ...(affectedCreditMemoId
+              ? [
+                  { type: "CreditMemos", id: "LIST" },
+                  { type: "CreditMemo", id: affectedCreditMemoId },
+                ]
+              : []),
+            ...(affectedAccountId
+              ? [
+                  { type: "AccountMetrics", id: affectedAccountId },
+                  { type: "AccountDetails", id: affectedAccountId },
+                ]
+              : []),
             ...(Array.isArray(affectedPendingExcessIds) &&
-              affectedPendingExcessIds.length > 0 &&
-              affectedPendingExcessIds.map((pendingExcessId) => ({
-                type: "PendingExcess",
-                id: pendingExcessId,
-              }))),
-            (Array.isArray(affectedPendingExcessIds) &&
+            affectedPendingExcessIds.length > 0
+              ? affectedPendingExcessIds.map((pendingExcessId) => ({
+                  type: "PendingExcess",
+                  id: pendingExcessId,
+                }))
+              : []),
+            ...((Array.isArray(affectedPendingExcessIds) &&
               affectedPendingExcessIds.length > 0) ||
-              (newPendingExcessCreated && {
-                type: "PendingExcesses",
-                id: "LIST",
-              }),
+            newPendingExcessCreated
+              ? [
+                  {
+                    type: "PendingExcesses",
+                    id: "LIST",
+                  },
+                ]
+              : []),
           ])
         );
       }
@@ -326,29 +352,38 @@ export default function SocketListeners({ userData }) {
             { type: "AccountsReceivable", id: accountsReceivableId },
             { type: "Sales", id: "LIST" },
             { type: "Sale", id: saleId },
-            ...(affectedAccountId && [
-              { type: "AccountMetrics", id: affectedAccountId },
-              { type: "AccountDetails", id: affectedAccountId },
-              { type: "CompanySalesVolume", id: "LIST" },
-              { type: "CompanySalesVolume", id: affectedAccountId },
-            ]),
-            ...(affectedProductId && [
-              { type: "Product", id: affectedProductId },
-              { type: "Products", id: "LIST" },
-              { type: "ProductsToRestock", id: "LIST" },
-            ]),
+            ...(affectedAccountId
+              ? [
+                  { type: "AccountMetrics", id: affectedAccountId },
+                  { type: "AccountDetails", id: affectedAccountId },
+                  { type: "CompanySalesVolume", id: "LIST" },
+                  { type: "CompanySalesVolume", id: affectedAccountId },
+                ]
+              : []),
+            ...(affectedProductId
+              ? [
+                  { type: "Product", id: affectedProductId },
+                  { type: "Products", id: "LIST" },
+                  { type: "ProductsToRestock", id: "LIST" },
+                ]
+              : []),
             ...(Array.isArray(affectedPendingExcessIds) &&
-              affectedPendingExcessIds.length > 0 &&
-              affectedPendingExcessIds.map((pendingExcessId) => ({
-                type: "PendingExcess",
-                id: pendingExcessId,
-              }))),
-            (Array.isArray(affectedPendingExcessIds) &&
+            affectedPendingExcessIds.length > 0
+              ? affectedPendingExcessIds.map((pendingExcessId) => ({
+                  type: "PendingExcess",
+                  id: pendingExcessId,
+                }))
+              : []),
+            ...((Array.isArray(affectedPendingExcessIds) &&
               affectedPendingExcessIds.length > 0) ||
-              (newPendingExcessCreated && {
-                type: "PendingExcesses",
-                id: "LIST",
-              }),
+            newPendingExcessCreated
+              ? [
+                  {
+                    type: "PendingExcesses",
+                    id: "LIST",
+                  },
+                ]
+              : []),
           ])
         );
       }
@@ -372,27 +407,34 @@ export default function SocketListeners({ userData }) {
             { type: "Orders", id: "LIST" },
             { type: "Products", id: "LIST" },
             { type: "ProductsToRestock", id: "LIST" },
-            ...(affectedAccountId && [
-              { type: "AccountMetrics", id: affectedAccountId },
-              { type: "AccountDetails", id: affectedAccountId },
-              { type: "CompanySalesVolume", id: "LIST" },
-              { type: "CompanySalesVolume", id: affectedAccountId },
-            ]),
+            ...(affectedAccountId
+              ? [
+                  { type: "AccountMetrics", id: affectedAccountId },
+                  { type: "AccountDetails", id: affectedAccountId },
+                  { type: "CompanySalesVolume", id: "LIST" },
+                  { type: "CompanySalesVolume", id: affectedAccountId },
+                ]
+              : []),
             ...Array.from(new Set(affectedProductIds || []))
               .filter(Boolean)
               .map((productId) => ({ type: "Product", id: productId })),
             ...(Array.isArray(affectedPendingExcessIds) &&
-              affectedPendingExcessIds.length > 0 &&
-              affectedPendingExcessIds.map((pendingExcessId) => ({
-                type: "PendingExcess",
-                id: pendingExcessId,
-              }))),
-            (Array.isArray(affectedPendingExcessIds) &&
+            affectedPendingExcessIds.length > 0
+              ? affectedPendingExcessIds.map((pendingExcessId) => ({
+                  type: "PendingExcess",
+                  id: pendingExcessId,
+                }))
+              : []),
+            ...((Array.isArray(affectedPendingExcessIds) &&
               affectedPendingExcessIds.length > 0) ||
-              (newPendingExcessCreated && {
-                type: "PendingExcesses",
-                id: "LIST",
-              }),
+            newPendingExcessCreated
+              ? [
+                  {
+                    type: "PendingExcesses",
+                    id: "LIST",
+                  },
+                ]
+              : []),
           ])
         );
       }
@@ -407,10 +449,12 @@ export default function SocketListeners({ userData }) {
             { type: "PendingExcesses", id: "LIST" },
             { type: "PendingExcess", id: pendingExcessId },
             { type: "Refunds", id: "LIST" },
-            ...(affectedAccountId && [
-              { type: "AccountMetrics", id: affectedAccountId },
-              { type: "AccountDetails", id: affectedAccountId },
-            ]),
+            ...(affectedAccountId
+              ? [
+                  { type: "AccountMetrics", id: affectedAccountId },
+                  { type: "AccountDetails", id: affectedAccountId },
+                ]
+              : []),
           ])
         );
       }
@@ -425,10 +469,12 @@ export default function SocketListeners({ userData }) {
             { type: "PendingExcesses", id: "LIST" },
             { type: "PendingExcess", id: pendingExcessId },
             { type: "CreditMemos", id: "LIST" },
-            ...(affectedAccountId && [
-              { type: "AccountMetrics", id: affectedAccountId },
-              { type: "AccountDetails", id: affectedAccountId },
-            ]),
+            ...(affectedAccountId
+              ? [
+                  { type: "AccountMetrics", id: affectedAccountId },
+                  { type: "AccountDetails", id: affectedAccountId },
+                ]
+              : []),
           ])
         );
       }
