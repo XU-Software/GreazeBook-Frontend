@@ -49,7 +49,7 @@ const columns = [
     field: "totalStocks",
     headerName: "Total Stocks",
     render: (value, row) => {
-      if (value < 0) {
+      if (value <= 0) {
         return (
           <Tooltip
             title={
@@ -62,7 +62,7 @@ const columns = [
           >
             <Chip
               icon={<Error sx={{ fontSize: 18 }} />}
-              label={`Backorder (${formatNumber(value)})`}
+              label={formatNumber(value)}
               color="error"
               size="small"
             />
@@ -77,7 +77,7 @@ const columns = [
           >
             <Chip
               icon={<WarningAmber sx={{ fontSize: 18 }} />}
-              label={`Low Stock (${formatNumber(value)})`}
+              label={formatNumber(value)}
               color="warning"
               size="small"
             />
@@ -97,7 +97,7 @@ const columns = [
         >
           <Chip
             icon={<CheckCircle sx={{ fontSize: 18 }} />}
-            label={`In Stock (${formatNumber(value)})`}
+            label={formatNumber(value)}
             color="success"
             size="small"
           />
