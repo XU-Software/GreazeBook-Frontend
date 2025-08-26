@@ -133,7 +133,7 @@ export default function Navbar() {
         </h1>
       </div>
       <div className="flex items-center md:gap-2">
-        <Tooltip title="Notifications" arrow>
+        <Tooltip title="Work in progress..." arrow>
           <IconButton size="medium" color="inherit">
             <NotificationsIcon sx={{ fontSize: 26 }} />
           </IconButton>
