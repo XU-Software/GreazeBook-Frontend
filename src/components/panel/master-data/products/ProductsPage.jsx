@@ -365,27 +365,32 @@ const ProductsPage = () => {
           </Typography>
 
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
-            <AddRowButton
-              columns={columnsGuide}
-              initialValues={{
-                materialCode: "",
-                productName: "",
-                productFamily: "",
-                uom: 0,
-                totalStocks: 0,
-              }}
-              isLoading={isAdding}
-              onSubmit={handleAddSingleProduct}
-              title="Add New Product"
-              buttonLabel="Product"
-              startIcon={<Add />}
-            />
-            <ImportExcel
-              handleImportExcel={handleImportProductsExcel}
-              isImporting={isImporting}
-              rowGuide={rowGuide}
-              columnsGuide={columnsGuide}
-            />
+            {role === "admin" && (
+              <>
+                <AddRowButton
+                  columns={columnsGuide}
+                  initialValues={{
+                    materialCode: "",
+                    productName: "",
+                    productFamily: "",
+                    uom: 0,
+                    totalStocks: 0,
+                  }}
+                  isLoading={isAdding}
+                  onSubmit={handleAddSingleProduct}
+                  title="Add New Product"
+                  buttonLabel="Product"
+                  startIcon={<Add />}
+                />
+                <ImportExcel
+                  handleImportExcel={handleImportProductsExcel}
+                  isImporting={isImporting}
+                  rowGuide={rowGuide}
+                  columnsGuide={columnsGuide}
+                />
+              </>
+            )}
+
             <ExportExcel
               exportData={exportData}
               fileName="products"
