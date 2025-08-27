@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "GreazeBook",
-  description: "Accounting Software System",
+  title: "Authentication",
+  robots: "noindex, nofollow",
 };
 
 export default function PublicLayout({ children }) {

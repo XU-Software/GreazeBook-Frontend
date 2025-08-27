@@ -13,11 +13,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
-  title: "GreazeBook",
-  description: "Accounting Software System",
-};
-
 export default function PublicLayout({ children }) {
   return (
     <html lang="en" data-toolpad-color-scheme="light">

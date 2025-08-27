@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "GreazeBook",
-  description: "Accounting Software System",
+  title: "Panel",
+  robots: "noindex, nofollow",
 };
 
 export default async function AppLayout({ children }) {
