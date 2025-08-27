@@ -11,16 +11,18 @@ import {
   Button,
   Typography,
   CircularProgress,
+  TextField,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useRouter } from "next/navigation";
 import axios from "@/lib/axios";
 
-const ResetPasswordPage = ({ token = "" }) => {
+const InvitePage = ({ token = "" }) => {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
+    name: "",
     password: "",
     confirmPassword: "",
   });
@@ -50,6 +52,11 @@ const ResetPasswordPage = ({ token = "" }) => {
       return;
     }
 
+    if (!formData.name) {
+      setError("Name field required");
+      return;
+    }
+
     if (!token) {
       setError("Invalid or missing token.");
       return;
@@ -60,8 +67,9 @@ const ResetPasswordPage = ({ token = "" }) => {
     setSuccessMsg("");
 
     try {
-      const response = await axios.post("/auth/reset-password", {
+      const response = await axios.post("/company/onboard-user", {
         token,
+        name: formData.name,
         password: formData.password,
         confirmPassword: formData.confirmPassword,
       });
@@ -69,12 +77,12 @@ const ResetPasswordPage = ({ token = "" }) => {
       const data = response.data;
 
       if (data.success) {
-        setSuccessMsg("Password successfully reset! Redirecting to login...");
+        setSuccessMsg("Success! Redirecting to signin page...");
         setTimeout(() => {
           router.push("/login");
         }, 3000);
       } else {
-        setError("Failed to reset password. Please try again.");
+        setError("Failed to accept invitation. Please try again.");
       }
     } catch (error) {
       setError(error.message || "An error occurred.");
@@ -82,6 +90,8 @@ const ResetPasswordPage = ({ token = "" }) => {
       setLoading(false);
     }
   };
+
+  console.log(token);
 
   return (
     <div className="min-h-screen flex justify-center items-center px-2">
@@ -112,10 +122,11 @@ const ResetPasswordPage = ({ token = "" }) => {
           }}
         >
           <Typography variant="h4" fontWeight="bold" mb={2}>
-            Reset Your Password
+            Onboarding Invitation
           </Typography>
           <Typography>
-            Enter a new password to regain access to your account.
+            Please enter your details to accept the onboarding invitation and to
+            create your account on GreazeBook
           </Typography>
         </Box>
 
@@ -134,11 +145,11 @@ const ResetPasswordPage = ({ token = "" }) => {
           autoComplete="off"
         >
           <Typography variant="h5" fontWeight="600" textAlign="center">
-            New Password
+            Enter Details
           </Typography>
 
           <Typography textAlign="center">
-            Please enter your new password details
+            Please enter required fields
           </Typography>
 
           {error && (
@@ -172,6 +183,19 @@ const ResetPasswordPage = ({ token = "" }) => {
               {successMsg}
             </Box>
           )}
+
+          <TextField
+            label="Name"
+            variant="outlined"
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            fullWidth
+            size="small"
+            autoFocus
+          />
 
           <FormControl variant="outlined" size="small" fullWidth required>
             <InputLabel htmlFor="password">Password</InputLabel>
@@ -237,12 +261,12 @@ const ResetPasswordPage = ({ token = "" }) => {
             {loading ? (
               <CircularProgress size={24} color="inherit" />
             ) : (
-              "Reset Password"
+              "Accept and Create"
             )}
           </Button>
 
           <Typography variant="body2" textAlign="center" mt={2}>
-            Remember your password?{" "}
+            Already have an account?{" "}
             <a
               href="/login"
               className="text-blue-600 hover:underline font-semibold"
@@ -256,4 +280,4 @@ const ResetPasswordPage = ({ token = "" }) => {
   );
 };
 
-export default ResetPasswordPage;
+export default InvitePage;
