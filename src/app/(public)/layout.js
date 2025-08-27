@@ -1,29 +1,14 @@
 import * as React from "react";
-import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
 import PublicNavbar from "@/components/layout/public/PublicNavbar";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export default function PublicLayout({ children }) {
   return (
-    <html lang="en" data-toolpad-color-scheme="light">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <header>
-          <PublicNavbar />
-        </header>
-        <main> {children}</main>
-      </body>
-    </html>
+    <div>
+      <header>
+        <PublicNavbar />
+      </header>
+      <main> {children}</main>
+    </div>
   );
 }
