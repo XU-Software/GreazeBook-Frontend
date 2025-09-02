@@ -213,7 +213,7 @@ const InvoicePage = () => {
               )
             }
           >
-            {role === "admin"
+            {role === "admin" || role === "superadmin"
               ? "Manage Accounts Receivable"
               : "View Accounts Receivable"}
           </Button>

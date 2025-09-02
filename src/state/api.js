@@ -8,6 +8,8 @@ export const api = createApi({
   reducerPath: "api",
   tagTypes: [
     "User",
+    "Companies",
+    "Company",
     "CompanyInvites",
     "CompanyInvite",
     "CompanyUsers",

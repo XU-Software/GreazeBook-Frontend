@@ -20,6 +20,7 @@ import GoogleIcon from "@mui/icons-material/Google";
 import Link from "next/link";
 import axios from "@/lib/axios";
 import { useRouter } from "next/navigation";
+import HomeButton from "@/components/Utils/HomeButton";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -55,7 +56,11 @@ const LoginPage = () => {
           email: "",
           password: "",
         });
-        router.push("/company/dashboard");
+        if (data.data.role === "superadmin") {
+          router.push("/super-admin/companies");
+        } else {
+          router.push("/company/dashboard");
+        }
       }
     } catch (error) {
       setError(error.message);
@@ -117,6 +122,7 @@ const LoginPage = () => {
             gap: 3,
           }}
         >
+          <HomeButton />
           <Typography variant="h5" fontWeight="600" textAlign="center">
             Sign In
           </Typography>

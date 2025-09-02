@@ -9,6 +9,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import axios from "@/lib/axios";
+import HomeButton from "@/components/Utils/HomeButton";
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
@@ -99,6 +100,7 @@ const ForgotPasswordPage = () => {
           noValidate
           autoComplete="off"
         >
+          <HomeButton />
           <Typography variant="h5" fontWeight="600" textAlign="center">
             Reset Password
           </Typography>

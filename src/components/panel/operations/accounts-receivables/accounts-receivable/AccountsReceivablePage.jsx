@@ -289,7 +289,7 @@ const AccountsReceivablePage = () => {
         </Typography>
 
         {/* Actions */}
-        {role === "admin" && (
+        {(role === "admin" || role === "superadmin") && (
           <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mb={3}>
             {status === "Paid" ? (
               <Tooltip title="AR is already paid">
@@ -518,7 +518,9 @@ const AccountsReceivablePage = () => {
                   <TableCell align="center">Action Type</TableCell>
                   <TableCell>Changed To</TableCell>
                   <TableCell>Reason</TableCell>
-                  {role === "admin" && <TableCell>Actions</TableCell>}
+                  {(role === "admin" || role === "superadmin") && (
+                    <TableCell>Actions</TableCell>
+                  )}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -576,7 +578,7 @@ const AccountsReceivablePage = () => {
                             ? sale.changeReason
                             : "-"}
                         </TableCell>
-                        {role === "admin" && (
+                        {(role === "admin" || role === "superadmin") && (
                           <TableCell>
                             <Stack direction="row" spacing={1}>
                               <Button
@@ -642,7 +644,9 @@ const AccountsReceivablePage = () => {
                   <TableCell>Void Status</TableCell>
                   <TableCell>Reference</TableCell>
                   <TableCell>Note</TableCell>
-                  {role === "admin" && <TableCell>Actions</TableCell>}
+                  {(role === "admin" || role === "superadmin") && (
+                    <TableCell>Actions</TableCell>
+                  )}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -676,7 +680,7 @@ const AccountsReceivablePage = () => {
                       </TableCell>
                       <TableCell>{p.reference}</TableCell>
                       <TableCell>{p.note}</TableCell>
-                      {role === "admin" && (
+                      {(role === "admin" || role === "superadmin") && (
                         <TableCell>
                           {!p.isVoid ? (
                             <Button

@@ -39,9 +39,9 @@ export default function AddRowButton({
 
   const handleClose = () => setOpen(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (onSubmit) onSubmit(form);
+    if (onSubmit) await onSubmit(form);
     handleClose();
   };
 

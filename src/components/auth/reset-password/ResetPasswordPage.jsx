@@ -16,6 +16,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useRouter } from "next/navigation";
 import axios from "@/lib/axios";
+import HomeButton from "@/components/Utils/HomeButton";
 
 const ResetPasswordPage = ({ token = "" }) => {
   const router = useRouter();
@@ -133,6 +134,7 @@ const ResetPasswordPage = ({ token = "" }) => {
           noValidate
           autoComplete="off"
         >
+          <HomeButton />
           <Typography variant="h5" fontWeight="600" textAlign="center">
             New Password
           </Typography>

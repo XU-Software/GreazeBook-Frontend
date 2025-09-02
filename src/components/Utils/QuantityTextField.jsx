@@ -7,11 +7,19 @@ const QuantityTextField = ({ value, onChange, name, ...props }) => {
   return (
     <NumericFormat
       value={value}
-      onValueChange={({ value: numericValue }) => {
+      // onValueChange={({ value: numericValue }) => {
+      //   onChange({
+      //     target: {
+      //       name,
+      //       value: numericValue,
+      //     },
+      //   });
+      // }}
+      onValueChange={({ floatValue }) => {
         onChange({
           target: {
             name,
-            value: numericValue,
+            value: floatValue ?? "", // empty string if cleared
           },
         });
       }}

@@ -17,6 +17,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useRouter } from "next/navigation";
 import axios from "@/lib/axios";
+import HomeButton from "@/components/Utils/HomeButton";
 
 const InvitePage = ({ token = "" }) => {
   const router = useRouter();
@@ -144,6 +145,7 @@ const InvitePage = ({ token = "" }) => {
           noValidate
           autoComplete="off"
         >
+          <HomeButton />
           <Typography variant="h5" fontWeight="600" textAlign="center">
             Enter Details
           </Typography>

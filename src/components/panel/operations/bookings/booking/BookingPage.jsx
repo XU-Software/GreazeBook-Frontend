@@ -190,7 +190,7 @@ const BookingPage = () => {
       <Box p={2}>
         {/* Action Buttons */}
         <Stack direction="row" spacing={2} mb={2}>
-          {role === "admin" && (
+          {(role === "admin" || role === "superadmin") && (
             <InvoiceNumberModal
               bookingData={bookingData}
               bookingId={bookingId}

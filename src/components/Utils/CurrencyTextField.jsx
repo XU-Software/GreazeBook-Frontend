@@ -7,12 +7,20 @@ const CurrencyTextField = ({ value, onChange, name, ...props }) => {
   return (
     <NumericFormat
       value={value}
-      onValueChange={(values) => {
-        const { value: numericValue } = values;
+      // onValueChange={(values) => {
+      //   const { value: numericValue } = values;
+      //   onChange({
+      //     target: {
+      //       name,
+      //       value: numericValue,
+      //     },
+      //   });
+      // }}
+      onValueChange={({ floatValue }) => {
         onChange({
           target: {
             name,
-            value: numericValue,
+            value: floatValue ?? "", // number or empty string if cleared
           },
         });
       }}

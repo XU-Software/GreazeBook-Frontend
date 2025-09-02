@@ -17,6 +17,8 @@ import axios from "@/lib/axios";
 import { useRouter } from "next/navigation";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import HomeButton from "@/components/Utils/HomeButton";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
 const RegisterCompanyPage = () => {
   const router = useRouter();
@@ -32,6 +34,13 @@ const RegisterCompanyPage = () => {
   const [error, setError] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
+
+  const [success, setSuccess] = useState(false);
+  const [registrationDetails, setRegistrationDetails] = useState({
+    email: "",
+    name: "",
+    companyName: "",
+  });
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -50,7 +59,9 @@ const RegisterCompanyPage = () => {
       const data = response.data;
 
       if (data.success) {
-        router.push("/company/dashboard");
+        // router.push("/company/dashboard");
+        setRegistrationDetails(data.data);
+        setSuccess(true);
       }
     } catch (error) {
       setError(error.message);
@@ -58,6 +69,49 @@ const RegisterCompanyPage = () => {
       setLoading(false);
     }
   };
+
+  if (success) {
+    // Success confirmation screen
+    return (
+      <div className="min-h-screen flex justify-center items-center px-2">
+        <Box
+          sx={{
+            maxWidth: 600,
+            width: "100%",
+            bgcolor: "background.paper",
+            borderRadius: 3,
+            boxShadow: 3,
+            p: 6,
+            textAlign: "center",
+          }}
+        >
+          <CheckCircleOutlineIcon
+            sx={{ fontSize: 80, mb: 2 }}
+            color="primary"
+          />
+          <Typography variant="h4" fontWeight="bold" gutterBottom>
+            Registration Request Submitted
+          </Typography>
+          <Typography variant="body1" color="text.secondary" mb={3}>
+            Thank you <b>{registrationDetails.name || "<Name>"}</b> for
+            registering your company{" "}
+            <b>{registrationDetails.companyName || "<Company Name>"}</b>. Your
+            request has been submitted and is pending approval. You will receive
+            an email to <b>{registrationDetails.email || "<Email>"}</b> once
+            your request has been reviewed.
+          </Typography>
+          <Button
+            href="/login"
+            variant="contained"
+            color="primary"
+            sx={{ mt: 2, py: 1.2, fontWeight: "bold" }}
+          >
+            Go to Login
+          </Button>
+        </Box>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex justify-center items-center px-2">
@@ -116,6 +170,7 @@ const RegisterCompanyPage = () => {
           noValidate
           autoComplete="off"
         >
+          <HomeButton />
           <Typography variant="h5" fontWeight="600" textAlign="center">
             Sign Up Your Business
           </Typography>

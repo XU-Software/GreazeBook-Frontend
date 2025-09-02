@@ -316,7 +316,7 @@ const AccountsPage = () => {
               fileName="accounts"
               sheetName="Accounts"
             />
-            {role === "admin" && (
+            {(role === "admin" || role === "superadmin") && (
               <DeleteSelectedButton
                 selected={selected}
                 setSelected={setSelected}
@@ -331,7 +331,7 @@ const AccountsPage = () => {
         rows={rows}
         columns={columns}
         onRowClick={(accountId) => router.push(`${pathName}/${accountId}`)}
-        enableSelection={role === "admin"}
+        enableSelection={role === "admin" || role === "superadmin"}
         selected={selected}
         setSelected={setSelected}
       />

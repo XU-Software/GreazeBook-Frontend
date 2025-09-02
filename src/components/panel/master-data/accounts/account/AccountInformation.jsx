@@ -133,7 +133,7 @@ const AccountInformation = ({
           }}
         >
           <Typography variant="h4">{accountName}</Typography>
-          {role === "admin" && (
+          {(role === "admin" || role === "superadmin") && (
             <>
               {editAccount ? (
                 <Stack direction="row" spacing={2}>
@@ -192,6 +192,7 @@ const AccountInformation = ({
                 ]}
                 initialValues={{ amount: "", dueDate: "", note: "" }}
                 onSubmit={handleWrapperFunction} // Pass wrapper
+                isLoading={isSettingOpeningAR}
               />
             </>
           )}

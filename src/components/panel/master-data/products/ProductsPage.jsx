@@ -365,7 +365,7 @@ const ProductsPage = () => {
           </Typography>
 
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
-            {role === "admin" && (
+            {(role === "admin" || role === "superadmin") && (
               <>
                 <AddRowButton
                   columns={columnsGuide}
@@ -396,7 +396,7 @@ const ProductsPage = () => {
               fileName="products"
               sheetName="Products"
             />
-            {role === "admin" && (
+            {(role === "admin" || role === "superadmin") && (
               <DeleteSelectedButton
                 selected={selected}
                 setSelected={setSelected}
@@ -411,7 +411,7 @@ const ProductsPage = () => {
         rows={rows}
         columns={columns}
         onRowClick={(productId) => router.push(`${pathName}/${productId}`)}
-        enableSelection={role === "admin"}
+        enableSelection={role === "admin" || role === "superadmin"}
         selected={selected}
         setSelected={setSelected}
       />

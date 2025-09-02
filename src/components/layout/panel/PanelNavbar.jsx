@@ -4,6 +4,7 @@
 import React, { useState } from "react";
 import { api } from "@/state/api";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useLogoutMutation } from "@/state/services/authApi";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
@@ -26,6 +27,7 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 
 function SettingsMenu() {
   const dispatch = useAppDispatch();
@@ -105,12 +107,16 @@ function SettingsMenu() {
 }
 
 export default function Navbar() {
+  const router = useRouter();
+
   const dispatch = useAppDispatch();
   const isSidebarCollapsed = useAppSelector(
     (state) => state.global.isSidebarCollapsed
   );
 
   const userData = useAppSelector((state) => state.global.userData); //Initial state is null, so safeguard every extraction from this data
+
+  const role = userData?.data?.role || "user";
 
   return (
     <header className="flex items-center justify-between px-6 py-2 shadow-sm bg-white z-40 fixed w-full h-18">
@@ -128,11 +134,25 @@ export default function Navbar() {
             )}
           </IconButton>
         </Tooltip>
-        <h1 className="hidden md:block text-md md:text-2xl font-semibold text-blue-500">
+        <Link
+          className="hidden md:block text-md md:text-2xl font-semibold text-blue-500"
+          href={"/company/dashboard"}
+        >
           {userData?.data?.company?.name || "Company"}
-        </h1>
+        </Link>
       </div>
       <div className="flex items-center md:gap-2">
+        {role === "superadmin" && (
+          <Tooltip title="Super Admin Panel">
+            <IconButton
+              color="primary"
+              onClick={() => router.push("/super-admin/companies")}
+            >
+              <AdminPanelSettingsIcon sx={{ fontSize: 26 }} />
+            </IconButton>
+          </Tooltip>
+        )}
+
         <Tooltip title="Work in progress..." arrow>
           <IconButton size="medium" color="inherit">
             <NotificationsIcon sx={{ fontSize: 26 }} />

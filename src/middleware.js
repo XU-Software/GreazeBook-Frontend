@@ -27,8 +27,16 @@ export async function middleware(req) {
     const { payload } = await jwtVerify(token, secret);
     const role = payload.role;
 
+    if (pathname.startsWith("/super-admin")) {
+      if (role === "superadmin") {
+        return NextResponse.next();
+      } else {
+        return NextResponse.redirect(new URL("/company/dashboard", req.url));
+      }
+    }
+
     // If user is an admin -> allow all access
-    if (role === "admin") {
+    if (role === "admin" || role === "superadmin") {
       return NextResponse.next();
     }
 
@@ -69,5 +77,6 @@ export const config = {
     "/operations/:path*",
     "/transaction-history/:path*",
     "/forms/:path*",
+    "/super-admin/:path*",
   ],
 };

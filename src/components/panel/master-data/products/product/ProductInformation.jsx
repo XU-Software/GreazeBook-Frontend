@@ -151,7 +151,7 @@ const ProductInformation = ({ productInfoData, productId = "" }) => {
         }}
       >
         <Typography variant="h4">{productName}</Typography>
-        {role === "admin" && (
+        {(role === "admin" || role === "superadmin") && (
           <>
             {" "}
             {editProduct ? (
@@ -214,6 +214,7 @@ const ProductInformation = ({ productInfoData, productId = "" }) => {
               ]}
               initialValues={{ quantity: "", reason: "" }}
               onSubmit={handleWrapperAddStockFunction} // Pass wrapper
+              isLoading={isAddingStock}
             />
             <AddRowButton
               buttonLabel="Stock"
@@ -236,6 +237,7 @@ const ProductInformation = ({ productInfoData, productId = "" }) => {
               ]}
               initialValues={{ quantity: "", reason: "" }}
               onSubmit={handleWrapperRemoveStockFunction} // Pass wrapper
+              isLoading={isRemovingStock}
             />
           </>
         )}

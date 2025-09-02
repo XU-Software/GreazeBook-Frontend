@@ -16,6 +16,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import SocketInitializer from "./socket/SocketInitializer";
 import SocketListeners from "./socket/SocketListeners";
+import HomeButton from "@/components/Utils/HomeButton";
 
 const PageWrapper = ({ children }) => {
   const isSidebarCollapsed = useAppSelector(
@@ -59,7 +60,8 @@ const PanelBootstrap = ({ children }) => {
 
   if (isError || !userDataResponse) {
     return (
-      <div className="w-full h-screen flex items-center justify-center text-red-500 text-center">
+      <div className="w-full h-screen flex flex-col gap-5 items-center justify-center text-red-500 text-center">
+        <HomeButton />
         <ErrorMessage
           message={
             error?.data?.message || error?.error || "Failed to load user data"
