@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function AppLayout({ children }) {
   return (
-    <div>
+    <div className="h-full">
       <PanelLayout>{children}</PanelLayout>
     </div>
   );
