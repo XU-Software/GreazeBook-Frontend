@@ -77,6 +77,7 @@ export const config = {
     "/operations/:path*",
     "/transaction-history/:path*",
     "/forms/:path*",
+    "/formats/:path*",
     "/super-admin/:path*",
   ],
 };

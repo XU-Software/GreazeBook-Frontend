@@ -13,6 +13,7 @@ import UndoIcon from "@mui/icons-material/Undo";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import DashboardIcon from "@mui/icons-material/Dashboard"; // Optional for Home or Dashboard route
+import PrintIcon from "@mui/icons-material/Print";
 
 export const navigationPageList = [
   { kind: "header", title: "Company" },
@@ -121,5 +122,15 @@ export const navigationPageList = [
     href: "/forms/booking",
     icon: AssignmentIcon,
     allowedRoles: ["admin", "user", "superadmin"],
+  },
+  {
+    kind: "header",
+    title: "Document Formats",
+  },
+  {
+    title: "Invoice Print Format",
+    href: "/formats/invoice-calibration",
+    icon: PrintIcon,
+    allowedRoles: ["admin", "superadmin"],
   },
 ];
