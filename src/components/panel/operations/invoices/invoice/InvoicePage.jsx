@@ -1,9 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { useGetSingleInvoiceQuery } from "@/state/services/invoicesApi";
-import { useAppSelector } from "@/app/redux";
+import {
+  useGetSingleInvoiceQuery,
+  useCancelInvoiceMutation,
+} from "@/state/services/invoicesApi";
+import { useAppSelector, useAppDispatch } from "@/app/redux";
+import { setShowSnackbar } from "@/state/snackbarSlice";
 import DynamicBreadcrumbs from "@/components/Utils/DynamicBreadcrumbs";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";
@@ -18,18 +22,27 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  TableFooter,
   Button,
+  Chip,
 } from "@mui/material";
 import { EastOutlined } from "@mui/icons-material";
 import { formatDateWithTime, formatDate } from "@/utils/dateFormatter";
 import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 import { formatNumber } from "@/utils/quantityFormatter";
+import {
+  calculateLessVat,
+  calculateAmountNetOfVat,
+} from "@/utils/vatCalculator";
+import ConfirmationModal from "@/components/Utils/ConfirmationModal";
 
 const InvoicePage = () => {
   const params = useParams();
   const pathname = usePathname();
   const router = useRouter();
   const { invoiceId } = params;
+
+  const dispatch = useAppDispatch();
 
   // Get only the first two non-empty segments
   const baseSegments = pathname.split("/").filter(Boolean).slice(0, 2);
@@ -39,6 +52,8 @@ const InvoicePage = () => {
 
   const userData = useAppSelector((state) => state.global.userData);
   const role = userData?.data?.role || "user";
+
+  const [openCancelInvoiceModal, setOpenCancelInvoiceModal] = useState(false);
 
   const {
     data: invoiceData,
@@ -50,6 +65,34 @@ const InvoicePage = () => {
     refetchOnMountOrArgChange: true,
     refetchOnFocus: true,
   });
+
+  const [cancelInvoice, { isLoading: isCancelling }] =
+    useCancelInvoiceMutation();
+
+  const handleCancelInvoice = async (invoiceId) => {
+    try {
+      if (!invoiceId) {
+        throw new Error("Invoice ID required", 400);
+      }
+
+      const res = await cancelInvoice(invoiceId).unwrap();
+      dispatch(
+        setShowSnackbar({
+          severity: "success",
+          message: res.message || "Invoice cancelled successfully",
+        })
+      );
+      setOpenCancelInvoiceModal(false);
+    } catch (error) {
+      dispatch(
+        setShowSnackbar({
+          severity: "error",
+          message:
+            error.data?.message || error.message || "Failed to cancel invoice",
+        })
+      );
+    }
+  };
 
   if (isLoading) {
     return (
@@ -77,6 +120,7 @@ const InvoicePage = () => {
     booking,
     accountsReceivable,
     totalAmount,
+    isCancelled,
   } = invoiceData.data;
 
   return (
@@ -84,9 +128,10 @@ const InvoicePage = () => {
       <DynamicBreadcrumbs />
       <Box sx={{ p: 2 }} className="container mx-auto">
         {/* Header */}
-        <Paper sx={{ p: 2, mb: 3 }} elevation={3}>
+        <Paper sx={{ p: 2, pb: 10, mb: 3 }} elevation={3}>
           <Typography variant="h4" gutterBottom>
-            Invoice #{salesInvoiceNumber}
+            Invoice Number: {salesInvoiceNumber}{" "}
+            {isCancelled && <Chip label="Cancelled" color="error" />}
           </Typography>
           <Typography color="text.secondary">
             Invoice Date: {formatDateWithTime(createdAt)}
@@ -183,15 +228,77 @@ const InvoicePage = () => {
                     </TableCell>
                   </TableRow>
                 ))}
+
+                {/* Fill with empty rows if less than 15 */}
+                {booking.orders.length < 15 &&
+                  Array.from({ length: 15 - booking.orders.length }).map(
+                    (_, i) => (
+                      <TableRow key={`empty-${i}`}>
+                        <TableCell colSpan={4}>-</TableCell>
+                      </TableRow>
+                    )
+                  )}
               </TableBody>
+
+              {/* Invoice Total */}
+
+              <TableFooter>
+                <TableRow>
+                  <TableCell colSpan={3} align="right">
+                    <Typography fontWeight="bold">
+                      Total Sales (VAT Inclusive)
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography color="primary">
+                      {formatToLocalCurrency(totalAmount || 0)}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+
+                <TableRow>
+                  <TableCell colSpan={3} align="right">
+                    <Typography fontWeight="bold">Less VAT</Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography color="primary">
+                      {formatToLocalCurrency(
+                        calculateLessVat(totalAmount) || 0
+                      )}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+
+                <TableRow>
+                  <TableCell colSpan={3} align="right">
+                    <Typography fontWeight="bold">Amount Net of VAT</Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography color="primary">
+                      {formatToLocalCurrency(
+                        calculateAmountNetOfVat(totalAmount) || 0
+                      )}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+
+                <TableRow>
+                  <TableCell colSpan={3} align="right">
+                    <Typography fontWeight="bold">Total Amount Due:</Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography color="primary">
+                      {formatToLocalCurrency(totalAmount || 0)}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              </TableFooter>
             </Table>
           ) : (
             <Typography color="text.secondary">No orders found.</Typography>
           )}
 
-          {/* Invoice Total */}
-
-          <Grid container justifyContent="flex-end" marginTop={2}>
+          {/* <Grid container justifyContent="flex-end" marginTop={2}>
             <Grid item xs={12} sm={6} md={4}>
               <Typography variant="body1" fontWeight="bold">
                 Total Amount:
@@ -200,9 +307,36 @@ const InvoicePage = () => {
                 {formatToLocalCurrency(totalAmount || 0)}
               </Typography>
             </Grid>
-          </Grid>
+          </Grid> */}
         </Paper>
-        <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
+        <Box
+          sx={{ display: "flex", justifyContent: "flex-end", mt: 2, gap: 2 }}
+        >
+          {(role === "admin" || role === "superadmin") && (
+            <>
+              <Button
+                variant="outlined"
+                color="error"
+                loading={isCancelling}
+                disabled={isCancelled}
+                onClick={() => setOpenCancelInvoiceModal(true)}
+              >
+                Cancel Invoice
+              </Button>
+              <ConfirmationModal
+                open={openCancelInvoiceModal}
+                onClose={() => setOpenCancelInvoiceModal(false)}
+                onConfirm={() => handleCancelInvoice(invoiceId)}
+                title={`Cancel Invoice: ${salesInvoiceNumber}`}
+                message="Are you sure you want to cancel this invoice? Cancelling this invoice will cancel all of it's related sales and each will return corresponding product stocks."
+                confirmText="Confirm"
+                confirmButtonColor="primary"
+                cancelText="Cancel"
+                cancelButtonColor="error"
+              />
+            </>
+          )}
+
           <Button
             variant="outlined"
             color="primary"

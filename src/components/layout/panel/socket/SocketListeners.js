@@ -480,6 +480,73 @@ export default function SocketListeners({ userData }) {
       }
     );
 
+    {
+      /*Invoices Event Listeners*/
+    }
+
+    socket.on(
+      "invoice_cancel",
+      ({
+        affectedInvoiceId,
+        affectedArId,
+        affectedAccountId,
+        affectedSaleIds,
+        affectedProductIds,
+        affectedPendingExcessIds,
+        newPendingExcessCreated,
+      }) => {
+        dispatch(
+          api.util.invalidateTags([
+            { type: "Invoices", id: "LIST" },
+            { type: "Invoice", id: affectedInvoiceId },
+            { type: "AccountsReceivables", id: "LIST" },
+            { type: "AccountsReceivable", id: affectedArId },
+            { type: "Accounts", id: "LIST" },
+            { type: "Account", id: affectedAccountId },
+            { type: "AccountMetrics", id: affectedAccountId },
+            { type: "AccountDetails", id: affectedAccountId },
+            { type: "CompanySalesVolume", id: "LIST" },
+            { type: "CompanySalesVolume", id: affectedAccountId },
+            ...(affectedSaleIds.length
+              ? [
+                  ...affectedSaleIds.map((saleId) => ({
+                    type: "Sale",
+                    id: saleId,
+                  })),
+                  { type: "Sales", id: "LIST" },
+                ]
+              : []),
+            ...(affectedProductIds.length
+              ? [
+                  ...affectedProductIds.map((productId) => ({
+                    type: "Product",
+                    id: productId,
+                  })),
+                  { type: "Products", id: "LIST" },
+                ]
+              : []),
+            ...(Array.isArray(affectedPendingExcessIds) &&
+            affectedPendingExcessIds.length > 0
+              ? affectedPendingExcessIds.map((pendingExcessId) => ({
+                  type: "PendingExcess",
+                  id: pendingExcessId,
+                }))
+              : []),
+            ...((Array.isArray(affectedPendingExcessIds) &&
+              affectedPendingExcessIds.length > 0) ||
+            newPendingExcessCreated
+              ? [
+                  {
+                    type: "PendingExcesses",
+                    id: "LIST",
+                  },
+                ]
+              : []),
+          ])
+        );
+      }
+    );
+
     return () => {
       //Accounts
       socket.off("account_added");
@@ -513,6 +580,9 @@ export default function SocketListeners({ userData }) {
       socket.off("ar_change_sale");
       socket.off("pending_excess_to_refund");
       socket.off("pending_excess_to_credit_memo");
+
+      //Invoices
+      socket.off("invoice_cancel");
     };
   }, [dispatch, userId]);
 

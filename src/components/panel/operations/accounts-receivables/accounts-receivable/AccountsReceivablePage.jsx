@@ -516,11 +516,11 @@ const AccountsReceivablePage = () => {
                   <TableCell align="right">Subtotal</TableCell>
                   <TableCell align="right">Volume</TableCell>
                   <TableCell align="center">Action Type</TableCell>
-                  <TableCell>Changed To</TableCell>
+                  {/* <TableCell>Changed To</TableCell>
                   <TableCell>Reason</TableCell>
                   {(role === "admin" || role === "superadmin") && (
                     <TableCell>Actions</TableCell>
-                  )}
+                  )} */}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -559,7 +559,7 @@ const AccountsReceivablePage = () => {
                         <TableCell align="center">
                           {getFulfillmentChip(sale.actionType)}
                         </TableCell>
-                        <TableCell>
+                        {/* <TableCell>
                           {changedTo ? (
                             <Chip
                               size="small"
@@ -605,7 +605,7 @@ const AccountsReceivablePage = () => {
                               </Button>
                             </Stack>
                           </TableCell>
-                        )}
+                        )} */}
                       </TableRow>
                     );
                   })
