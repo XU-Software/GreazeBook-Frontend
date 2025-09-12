@@ -9,13 +9,14 @@ const CanvasSection = ({
   fields,
   handleStop = () => {},
   table,
-  setTable = () => {},
+  handleTableStop = () => {},
+  mmToPx = () => {},
 }) => {
   const tableRef = useRef(null);
 
   // Convert mm to pixels for on-screen preview (assume 3.78px/mm at 96 DPI)
-  const mmToPx = (mm) => (parseFloat(mm) || 0) * 3.78;
-  const fontPtToPx = (pt) => (parseFloat(pt) || 0) * 1.33; // 1pt ≈ 1.33px at 96dpi
+  // const mmToPx = (mm) => (parseFloat(mm) || 0) * 3.78;
+  // const fontPtToPx = (pt) => (parseFloat(pt) || 0) * 1.33; // 1pt ≈ 1.33px at 96dpi
   return (
     <Grid item size={{ xs: 12, md: 9 }} sx={{ overflow: "auto" }}>
       <Box
@@ -34,7 +35,7 @@ const CanvasSection = ({
             <Draggable
               key={f.id}
               nodeRef={nodeRef}
-              position={{ x: f.x, y: f.y }}
+              position={{ x: mmToPx(f.x), y: mmToPx(f.y) }}
               onStop={(e, data) => handleStop(e, data, f.id)}
             >
               <Box
@@ -44,7 +45,7 @@ const CanvasSection = ({
                   padding: "4px 6px",
                   border: "1px dashed #1976d2",
                   backgroundColor: "rgba(25,118,210,0.1)",
-                  fontSize: fontPtToPx(f.fontSize),
+                  fontSize: mmToPx(f.fontSize),
                   cursor: "move",
                   whiteSpace: "nowrap",
                 }}
@@ -58,10 +59,8 @@ const CanvasSection = ({
         {/* Draggable Products Table */}
         <Draggable
           nodeRef={tableRef}
-          position={{ x: table.x, y: table.y }}
-          onStop={(e, data) =>
-            setTable((prev) => ({ ...prev, x: data.x, y: data.y }))
-          }
+          position={{ x: mmToPx(table.x), y: mmToPx(table.y) }}
+          onStop={(e, data) => handleTableStop(e, data)}
         >
           <Box
             ref={tableRef}
@@ -101,7 +100,7 @@ const CanvasSection = ({
                     p: 0.5,
                     textAlign: "center",
                     fontWeight: "bold",
-                    fontSize: fontPtToPx(table.fontSize),
+                    fontSize: mmToPx(table.fontSize),
                   }}
                 >
                   {col.label}
@@ -129,7 +128,7 @@ const CanvasSection = ({
                           : "none",
                       p: 0.5,
                       textAlign: "center",
-                      fontSize: fontPtToPx(table.fontSize),
+                      fontSize: mmToPx(table.fontSize),
                     }}
                   >
                     Sample

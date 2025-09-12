@@ -29,13 +29,11 @@ export const invoicesApi = api.injectEndpoints({
       }),
       providesTags: (result, error, arg) => [{ type: "Invoice", id: arg }],
     }),
+
     cancelInvoice: build.mutation({
       query: (invoiceId) => ({
         url: `/invoice/${invoiceId}/cancel`,
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
       }),
       invalidatesTags: (result, error, arg) => {
         const tags = [
@@ -109,6 +107,27 @@ export const invoicesApi = api.injectEndpoints({
         return tags;
       },
     }),
+
+    saveInvoiceTemplate: build.mutation({
+      query: (config) => ({
+        url: `/invoice/invoice-template`,
+        method: "POST",
+        body: config,
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+
+      invalidatesTags: ["InvoiceTemplate"],
+    }),
+
+    getInvoiceTemplate: build.query({
+      query: () => ({
+        url: `/invoice/invoice-template/fetch`,
+      }),
+      providesTags: ["InvoiceTemplate"],
+    }),
   }),
 });
 
@@ -116,4 +135,6 @@ export const {
   useGetInvoicesQuery,
   useGetSingleInvoiceQuery,
   useCancelInvoiceMutation,
+  useSaveInvoiceTemplateMutation,
+  useGetInvoiceTemplateQuery,
 } = invoicesApi;

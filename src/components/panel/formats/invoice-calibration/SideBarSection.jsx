@@ -35,6 +35,7 @@ const SideBarSection = ({
                 onChange={(e) =>
                   setPaperSize({ ...paperSize, width: e.target.value })
                 }
+                size="small"
                 fullWidth
               />
             </Grid>
@@ -46,6 +47,7 @@ const SideBarSection = ({
                 onChange={(e) =>
                   setPaperSize({ ...paperSize, height: e.target.value })
                 }
+                size="small"
                 fullWidth
               />
             </Grid>
@@ -80,10 +82,11 @@ const SideBarSection = ({
             Products Table
           </Typography>
           <TextField
-            label="Row Height"
+            label="Row Height (mm)"
             type="number"
             value={table.rowHeight}
             onChange={(e) => handleTableChange("rowHeight", e.target.value)}
+            size="small"
             fullWidth
             sx={{ mb: 2 }}
           />
@@ -92,14 +95,15 @@ const SideBarSection = ({
             type="number"
             value={table.fontSize}
             onChange={(e) => handleTableChange("fontSize", e.target.value)}
+            size="small"
             fullWidth
             sx={{ mb: 2 }}
           />
           {table.columns.map((col, idx) => (
             <Box key={idx} sx={{ mb: 1 }}>
-              <Typography>{col.label}</Typography>
+              <Typography gutterBottom>{col.label}</Typography>
               <TextField
-                label="Column Width"
+                label="Column Width (mm)"
                 type="number"
                 value={col.width}
                 onChange={(e) =>
