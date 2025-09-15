@@ -21,6 +21,7 @@ import OrdersDetail from "./OrdersDetail";
 import NoteDetails from "./NoteDetails";
 import InvoiceNumberModal from "./InvoiceNumberModal";
 import ConfirmationModal from "@/components/Utils/ConfirmationModal";
+import GenerateAndPrintInvoiceModal from "./GenerateAndPrintModal";
 
 const BookingPage = () => {
   const params = useParams();
@@ -191,10 +192,16 @@ const BookingPage = () => {
         {/* Action Buttons */}
         <Stack direction="row" spacing={2} mb={2}>
           {(role === "admin" || role === "superadmin") && (
-            <InvoiceNumberModal
-              bookingData={bookingData}
-              bookingId={bookingId}
-            />
+            <>
+              <GenerateAndPrintInvoiceModal
+                bookingData={bookingData}
+                bookingId={bookingId}
+              />
+              <InvoiceNumberModal
+                bookingData={bookingData}
+                bookingId={bookingId}
+              />
+            </>
           )}
           {bookingData.data.status === "Pending" && (
             <Button
