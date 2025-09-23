@@ -2,8 +2,10 @@
 
 // components/InvoiceNumberModal.js
 import React, { useState, useRef } from "react";
-import { useApproveBookingMutation } from "@/state/services/bookingsApi";
-import { useGetInvoiceTemplateQuery } from "@/state/services/invoicesApi";
+import {
+  useGetInvoiceTemplateQuery,
+  useInvoiceBookingMutation,
+} from "@/state/services/invoicesApi";
 import { useAppDispatch } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
 import {
@@ -26,7 +28,11 @@ import {
 } from "@/utils/invoiceTemplateHelpers";
 import ColoredLink from "@/components/Utils/ColoredLink";
 
-const GenerateAndPrintInvoiceModal = ({ bookingData, bookingId = "" }) => {
+const GenerateAndPrintInvoiceModal = ({
+  bookingData,
+  bookingId = "",
+  disabled = false,
+}) => {
   const dispatch = useAppDispatch();
   const contentRef = useRef(null);
 
@@ -60,10 +66,10 @@ const GenerateAndPrintInvoiceModal = ({ bookingData, bookingId = "" }) => {
     body { margin: 0; }`,
   });
 
-  const [approveBooking, { isLoading: isApprovingBooking }] =
-    useApproveBookingMutation();
+  const [invoiceBooking, { isLoading: isInvoicing }] =
+    useInvoiceBookingMutation();
 
-  const handleApproveAndPrint = async (e) => {
+  const handleInvoiceAndPrint = async (e) => {
     e.preventDefault();
 
     if (!invoiceNumber.trim()) throw new Error("Invoice number required", 400);
@@ -93,7 +99,7 @@ const GenerateAndPrintInvoiceModal = ({ bookingData, bookingId = "" }) => {
 
       if (!confirmed) return;
 
-      approveBooking({
+      invoiceBooking({
         bookingId,
         salesInvoiceNumber: invoiceNumber,
       })
@@ -160,16 +166,15 @@ const GenerateAndPrintInvoiceModal = ({ bookingData, bookingId = "" }) => {
 
   return (
     <>
-      {bookingData.data.status === "Pending" && (
-        <Button
-          variant="contained"
-          color="primary"
-          loading={isApprovingBooking}
-          onClick={() => setToggleInvoiceAndPrintModal(true)}
-        >
-          Generate And Print Invoice
-        </Button>
-      )}
+      <Button
+        variant="outlined"
+        color="primary"
+        loading={isInvoicing}
+        onClick={() => setToggleInvoiceAndPrintModal(true)}
+        disabled={disabled}
+      >
+        Generate And Print Invoice
+      </Button>
 
       <Dialog open={toggleInvoiceAndPrintModal} onClose={onClose}>
         <DialogTitle>Enter Invoice Number</DialogTitle>
@@ -191,7 +196,7 @@ const GenerateAndPrintInvoiceModal = ({ bookingData, bookingId = "" }) => {
           </Box>
         )}
 
-        <form onSubmit={handleApproveAndPrint}>
+        <form onSubmit={handleInvoiceAndPrint}>
           <DialogContent dividers>
             <TextField
               autoFocus
@@ -207,7 +212,7 @@ const GenerateAndPrintInvoiceModal = ({ bookingData, bookingId = "" }) => {
             <Button
               onClick={onClose}
               variant="outlined"
-              loading={isApprovingBooking || isLoading}
+              loading={isInvoicing || isLoading}
             >
               Cancel
             </Button>
@@ -215,7 +220,7 @@ const GenerateAndPrintInvoiceModal = ({ bookingData, bookingId = "" }) => {
               type="submit"
               variant="contained"
               color="primary"
-              loading={isApprovingBooking || isLoading}
+              loading={isInvoicing || isLoading}
               disabled={!invoiceNumber.trim()}
             >
               Confirm

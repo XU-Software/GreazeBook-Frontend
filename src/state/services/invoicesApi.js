@@ -30,6 +30,40 @@ export const invoicesApi = api.injectEndpoints({
       providesTags: (result, error, arg) => [{ type: "Invoice", id: arg }],
     }),
 
+    invoiceBooking: build.mutation({
+      query: ({ bookingId, salesInvoiceNumber }) => ({
+        url: `/invoice/${bookingId}/invoice`,
+        method: "POST",
+        body: { salesInvoiceNumber },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: (result, error, arg) => [
+        { type: "Bookings", id: "LIST" },
+        { type: "Booking", id: arg.bookingId },
+        { type: "Invoices", id: "LIST" },
+        { type: "Sales", id: "LIST" },
+        { type: "AccountsReceivables", id: "LIST" },
+        { type: "Products", id: "LIST" },
+        { type: "ProductsToRestock", id: "LIST" },
+        ...(result?.affectedProductIds?.length
+          ? result.affectedProductIds.map((productId) => ({
+              type: "Product",
+              id: productId,
+            }))
+          : []),
+        ...(result?.affectedAccountId
+          ? [
+              { type: "AccountMetrics", id: result.affectedAccountId },
+              { type: "AccountDetails", id: result.affectedAccountId },
+              { type: "CompanySalesVolume", id: "LIST" },
+              { type: "CompanySalesVolume", id: result.affectedAccountId },
+            ]
+          : []),
+      ],
+    }),
+
     cancelInvoice: build.mutation({
       query: (invoiceId) => ({
         url: `/invoice/${invoiceId}/cancel`,
@@ -134,6 +168,7 @@ export const invoicesApi = api.injectEndpoints({
 export const {
   useGetInvoicesQuery,
   useGetSingleInvoiceQuery,
+  useInvoiceBookingMutation,
   useCancelInvoiceMutation,
   useSaveInvoiceTemplateMutation,
   useGetInvoiceTemplateQuery,

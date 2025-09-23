@@ -8,6 +8,7 @@ import {
   useGetSingleBookingQuery,
   useUpdatePendingBookingMutation,
   useUpdatePendingOrdersMutation,
+  useApproveBookingMutation,
 } from "@/state/services/bookingsApi";
 import DynamicBreadcrumbs from "@/components/Utils/DynamicBreadcrumbs";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
@@ -15,7 +16,6 @@ import ErrorMessage from "@/components/Utils/ErrorMessage";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
 import { Box, Button, Stack } from "@mui/material";
-
 import BookingDetails from "./BookingDetails";
 import OrdersDetail from "./OrdersDetail";
 import NoteDetails from "./NoteDetails";
@@ -62,6 +62,9 @@ const BookingPage = () => {
 
   // Toggle state for delete confirmation modal
   const [toggleDeleteModal, setToggleDeleteModal] = useState(false);
+
+  // Toggle state for approval modal
+  const [toggleApproveModal, setToggelApproveModal] = useState(false);
 
   const [updatePendingBooking, { isLoading: isUpdatingBooking }] =
     useUpdatePendingBookingMutation();
@@ -147,6 +150,9 @@ const BookingPage = () => {
   // HANDLE FOR DELETING PENDING BOOKING
   const handleDeleteBooking = async (bookingId) => {
     try {
+      if (!bookingId) {
+        throw new Error("Booking ID required", 400);
+      }
       const res = await deletePendingBooking({ bookingId }).unwrap();
       dispatch(
         setShowSnackbar({
@@ -161,6 +167,36 @@ const BookingPage = () => {
           severity: "error",
           message:
             error.data?.message || error.message || "Failed to delete booking",
+        })
+      );
+    }
+  };
+
+  const [approveBooking, { isLoading: isApproving }] =
+    useApproveBookingMutation();
+
+  const handleApproveBooking = async (bookingId) => {
+    try {
+      if (!bookingId) {
+        throw new Error("Booking ID required", 400);
+      }
+
+      const res = await approveBooking(bookingId).unwrap();
+
+      dispatch(
+        setShowSnackbar({
+          severity: "success",
+          message: res.message || "Booking approved",
+        })
+      );
+
+      setToggelApproveModal(false);
+    } catch (error) {
+      dispatch(
+        setShowSnackbar({
+          severity: "error",
+          message:
+            error.data?.message || error.message || "Failed to approve booking",
         })
       );
     }
@@ -196,13 +232,33 @@ const BookingPage = () => {
               <GenerateAndPrintInvoiceModal
                 bookingData={bookingData}
                 bookingId={bookingId}
+                disabled={
+                  bookingData.data.status === "Pending" ||
+                  bookingData.data.status === "Invoiced"
+                }
               />
               <InvoiceNumberModal
                 bookingData={bookingData}
                 bookingId={bookingId}
+                disabled={
+                  bookingData.data.status === "Pending" ||
+                  bookingData.data.status === "Invoiced"
+                }
               />
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => setToggelApproveModal(true)}
+                disabled={
+                  bookingData.data.status === "Approved" ||
+                  bookingData.data.status === "Invoiced"
+                }
+              >
+                Approve
+              </Button>
             </>
           )}
+
           {bookingData.data.status === "Pending" && (
             <Button
               variant="outlined"
@@ -253,6 +309,19 @@ const BookingPage = () => {
         confirmButtonColor="error"
         cancelText="Cancel"
         cancelButtonColor="primary"
+      />
+      <ConfirmationModal
+        open={toggleApproveModal}
+        onClose={() => setToggelApproveModal(false)}
+        onConfirm={() => handleApproveBooking(bookingId)}
+        title={"Approve Booking"}
+        message={
+          "Approve this booking first to allow invoice print and generation."
+        }
+        confirmText="Confirm"
+        confirmButtonColor="primary"
+        cancelText="Cancel"
+        cancelButtonColor="error"
       />
     </div>
   );

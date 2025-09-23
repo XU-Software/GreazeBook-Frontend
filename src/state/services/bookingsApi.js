@@ -132,36 +132,13 @@ export const bookingsApi = api.injectEndpoints({
       ],
     }),
     approveBooking: build.mutation({
-      query: ({ bookingId, salesInvoiceNumber }) => ({
-        url: `/invoice/${bookingId}/approve`,
-        method: "POST",
-        body: { salesInvoiceNumber },
-        headers: {
-          "Content-Type": "application/json",
-        },
+      query: (bookingId) => ({
+        url: `/booking/${bookingId}/approve`,
+        method: "PATCH",
       }),
       invalidatesTags: (result, error, arg) => [
         { type: "Bookings", id: "LIST" },
-        { type: "Booking", id: arg.bookingId },
-        { type: "Invoices", id: "LIST" },
-        { type: "Sales", id: "LIST" },
-        { type: "AccountsReceivables", id: "LIST" },
-        { type: "Products", id: "LIST" },
-        { type: "ProductsToRestock", id: "LIST" },
-        ...(result?.affectedProductIds?.length
-          ? result.affectedProductIds.map((productId) => ({
-              type: "Product",
-              id: productId,
-            }))
-          : []),
-        ...(result?.affectedAccountId
-          ? [
-              { type: "AccountMetrics", id: result.affectedAccountId },
-              { type: "AccountDetails", id: result.affectedAccountId },
-              { type: "CompanySalesVolume", id: "LIST" },
-              { type: "CompanySalesVolume", id: result.affectedAccountId },
-            ]
-          : []),
+        { type: "Booking", id: arg },
       ],
     }),
     deletePendingBooking: build.mutation({

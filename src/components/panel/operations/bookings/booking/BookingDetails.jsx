@@ -221,7 +221,13 @@ const BookingDetails = ({
             <Typography variant="subtitle2">Status</Typography>
             <Chip
               label={bookingData.status}
-              color={bookingData.status === "Approved" ? "success" : "warning"}
+              color={
+                bookingData.status === "Invoiced"
+                  ? "success"
+                  : bookingData.status === "Approved"
+                  ? "primary"
+                  : "warning"
+              }
               size="small"
             />
           </Stack>

@@ -25,7 +25,8 @@ import { usePathname } from "next/navigation";
 
 const statusColorMap = {
   Pending: "warning",
-  Approved: "success",
+  Approved: "primary",
+  Invoiced: "success",
 };
 
 const columns = [

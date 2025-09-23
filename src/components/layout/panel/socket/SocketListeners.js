@@ -201,36 +201,14 @@ export default function SocketListeners({ userData }) {
     socket.on("booking_note_added", (bookingId) => {
       dispatch(api.util.invalidateTags([{ type: "Booking", id: bookingId }]));
     });
-    socket.on(
-      "booking_approved",
-      ({ bookingId, affectedProductIds, affectedAccountId }) => {
-        dispatch(
-          api.util.invalidateTags([
-            { type: "Bookings", id: "LIST" },
-            { type: "Booking", id: bookingId },
-            { type: "Invoices", id: "LIST" },
-            { type: "Sales", id: "LIST" },
-            { type: "AccountsReceivables", id: "LIST" },
-            { type: "Products", id: "LIST" },
-            { type: "ProductsToRestock", id: "LIST" },
-            ...(affectedProductIds?.length
-              ? affectedProductIds.map((productId) => ({
-                  type: "Product",
-                  id: productId,
-                }))
-              : []),
-            ...(affectedAccountId
-              ? [
-                  { type: "AccountMetrics", id: affectedAccountId },
-                  { type: "AccountDetails", id: affectedAccountId },
-                  { type: "CompanySalesVolume", id: "LIST" },
-                  { type: "CompanySalesVolume", id: affectedAccountId },
-                ]
-              : []),
-          ])
-        );
-      }
-    );
+    socket.on("booking_approved", (bookingId) => {
+      dispatch(
+        api.util.invalidateTags([
+          { type: "Bookings", id: "LIST" },
+          { type: "Booking", id: bookingId },
+        ])
+      );
+    });
     socket.on("booking_deleted", () => {
       dispatch(api.util.invalidateTags([{ type: "Bookings", id: "LIST" }]));
     });
@@ -485,6 +463,37 @@ export default function SocketListeners({ userData }) {
     }
 
     socket.on(
+      "booking_invoiced",
+      ({ bookingId, affectedProductIds, affectedAccountId }) => {
+        dispatch(
+          api.util.invalidateTags([
+            { type: "Bookings", id: "LIST" },
+            { type: "Booking", id: bookingId },
+            { type: "Invoices", id: "LIST" },
+            { type: "Sales", id: "LIST" },
+            { type: "AccountsReceivables", id: "LIST" },
+            { type: "Products", id: "LIST" },
+            { type: "ProductsToRestock", id: "LIST" },
+            ...(affectedProductIds?.length
+              ? affectedProductIds.map((productId) => ({
+                  type: "Product",
+                  id: productId,
+                }))
+              : []),
+            ...(affectedAccountId
+              ? [
+                  { type: "AccountMetrics", id: affectedAccountId },
+                  { type: "AccountDetails", id: affectedAccountId },
+                  { type: "CompanySalesVolume", id: "LIST" },
+                  { type: "CompanySalesVolume", id: affectedAccountId },
+                ]
+              : []),
+          ])
+        );
+      }
+    );
+
+    socket.on(
       "invoice_cancel",
       ({
         affectedInvoiceId,
@@ -582,6 +591,7 @@ export default function SocketListeners({ userData }) {
       socket.off("pending_excess_to_credit_memo");
 
       //Invoices
+      socket.off("booking_invoiced");
       socket.off("invoice_cancel");
     };
   }, [dispatch, userId]);

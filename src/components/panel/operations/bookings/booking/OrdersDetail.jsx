@@ -66,7 +66,7 @@ const OrdersDetail = ({
             <div className="flex items-center gap-4">
               <Tooltip
                 title={
-                  bookingData.status === "Approved"
+                  bookingData.status !== "Pending"
                     ? "Cannot add new orders to an approved booking"
                     : "Add a new order to this booking"
                 }
@@ -76,7 +76,7 @@ const OrdersDetail = ({
                   {/* Needed to wrap disabled button to ensure Tooltip works */}
                   <Button
                     variant="outlined"
-                    disabled={bookingData.status === "Approved" || editOrders}
+                    disabled={bookingData.status !== "Pending" || editOrders}
                     onClick={() => setToggelModal(true)}
                   >
                     + Add Order

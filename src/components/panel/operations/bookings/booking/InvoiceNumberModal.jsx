@@ -2,7 +2,7 @@
 
 // components/InvoiceNumberModal.js
 import React, { useState } from "react";
-import { useApproveBookingMutation } from "@/state/services/bookingsApi";
+import { useInvoiceBookingMutation } from "@/state/services/invoicesApi";
 import { useAppDispatch } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
 import {
@@ -14,7 +14,7 @@ import {
   Button,
 } from "@mui/material";
 
-const InvoiceNumberModal = ({ bookingData, bookingId = "" }) => {
+const InvoiceNumberModal = ({ bookingId = "", disabled }) => {
   const dispatch = useAppDispatch();
 
   // Toggle state of invoice number modal
@@ -25,22 +25,22 @@ const InvoiceNumberModal = ({ bookingData, bookingId = "" }) => {
 
   const onClose = () => setToggleInvoiceNumberModal(false);
 
-  const [approveBooking, { isLoading: isApprovingBooking }] =
-    useApproveBookingMutation();
+  const [invoiceBooking, { isLoading: isInvoicing }] =
+    useInvoiceBookingMutation();
 
-  const handleApproveBooking = async (e, bookingId, salesInvoiceNumber) => {
+  const handleInvoiceBooking = async (e, bookingId, salesInvoiceNumber) => {
     e.preventDefault();
     try {
       if (!salesInvoiceNumber.trim())
         throw new Error("Invoice number required", 400);
-      const res = await approveBooking({
+      const res = await invoiceBooking({
         bookingId,
         salesInvoiceNumber,
       }).unwrap();
       dispatch(
         setShowSnackbar({
           severity: "success",
-          message: res.message || "Booking approved",
+          message: res.message || "Booking invoiced",
         })
       );
       setInvoiceNumber("");
@@ -50,7 +50,7 @@ const InvoiceNumberModal = ({ bookingData, bookingId = "" }) => {
         setShowSnackbar({
           severity: "error",
           message:
-            error.data?.message || error.message || "Failed to approve booking",
+            error.data?.message || error.message || "Failed to invoice booking",
         })
       );
     }
@@ -58,21 +58,20 @@ const InvoiceNumberModal = ({ bookingData, bookingId = "" }) => {
 
   return (
     <>
-      {bookingData.data.status === "Pending" && (
-        <Button
-          variant="contained"
-          color="primary"
-          loading={isApprovingBooking}
-          onClick={() => setToggleInvoiceNumberModal(true)}
-        >
-          Generate Invoice
-        </Button>
-      )}
+      <Button
+        variant="outlined"
+        color="primary"
+        loading={isInvoicing}
+        onClick={() => setToggleInvoiceNumberModal(true)}
+        disabled={disabled}
+      >
+        Generate Invoice
+      </Button>
 
       <Dialog open={toggleInvoiceNumberModal} onClose={onClose}>
         <DialogTitle>Enter Invoice Number</DialogTitle>
         <form
-          onSubmit={(e) => handleApproveBooking(e, bookingId, invoiceNumber)}
+          onSubmit={(e) => handleInvoiceBooking(e, bookingId, invoiceNumber)}
         >
           <DialogContent dividers>
             <TextField
@@ -86,18 +85,14 @@ const InvoiceNumberModal = ({ bookingData, bookingId = "" }) => {
             />
           </DialogContent>
           <DialogActions>
-            <Button
-              onClick={onClose}
-              variant="outlined"
-              loading={isApprovingBooking}
-            >
+            <Button onClick={onClose} variant="outlined" loading={isInvoicing}>
               Cancel
             </Button>
             <Button
               type="submit"
               variant="contained"
               color="primary"
-              loading={isApprovingBooking}
+              loading={isInvoicing}
               disabled={!invoiceNumber.trim()}
             >
               Confirm

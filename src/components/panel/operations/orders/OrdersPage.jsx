@@ -157,7 +157,7 @@ const OrdersPage = () => {
         id: order.orderId,
         salesInvoiceNumber: order.sale
           ? order.sale.accountsReceivable.invoice.salesInvoiceNumber
-          : "Not Approved Yet",
+          : "Not Invoiced Yet",
         accountsReceivableId: order.sale
           ? order.sale.accountsReceivable.accountsReceivableId
           : null,
