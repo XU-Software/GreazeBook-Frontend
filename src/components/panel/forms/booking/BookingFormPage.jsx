@@ -46,7 +46,8 @@ export default function BookingFormPage() {
       !orderDate ||
       !deliveryDate ||
       !customerName ||
-      !term ||
+      term === "" ||
+      term === null ||
       !freebiesRemarksConcern ||
       !accountData ||
       ordersData.length === 0
