@@ -26,6 +26,7 @@ import { Chip, Tooltip, Typography } from "@mui/material";
 import { WarningAmber, Error, CheckCircle, Add } from "@mui/icons-material";
 import { usePathname } from "next/navigation";
 import { formatNumber } from "@/utils/quantityFormatter";
+import { formatToLocalCurrency } from "@/utils/currencyFormatter";
 
 const columns = [
   {
@@ -107,6 +108,12 @@ const columns = [
     minWidth: 150,
   },
   {
+    field: "acquisitionCost",
+    headerName: "Acquisition Cost",
+    render: (value) => formatToLocalCurrency(value),
+    minWidth: 150,
+  },
+  {
     field: "totalLiters",
     headerName: "Total Liters",
     render: (value) => formatNumber(value),
@@ -126,6 +133,7 @@ const rowGuide = {
   productFamily: "Product Family1",
   uom: "123 or 1 or 1.5 (In Liters)",
   totalStocks: "123 or 0",
+  acquisitionCost: "123 or 123.5",
 };
 
 const columnsGuide = [
@@ -149,6 +157,12 @@ const columnsGuide = [
   {
     field: "totalStocks",
     headerName: "Total Stocks",
+    type: "number",
+    isQuantity: true,
+  },
+  {
+    field: "acquisitionCost",
+    headerName: "Acquisition Cost",
     type: "number",
     isQuantity: true,
   },
@@ -300,6 +314,7 @@ const ProductsPage = () => {
         uom: prod.uom,
         totalStocks: prod.totalStocks,
         totalLiters: prod.totalLiters,
+        acquisitionCost: prod.acquisitionCost,
         restockThreshold: prod.restockThreshold,
         isLowStock: prod.isLowStock,
         createdAt: formattedDate,
@@ -317,6 +332,7 @@ const ProductsPage = () => {
             ? `Low Stock (${formattedTotalStocks})`
             : `In Stock (${formattedTotalStocks})`,
         "Total Liters": formatNumber(prod.totalLiters),
+        "Acquisition Cost": formatToLocalCurrency(prod.acquisitionCost),
         "Created At": formattedDate,
       });
     });
@@ -375,6 +391,7 @@ const ProductsPage = () => {
                     productFamily: "",
                     uom: 0,
                     totalStocks: 0,
+                    acquisitionCost: 0,
                   }}
                   isLoading={isAdding}
                   onSubmit={handleAddSingleProduct}

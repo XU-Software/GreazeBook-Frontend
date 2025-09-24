@@ -34,6 +34,7 @@ const ProductInformation = ({ productInfoData, productId = "" }) => {
     productFamily,
     uom,
     totalStocks,
+    acquisitionCost,
     createdAt,
     updatedAt,
   } = productInfoData.data;
@@ -316,6 +317,27 @@ const ProductInformation = ({ productInfoData, productId = "" }) => {
             type="number"
             name="uom"
             isQuantity={true}
+            onChange={(e) =>
+              setProductFormData((prev) => ({
+                ...prev,
+                [e.target.name]: e.target.value,
+              }))
+            }
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <EditableField
+            label="Acquisition Cost"
+            value={
+              productFormData.acquisitionCost !== undefined
+                ? productFormData.acquisitionCost
+                : acquisitionCost || ""
+            }
+            editing={editProduct}
+            type="number"
+            name="acquisitionCost"
+            isCurrency={true}
             onChange={(e) =>
               setProductFormData((prev) => ({
                 ...prev,
