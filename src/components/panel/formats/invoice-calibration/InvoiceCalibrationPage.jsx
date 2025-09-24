@@ -3,10 +3,19 @@ import React, { useState, useEffect } from "react";
 import {
   useSaveInvoiceTemplateMutation,
   useGetInvoiceTemplateQuery,
+  useGetInvoiceNumberSeriesQuery,
+  useSaveInvoiceNumberSeriesMutation,
 } from "@/state/services/invoicesApi";
 import { useAppDispatch } from "@/app/redux";
 import { setShowSnackbar } from "@/state/snackbarSlice";
-import { Box, Button, Typography, Grid, Divider } from "@mui/material";
+import {
+  Box,
+  Button,
+  Typography,
+  Grid,
+  Divider,
+  TextField,
+} from "@mui/material";
 import SideBarSection from "./SideBarSection";
 import CanvasSection from "./CanvasSection";
 import PrintButton from "./PrintButton";
@@ -58,6 +67,11 @@ export default function InvoiceCalibrationPage() {
     ],
   });
 
+  const [invoiceNumberSeries, setInvoiceNumberSeries] = useState({
+    currentNumber: "",
+    prefix: "",
+  });
+
   const {
     data: invoiceTemplateData,
     isLoading,
@@ -65,6 +79,17 @@ export default function InvoiceCalibrationPage() {
     error,
     refetch,
   } = useGetInvoiceTemplateQuery({
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+  });
+
+  const {
+    data: invoiceNumberSeriesData,
+    isLoading: isLoadingInvoiceNumberSeries,
+    isError: isErrorInvoiceNumberSeries,
+    error: errorInvoiceNumberSeries,
+    refetch: refetchInvoiceNumberSeries,
+  } = useGetInvoiceNumberSeriesQuery({
     refetchOnMountOrArgChange: true,
     refetchOnFocus: true,
   });
@@ -108,7 +133,14 @@ export default function InvoiceCalibrationPage() {
         });
       }
     }
-  }, [invoiceTemplateData]);
+
+    if (invoiceNumberSeriesData?.success && invoiceNumberSeriesData?.data) {
+      setInvoiceNumberSeries({
+        currentNumber: invoiceNumberSeriesData.data.currentNumber,
+        prefix: invoiceNumberSeriesData.data.prefix ?? "",
+      });
+    }
+  }, [invoiceTemplateData, invoiceNumberSeriesData]);
 
   // x and y value from draggable is already a number and in px
   const handleStop = (e, data, id) => {
@@ -138,6 +170,10 @@ export default function InvoiceCalibrationPage() {
       updatedCols[index][key] = value;
       return { ...prev, columns: updatedCols };
     });
+  };
+
+  const handleInvoiceNumberSeriesChange = (name, value) => {
+    setInvoiceNumberSeries((prev) => ({ ...prev, [name]: value }));
   };
 
   const [saveInvoiceTemplate, { isLoading: isSavingTemplate }] =
@@ -188,7 +224,38 @@ export default function InvoiceCalibrationPage() {
     }
   };
 
-  if (isLoading) {
+  const [saveInvoiceNumberSeries, { isLoading: isSavingNumberSeries }] =
+    useSaveInvoiceNumberSeriesMutation();
+
+  const handleSaveInvoiceNumberSeries = async () => {
+    try {
+      if (!invoiceNumberSeries.currentNumber) {
+        throw new Error("Invoice Number Series Entry Point is required", 400);
+      }
+      const res = await saveInvoiceNumberSeries(invoiceNumberSeries).unwrap();
+
+      dispatch(
+        setShowSnackbar({
+          severity: "success",
+          message:
+            res.message ||
+            "Invoice number series entry point saved successfully",
+        })
+      );
+    } catch (error) {
+      dispatch(
+        setShowSnackbar({
+          severity: "error",
+          message:
+            error.data?.message ||
+            error.message ||
+            "Failed to save invoice number series entry point",
+        })
+      );
+    }
+  };
+
+  if (isLoading || isLoadingInvoiceNumberSeries) {
     return (
       <div className="h-full flex items-center justify-center">
         <LoadingSpinner />
@@ -196,15 +263,24 @@ export default function InvoiceCalibrationPage() {
     );
   }
 
-  if (isError || !invoiceTemplateData) {
+  if (
+    isError ||
+    !invoiceTemplateData ||
+    isErrorInvoiceNumberSeries ||
+    !invoiceNumberSeriesData
+  ) {
     return (
       <ErrorMessage
         message={
-          error?.data?.message ||
-          error?.error ||
-          "Failed to load invoice template"
+          error
+            ? error?.data?.message ||
+              error?.error ||
+              "Failed to load invoice template"
+            : errorInvoiceNumberSeries?.data?.message ||
+              errorInvoiceNumberSeries?.error ||
+              "Failed to load invoice number series"
         }
-        onRetry={refetch}
+        onRetry={isError ? refetch : refetchInvoiceNumberSeries}
       />
     );
   }
@@ -245,6 +321,68 @@ export default function InvoiceCalibrationPage() {
           <b>SAVE</b> the format and will automatically be used on every invoice
           printing.
         </Typography>
+
+        <Box sx={{ my: 2 }}>
+          {!invoiceNumberSeriesData.success && (
+            <Typography gutterBottom color="warning">
+              Your company does not have Invoice Number Series Entry Point yet.
+              Please provide the invoice number entry point and save to start
+              generating invoices.
+            </Typography>
+          )}
+
+          <span className="flex gap-4">
+            <Typography gutterBottom>
+              Prefix Example: <b>Invoice - </b>
+            </Typography>
+            <Typography gutterBottom>
+              Invoice Number Entry Point Example: <b>12345</b>
+            </Typography>
+          </span>
+
+          <Typography gutterBottom color="primary">
+            Invoice Number Format Result: <b>Invoice - 12345</b>
+          </Typography>
+
+          <Grid container spacing={2}>
+            <Grid item size={{ xs: 12, sm: 2 }}>
+              <TextField
+                label="Prefix (Optional)"
+                type="text"
+                name="prefix"
+                value={invoiceNumberSeries.prefix}
+                onChange={(e) =>
+                  handleInvoiceNumberSeriesChange(e.target.name, e.target.value)
+                }
+                size="small"
+                fullWidth
+              />
+            </Grid>
+
+            <Grid item size={{ xs: 12, sm: 2 }}>
+              <TextField
+                label="Invoice Number Entry Point"
+                type="number"
+                name="currentNumber"
+                value={invoiceNumberSeries.currentNumber}
+                onChange={(e) =>
+                  handleInvoiceNumberSeriesChange(e.target.name, e.target.value)
+                }
+                size="small"
+                fullWidth
+              />
+            </Grid>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleSaveInvoiceNumberSeries}
+              loading={isSavingNumberSeries}
+            >
+              Save Invoice Number Entry Point
+            </Button>
+          </Grid>
+        </Box>
+
         <Box sx={{ my: 2, display: "flex", gap: 2 }}>
           <Button
             variant="contained"

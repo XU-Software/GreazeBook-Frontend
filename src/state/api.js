@@ -32,6 +32,7 @@ export const api = createApi({
     "Invoices",
     "Invoice",
     "InvoiceTemplate",
+    "InvoiceNumberSeries",
     "AccountsReceivables",
     "AccountsReceivable",
     "Sales",

@@ -10,32 +10,32 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
+  Typography,
   Button,
 } from "@mui/material";
+import ColoredLink from "@/components/Utils/ColoredLink";
 
-const InvoiceNumberModal = ({ bookingId = "", disabled }) => {
+const InvoiceNumberModal = ({
+  bookingId = "",
+  disabled,
+  invoiceNumberSeriesData,
+}) => {
   const dispatch = useAppDispatch();
 
   // Toggle state of invoice number modal
   const [toggleInvoiceNumberModal, setToggleInvoiceNumberModal] =
     useState(false);
 
-  const [invoiceNumber, setInvoiceNumber] = useState("");
-
   const onClose = () => setToggleInvoiceNumberModal(false);
 
   const [invoiceBooking, { isLoading: isInvoicing }] =
     useInvoiceBookingMutation();
 
-  const handleInvoiceBooking = async (e, bookingId, salesInvoiceNumber) => {
+  const handleInvoiceBooking = async (e, bookingId) => {
     e.preventDefault();
     try {
-      if (!salesInvoiceNumber.trim())
-        throw new Error("Invoice number required", 400);
       const res = await invoiceBooking({
         bookingId,
-        salesInvoiceNumber,
       }).unwrap();
       dispatch(
         setShowSnackbar({
@@ -43,7 +43,6 @@ const InvoiceNumberModal = ({ bookingId = "", disabled }) => {
           message: res.message || "Booking invoiced",
         })
       );
-      setInvoiceNumber("");
       onClose();
     } catch (error) {
       dispatch(
@@ -69,36 +68,60 @@ const InvoiceNumberModal = ({ bookingId = "", disabled }) => {
       </Button>
 
       <Dialog open={toggleInvoiceNumberModal} onClose={onClose}>
-        <DialogTitle>Enter Invoice Number</DialogTitle>
-        <form
-          onSubmit={(e) => handleInvoiceBooking(e, bookingId, invoiceNumber)}
-        >
-          <DialogContent dividers>
-            <TextField
-              autoFocus
-              margin="dense"
-              label="Invoice Number"
-              fullWidth
-              variant="outlined"
-              value={invoiceNumber}
-              onChange={(e) => setInvoiceNumber(e.target.value)}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={onClose} variant="outlined" loading={isInvoicing}>
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              loading={isInvoicing}
-              disabled={!invoiceNumber.trim()}
-            >
-              Confirm
-            </Button>
-          </DialogActions>
-        </form>
+        {invoiceNumberSeriesData.success ? (
+          <>
+            <DialogTitle>Generate And Print Invoice</DialogTitle>
+            <DialogContent dividers>
+              <Typography sx={{ mb: 2 }} textAlign="center">
+                Invoice Number will increment automatically by each invoice
+                generation based on the invoice number entry point provided. You
+                can also change the invoice number entry point in{" "}
+                <ColoredLink
+                  href={`/formats/invoice-calibration`}
+                  linkText="Invoice Number Entry Point."
+                />
+              </Typography>
+              <Typography sx={{ mb: 2 }} textAlign="center">
+                Current Invoice Number to be used:{" "}
+                <b>
+                  {invoiceNumberSeriesData.data.prefix ?? ""}{" "}
+                  {invoiceNumberSeriesData.data.currentNumber}
+                </b>
+              </Typography>
+            </DialogContent>
+          </>
+        ) : (
+          <>
+            <DialogTitle>
+              Please Set The Invoice Number Entry Point first
+            </DialogTitle>
+            <DialogContent dividers>
+              <Typography sx={{ mb: 2 }} textAlign="center" color="warning">
+                Cannot proceed invoice generation. Please set the invoice number
+                entry point first before an invoice be generated. Setup here{" "}
+                <ColoredLink
+                  href={`/formats/invoice-calibration`}
+                  linkText="Invoice Number Entry Point."
+                />
+              </Typography>
+            </DialogContent>
+          </>
+        )}
+
+        <DialogActions>
+          <Button onClick={onClose} variant="outlined" loading={isInvoicing}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={(e) => handleInvoiceBooking(e, bookingId)}
+            loading={isInvoicing}
+            disabled={!invoiceNumberSeriesData.success}
+          >
+            Confirm
+          </Button>
+        </DialogActions>
       </Dialog>
     </>
   );

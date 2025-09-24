@@ -31,10 +31,9 @@ export const invoicesApi = api.injectEndpoints({
     }),
 
     invoiceBooking: build.mutation({
-      query: ({ bookingId, salesInvoiceNumber }) => ({
+      query: ({ bookingId }) => ({
         url: `/invoice/${bookingId}/invoice`,
         method: "POST",
-        body: { salesInvoiceNumber },
         headers: {
           "Content-Type": "application/json",
         },
@@ -43,6 +42,7 @@ export const invoicesApi = api.injectEndpoints({
         { type: "Bookings", id: "LIST" },
         { type: "Booking", id: arg.bookingId },
         { type: "Invoices", id: "LIST" },
+        { type: "InvoiceNumberSeries", id: "SINGLE" },
         { type: "Sales", id: "LIST" },
         { type: "AccountsReceivables", id: "LIST" },
         { type: "Products", id: "LIST" },
@@ -162,6 +162,25 @@ export const invoicesApi = api.injectEndpoints({
       }),
       providesTags: [{ type: "InvoiceTemplate", id: "SINGLE" }],
     }),
+
+    saveInvoiceNumberSeries: build.mutation({
+      query: ({ currentNumber, prefix }) => ({
+        url: `/invoice/invoice-number-series`,
+        method: "POST",
+        body: { currentNumber, prefix },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: [{ type: "InvoiceNumberSeries", id: "SINGLE" }],
+    }),
+
+    getInvoiceNumberSeries: build.query({
+      query: () => ({
+        url: `/invoice/invoice-number-series/fetch`,
+      }),
+      providesTags: [{ type: "InvoiceNumberSeries", id: "SINGLE" }],
+    }),
   }),
 });
 
@@ -172,4 +191,6 @@ export const {
   useCancelInvoiceMutation,
   useSaveInvoiceTemplateMutation,
   useGetInvoiceTemplateQuery,
+  useSaveInvoiceNumberSeriesMutation,
+  useGetInvoiceNumberSeriesQuery,
 } = invoicesApi;

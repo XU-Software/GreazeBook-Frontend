@@ -10,6 +10,7 @@ import {
   useUpdatePendingOrdersMutation,
   useApproveBookingMutation,
 } from "@/state/services/bookingsApi";
+import { useGetInvoiceNumberSeriesQuery } from "@/state/services/invoicesApi";
 import DynamicBreadcrumbs from "@/components/Utils/DynamicBreadcrumbs";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
 import ErrorMessage from "@/components/Utils/ErrorMessage";
@@ -46,6 +47,17 @@ const BookingPage = () => {
     error,
     refetch,
   } = useGetSingleBookingQuery(bookingId, {
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+  });
+
+  const {
+    data: invoiceNumberSeriesData,
+    isLoading: isLoadingInvoiceNumberSeries,
+    isError: isErrorInvoiceNumberSeries,
+    error: errorInvoiceNumberSeries,
+    refetch: refetchInvoiceNumberSeries,
+  } = useGetInvoiceNumberSeriesQuery({
     refetchOnMountOrArgChange: true,
     refetchOnFocus: true,
   });
@@ -202,7 +214,7 @@ const BookingPage = () => {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || isLoadingInvoiceNumberSeries) {
     return (
       <div className="h-full flex items-center justify-center">
         <LoadingSpinner />
@@ -210,13 +222,22 @@ const BookingPage = () => {
     );
   }
 
-  if (isError || !bookingData) {
+  if (
+    isError ||
+    !bookingData ||
+    isErrorInvoiceNumberSeries ||
+    !invoiceNumberSeriesData
+  ) {
     return (
       <ErrorMessage
         message={
-          error?.data?.message || error?.error || "Failed to load booking"
+          error
+            ? error?.data?.message || error?.error || "Failed to load booking"
+            : errorInvoiceNumberSeries?.data?.message ||
+              errorInvoiceNumberSeries?.error ||
+              "Failed to load invoice number series"
         }
-        onRetry={refetch}
+        onRetry={isError ? refetch : refetchInvoiceNumberSeries}
       />
     );
   }
@@ -232,6 +253,7 @@ const BookingPage = () => {
               <GenerateAndPrintInvoiceModal
                 bookingData={bookingData}
                 bookingId={bookingId}
+                invoiceNumberSeriesData={invoiceNumberSeriesData}
                 disabled={
                   bookingData.data.status === "Pending" ||
                   bookingData.data.status === "Invoiced"
@@ -240,6 +262,7 @@ const BookingPage = () => {
               <InvoiceNumberModal
                 bookingData={bookingData}
                 bookingId={bookingId}
+                invoiceNumberSeriesData={invoiceNumberSeriesData}
                 disabled={
                   bookingData.data.status === "Pending" ||
                   bookingData.data.status === "Invoiced"

@@ -470,6 +470,7 @@ export default function SocketListeners({ userData }) {
             { type: "Bookings", id: "LIST" },
             { type: "Booking", id: bookingId },
             { type: "Invoices", id: "LIST" },
+            { type: "InvoiceNumberSeries", id: "SINGLE" },
             { type: "Sales", id: "LIST" },
             { type: "AccountsReceivables", id: "LIST" },
             { type: "Products", id: "LIST" },
@@ -562,6 +563,12 @@ export default function SocketListeners({ userData }) {
       );
     });
 
+    socket.on("invoice_number_series_saved", () => {
+      dispatch(
+        api.util.invalidateTags([{ type: "InvoiceNumberSeries", id: "SINGLE" }])
+      );
+    });
+
     return () => {
       //Accounts
       socket.off("account_added");
@@ -600,6 +607,7 @@ export default function SocketListeners({ userData }) {
       socket.off("booking_invoiced");
       socket.off("invoice_cancel");
       socket.off("invoice_template_saved");
+      socket.off("invoice_number_series_saved");
     };
   }, [dispatch, userId]);
 

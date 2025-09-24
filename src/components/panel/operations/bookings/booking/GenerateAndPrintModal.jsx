@@ -17,6 +17,7 @@ import {
   Button,
   Box,
   Divider,
+  Typography,
 } from "@mui/material";
 import { useReactToPrint } from "react-to-print";
 import LoadingSpinner from "@/components/Utils/LoadingSpinner";
@@ -31,6 +32,7 @@ import ColoredLink from "@/components/Utils/ColoredLink";
 const GenerateAndPrintInvoiceModal = ({
   bookingData,
   bookingId = "",
+  invoiceNumberSeriesData,
   disabled = false,
 }) => {
   const dispatch = useAppDispatch();
@@ -42,8 +44,6 @@ const GenerateAndPrintInvoiceModal = ({
   // Toggle state of invoice number modal
   const [toggleInvoiceAndPrintModal, setToggleInvoiceAndPrintModal] =
     useState(false);
-
-  const [invoiceNumber, setInvoiceNumber] = useState("");
 
   const [message, setMessage] = useState("");
 
@@ -72,8 +72,6 @@ const GenerateAndPrintInvoiceModal = ({
   const handleInvoiceAndPrint = async (e) => {
     e.preventDefault();
 
-    if (!invoiceNumber.trim()) throw new Error("Invoice number required", 400);
-
     if (!invoiceTemplateData?.success || !invoiceTemplateData?.data) {
       setMessage(
         <>
@@ -101,7 +99,6 @@ const GenerateAndPrintInvoiceModal = ({
 
       invoiceBooking({
         bookingId,
-        salesInvoiceNumber: invoiceNumber,
       })
         .unwrap()
         .then((res) => {
@@ -112,7 +109,6 @@ const GenerateAndPrintInvoiceModal = ({
             })
           );
 
-          setInvoiceNumber("");
           onClose();
         })
         .catch((error) => {
@@ -177,8 +173,46 @@ const GenerateAndPrintInvoiceModal = ({
       </Button>
 
       <Dialog open={toggleInvoiceAndPrintModal} onClose={onClose}>
-        <DialogTitle>Enter Invoice Number</DialogTitle>
-        <Divider />
+        {invoiceNumberSeriesData.success ? (
+          <>
+            <DialogTitle>Generate And Print Invoice</DialogTitle>
+            <DialogContent dividers>
+              <Typography sx={{ mb: 2 }} textAlign="center">
+                Invoice Number will increment automatically by each invoice
+                generation based on the invoice number entry point provided. You
+                can also change the invoice number entry point in{" "}
+                <ColoredLink
+                  href={`/formats/invoice-calibration`}
+                  linkText="Invoice Number Entry Point."
+                />
+              </Typography>
+              <Typography sx={{ mb: 2 }} textAlign="center">
+                Current Invoice Number to be used:{" "}
+                <b>
+                  {invoiceNumberSeriesData.data.prefix ?? ""}{" "}
+                  {invoiceNumberSeriesData.data.currentNumber}
+                </b>
+              </Typography>
+            </DialogContent>
+          </>
+        ) : (
+          <>
+            <DialogTitle>
+              Please Set The Invoice Number Entry Point first
+            </DialogTitle>
+            <DialogContent dividers>
+              <Typography sx={{ mb: 2 }} textAlign="center" color="warning">
+                Cannot proceed invoice generation and printing. Please set the
+                invoice number entry point first before an invoice be generated.
+                Setup here{" "}
+                <ColoredLink
+                  href={`/formats/invoice-calibration`}
+                  linkText="Invoice Number Entry Point."
+                />
+              </Typography>
+            </DialogContent>
+          </>
+        )}
 
         {message && (
           <Box
@@ -196,37 +230,24 @@ const GenerateAndPrintInvoiceModal = ({
           </Box>
         )}
 
-        <form onSubmit={handleInvoiceAndPrint}>
-          <DialogContent dividers>
-            <TextField
-              autoFocus
-              margin="dense"
-              label="Invoice Number"
-              fullWidth
-              variant="outlined"
-              value={invoiceNumber}
-              onChange={(e) => setInvoiceNumber(e.target.value)}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button
-              onClick={onClose}
-              variant="outlined"
-              loading={isInvoicing || isLoading}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              loading={isInvoicing || isLoading}
-              disabled={!invoiceNumber.trim()}
-            >
-              Confirm
-            </Button>
-          </DialogActions>
-        </form>
+        <DialogActions>
+          <Button
+            onClick={onClose}
+            variant="outlined"
+            loading={isInvoicing || isLoading}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleInvoiceAndPrint}
+            loading={isInvoicing || isLoading}
+            disabled={!invoiceNumberSeriesData.success}
+          >
+            Confirm
+          </Button>
+        </DialogActions>
       </Dialog>
 
       {invoiceTemplateData?.success && invoiceTemplateData?.data && (
