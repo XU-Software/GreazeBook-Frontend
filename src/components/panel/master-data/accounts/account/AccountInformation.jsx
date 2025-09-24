@@ -40,6 +40,7 @@ const AccountInformation = ({
     accountName,
     tradeType,
     location,
+    municipality,
     dsp,
     contactInformation,
     createdAt,
@@ -243,6 +244,26 @@ const AccountInformation = ({
             editing={editAccount}
             type="text"
             name="location"
+            onChange={(e) =>
+              setAccountFormData((prev) => ({
+                ...prev,
+                [e.target.name]: e.target.value,
+              }))
+            }
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <EditableField
+            label="Municipality"
+            value={
+              accountFormData.municipality !== undefined
+                ? accountFormData.municipality
+                : municipality || ""
+            }
+            editing={editAccount}
+            type="text"
+            name="municipality"
             onChange={(e) =>
               setAccountFormData((prev) => ({
                 ...prev,

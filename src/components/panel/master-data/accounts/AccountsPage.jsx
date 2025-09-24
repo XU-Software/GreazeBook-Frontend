@@ -45,6 +45,11 @@ const columns = [
     minWidth: 150,
   },
   {
+    field: "municipality",
+    headerName: "Municipality",
+    minWidth: 150,
+  },
+  {
     field: "dsp",
     headerName: "DSP",
     minWidth: 150,
@@ -67,6 +72,7 @@ const rowGuide = {
   accountName: "John Doe",
   tradeType: "Trade type",
   location: "Philippines",
+  municipality: "Dasmarinas",
   dsp: "DSP 1",
   contactInformation: "Email or Phone number",
 };
@@ -86,6 +92,11 @@ const columnsGuide = [
   {
     field: "location",
     headerName: "Location",
+    type: "text",
+  },
+  {
+    field: "municipality",
+    headerName: "Municipality",
     type: "text",
   },
   {
@@ -238,6 +249,7 @@ const AccountsPage = () => {
         accountName: acc.accountName,
         tradeType: acc.tradeType,
         location: acc.location,
+        municipality: acc.municipality,
         dsp: acc.dsp,
         contactInformation: acc.contactInformation,
         createdAt: formattedDate,
@@ -248,6 +260,7 @@ const AccountsPage = () => {
         "Account Name": acc.accountName,
         "Trade Type": acc.tradeType,
         Location: acc.location,
+        Municipality: acc.municipality,
         DSP: acc.dsp,
         "Contact Information": acc.contactInformation,
         "Created At": formattedDate,
@@ -296,6 +309,7 @@ const AccountsPage = () => {
                 accountName: "",
                 tradeType: "",
                 location: "",
+                municipality: "",
                 dsp: "",
                 contactInformation: "",
               }}
