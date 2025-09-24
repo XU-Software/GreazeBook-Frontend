@@ -153,14 +153,14 @@ export const invoicesApi = api.injectEndpoints({
         },
       }),
 
-      invalidatesTags: ["InvoiceTemplate"],
+      invalidatesTags: [{ type: "InvoiceTemplate", id: "SINGLE" }],
     }),
 
     getInvoiceTemplate: build.query({
       query: () => ({
         url: `/invoice/invoice-template/fetch`,
       }),
-      providesTags: ["InvoiceTemplate"],
+      providesTags: [{ type: "InvoiceTemplate", id: "SINGLE" }],
     }),
   }),
 });

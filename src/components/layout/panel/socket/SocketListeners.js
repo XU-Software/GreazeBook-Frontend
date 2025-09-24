@@ -556,6 +556,12 @@ export default function SocketListeners({ userData }) {
       }
     );
 
+    socket.on("invoice_template_saved", () => {
+      dispatch(
+        api.util.invalidateTags([{ type: "InvoiceTemplate", id: "SINGLE" }])
+      );
+    });
+
     return () => {
       //Accounts
       socket.off("account_added");
@@ -593,6 +599,7 @@ export default function SocketListeners({ userData }) {
       //Invoices
       socket.off("booking_invoiced");
       socket.off("invoice_cancel");
+      socket.off("invoice_template_saved");
     };
   }, [dispatch, userId]);
 
