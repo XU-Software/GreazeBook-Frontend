@@ -302,29 +302,34 @@ const AccountsPage = () => {
             Number of Accounts: {formatNumber(accountsData?.total)}
           </Typography>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
-            <AddRowButton
-              columns={columnsGuide}
-              initialValues={{
-                customerNumber: "",
-                accountName: "",
-                tradeType: "",
-                location: "",
-                municipality: "",
-                dsp: "",
-                contactInformation: "",
-              }}
-              isLoading={isAdding}
-              onSubmit={handleAddSingleAccount}
-              title="Add New Account"
-              buttonLabel="Account"
-              startIcon={<Add />}
-            />
-            <ImportExcel
-              handleImportExcel={handleImportAccountsExcel}
-              isImporting={isImporting}
-              rowGuide={rowGuide}
-              columnsGuide={columnsGuide}
-            />
+            {(role === "admin" || role === "superadmin") && (
+              <>
+                <AddRowButton
+                  columns={columnsGuide}
+                  initialValues={{
+                    customerNumber: "",
+                    accountName: "",
+                    tradeType: "",
+                    location: "",
+                    municipality: "",
+                    dsp: "",
+                    contactInformation: "",
+                  }}
+                  isLoading={isAdding}
+                  onSubmit={handleAddSingleAccount}
+                  title="Add New Account"
+                  buttonLabel="Account"
+                  startIcon={<Add />}
+                />
+                <ImportExcel
+                  handleImportExcel={handleImportAccountsExcel}
+                  isImporting={isImporting}
+                  rowGuide={rowGuide}
+                  columnsGuide={columnsGuide}
+                />
+              </>
+            )}
+
             <ExportExcel
               exportData={exportData}
               fileName="accounts"
