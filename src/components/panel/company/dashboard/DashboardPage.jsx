@@ -137,6 +137,9 @@ const DashboardPage = () => {
         />
       </Box>
 
+      <Typography variant="h6" gutterBottom>
+        Margin Computation
+      </Typography>
       <Grid container spacing={2} mb={4} justifyContent="center">
         <Grid
           item
