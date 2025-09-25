@@ -13,6 +13,12 @@ import {
   Typography,
   Tooltip,
   IconButton,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
 } from "@mui/material";
 import { Check, Close, Edit } from "@mui/icons-material";
 import DashboardTable from "./DashboardTable";
@@ -131,14 +137,71 @@ const DashboardPage = () => {
         />
       </Box>
 
+      <Grid container spacing={2} mb={4} justifyContent="center">
+        <Grid
+          item
+          size={{ xs: 12, sm: 4 }}
+          component={Paper}
+          elevation={2}
+          padding={2}
+          textAlign="center"
+        >
+          <Typography variant="h6">Total Sales</Typography>
+          <Typography variant="h5" padding={2}>
+            {dashboardState.data
+              ? formatToLocalCurrency(
+                  dashboardState.data?.marginComputation?.totalSales || 0
+                )
+              : "Filter date first."}
+          </Typography>
+        </Grid>
+
+        <Grid
+          item
+          size={{ xs: 12, sm: 4 }}
+          component={Paper}
+          elevation={2}
+          padding={2}
+          textAlign="center"
+        >
+          <Typography variant="h6">Cost Of Goods Sold</Typography>
+          <Typography variant="h5" padding={2}>
+            {dashboardState.data
+              ? formatToLocalCurrency(
+                  dashboardState.data?.marginComputation
+                    ?.totalAcquisitionCost || 0
+                )
+              : "Filter date first."}
+          </Typography>
+        </Grid>
+
+        <Grid
+          item
+          size={{ xs: 12, sm: 4 }}
+          component={Paper}
+          elevation={2}
+          padding={2}
+          textAlign="center"
+        >
+          <Typography variant="h6">Margin</Typography>
+          <Typography variant="h5" padding={2}>
+            {dashboardState.data
+              ? formatToLocalCurrency(
+                  dashboardState.data?.marginComputation?.totalMargin || 0
+                )
+              : "Filter date first."}
+          </Typography>
+        </Grid>
+      </Grid>
+
       <Grid container spacing={2} mb={4}>
         {/* SALES */}
         <Grid item size={{ xs: 12, md: 6, lg: 6 }}>
           <DashboardTable
-            title="Sales"
+            title="Sales Volume"
             columns={[
               { field: "dsp", headerName: "DSP NAME" },
-              { field: "salesToTrade", headerName: "SALES-TO-TRADE" },
+              { field: "salesToTrade", headerName: "SALES-TO-TRADE (VOLUME)" },
               {
                 field: "oplan",
                 headerName: (
