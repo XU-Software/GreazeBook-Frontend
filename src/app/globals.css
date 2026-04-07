@@ -50,3 +50,99 @@ body,
 @theme {
   --color-primary: #0d9488;
 }
+
+/* --- ADDED CONTENT BELOW --- */
+
+/* @import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap"); */
+
+@theme inline {
+  --font-syne: "Syne", sans-serif;
+  --font-dm: "DM Sans", sans-serif;
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+}
+
+:root {
+  --card: #ffffff;
+  --card-foreground: hsl(213 56% 15%);
+  --popover: #ffffff;
+  --popover-foreground: hsl(213 56% 15%);
+  --primary: hsl(210 79% 46%);
+  --primary-foreground: #ffffff;
+  --secondary: hsl(207 89% 94%);
+  --secondary-foreground: hsl(213 56% 15%);
+  --muted: hsl(210 40% 96%);
+  --muted-foreground: hsl(215 16% 47%);
+  --accent: hsl(207 90% 61%);
+  --accent-foreground: #ffffff;
+  --destructive: hsl(0 84.2% 60.2%);
+  --destructive-foreground: hsl(0 0% 98%);
+  --border: hsl(214 32% 91%);
+  --input: hsl(214 32% 91%);
+  --ring: hsl(210 79% 46%);
+  --radius: 0.625rem;
+}
+
+.dark {
+  --card: hsl(213 56% 10%);
+  --card-foreground: hsl(0 0% 98%);
+  --popover: hsl(213 56% 10%);
+  --popover-foreground: hsl(0 0% 98%);
+  --primary: hsl(210 79% 46%);
+  --secondary: hsl(213 56% 15%);
+  --secondary-foreground: hsl(0 0% 98%);
+  --muted: hsl(213 56% 15%);
+  --muted-foreground: hsl(215 20% 65%);
+  --accent: hsl(207 90% 61%);
+  --border: hsl(213 56% 20%);
+  --input: hsl(213 56% 20%);
+  --ring: hsl(210 79% 46%);
+}
+
+/* Apply new border and outline logic globally */
+*,
+*::before,
+*::after {
+  border-color: var(--border);
+  outline-color: color-mix(in srgb, var(--ring) 50%, transparent);
+}
