@@ -136,6 +136,7 @@ export default function PublicNavbar() {
             <div className="gb-logo-icon">
               <OpacityIcon sx={{ color: "white", fontSize: 18 }} />
             </div>
+
             <span className="gb-logo-text">GreazeBook</span>
           </Link>
 
